@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r372 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r372%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609231926.k8NJQtSM026142%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000157.html">
+   <LINK REL="Next"  HREF="000159.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r372 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r372%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609231926.k8NJQtSM026142%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r372 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 23 21:26:55 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000157.html">[Wl530g-svncheckins] r371 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000159.html">[Wl530g-svncheckins] r373 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-23 21:26:53 +0200 (Sat, 23 Sep 2006)
+New Revision: 372
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+Log:
+cleanup
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-23 19:11:20 UTC (rev 371)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-23 19:26:53 UTC (rev 372)
+@@ -582,19 +582,6 @@
+ 	if (restore_defaults)
+ 		cprintf(&quot;Restoring defaults...&quot;);
+ 
+-#ifdef REMOVE
+-	/* Delete dynamically generated variables */
+-	if (restore_defaults) {
+-		char tmp[100], prefix[] = &quot;wlXXXXXXXXXX_&quot;;
+-		for (i = 0; i &lt; MAX_NVPARSE; i++) {
+-			del_filter_client(i);
+-			del_forward_port(i);
+-			del_autofw_port(i);
+-			snprintf(prefix, sizeof(prefix), &quot;wl%d_&quot;, i);
+-			nvram_unset(strcat_r(prefix, &quot;ifname&quot;, tmp));
+-		}
+-	}
+-#endif
+ 	/* Restore defaults */
+ 	for (t = router_defaults; t-&gt;name; t++) {
+ 		if (restore_defaults || !nvram_get(t-&gt;name)) {
+@@ -928,7 +915,9 @@
+ 
+ 	/* Setup console */
+ 	if (console_init())
++	{
+ 		noconsole = 1;
++	}
+ 	klogctl(8, NULL, atoi(nvram_safe_get(&quot;console_loglevel&quot;)));
+ 
+ 	/* Modules */
+@@ -1259,22 +1248,7 @@
+ 		}
+ 	}
+ 
+-	/* hotplug [event] */
+-	else if (strstr(base, &quot;hotplug&quot;)) {
+-		if (argc &gt;= 2) {
+-			if (!strcmp(argv[1], &quot;net&quot;))
+-				return hotplug_net();
+ #ifdef ASUS_EXT
+-			else if(!strcmp(argv[1], &quot;usb&quot;))
+-				return hotplug_usb();
+-#endif
+-		} else {
+-			fprintf(stderr, &quot;usage: hotplug [event]\n&quot;);
+-			return EINVAL;
+-		}
+-	}
+-
+-#ifdef ASUS_EXT
+ 	/* stop all service */
+ 	else if (strstr(base, &quot;stopservice&quot;)) {
+ 		return stop_service_main();
+@@ -1291,33 +1265,10 @@
+ 	else if (strstr(base, &quot;rgcfg&quot;)) {
+ 		return rgcfg_main(argc, argv);
+ 	}
+-#ifdef REMOVE
+-	/* send alarm */
+-	else if (strstr(base, &quot;sendalarm&quot;)) {
+-		if (argc &gt;= 1)
+-			return sendalarm_main(argc, argv);
+-		else {
+-			fprintf(stderr, &quot;usage: sendalarm\n&quot;);
+-			return EINVAL;
+-		}
+-	}
+-#endif
+ 	/* invoke watchdog */
+ 	else if (strstr(base, &quot;watchdog&quot;)) {
+ 		return(watchdog_main());
+ 	}
+-#ifdef REMOVE
+-	/* remove webcam module */
+-	else if (strstr(base, &quot;rmwebcam&quot;)) {
+-		if (argc &gt;= 2)
+-			return (remove_webcam_main(atoi(argv[1])));
+-		else return EINVAL;
+-	}
+-	/* remove usbstorage module */
+-	else if (strstr(base, &quot;rmstorage&quot;)) {
+-		return (remove_storage_main());
+-	}
+-#endif
+ 	/* run ntp client */
+ 	else if (strstr(base, &quot;ntp&quot;)) {
+ 		return (ntp_main());
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000157.html">[Wl530g-svncheckins] r371 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000159.html">[Wl530g-svncheckins] r373 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

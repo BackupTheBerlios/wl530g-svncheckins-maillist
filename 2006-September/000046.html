@@ -1,0 +1,519 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r260 - trunk/firmware_files/rootfs/usr/bin
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r260%20-%20trunk/firmware_files/rootfs/usr/bin&In-Reply-To=%3C200609172106.k8HL6KoE011820%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000045.html">
+   <LINK REL="Next"  HREF="000047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r260 - trunk/firmware_files/rootfs/usr/bin</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r260%20-%20trunk/firmware_files/rootfs/usr/bin&In-Reply-To=%3C200609172106.k8HL6KoE011820%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r260 - trunk/firmware_files/rootfs/usr/bin">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 23:06:20 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000045.html">[Wl530g-svncheckins] r259 - trunk/firmware_files/rootfs/bin
+</A></li>
+        <LI>Next message: <A HREF="000047.html">[Wl530g-svncheckins] r261 - trunk/firmware_files/rootfs/usr/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-17 23:05:33 +0200 (Sun, 17 Sep 2006)
+New Revision: 260
+
+Removed:
+   trunk/firmware_files/rootfs/usr/bin/[
+   trunk/firmware_files/rootfs/usr/bin/[[
+   trunk/firmware_files/rootfs/usr/bin/awk
+   trunk/firmware_files/rootfs/usr/bin/basename
+   trunk/firmware_files/rootfs/usr/bin/clear
+   trunk/firmware_files/rootfs/usr/bin/cmp
+   trunk/firmware_files/rootfs/usr/bin/crontab
+   trunk/firmware_files/rootfs/usr/bin/cut
+   trunk/firmware_files/rootfs/usr/bin/dirname
+   trunk/firmware_files/rootfs/usr/bin/du
+   trunk/firmware_files/rootfs/usr/bin/env
+   trunk/firmware_files/rootfs/usr/bin/expr
+   trunk/firmware_files/rootfs/usr/bin/find
+   trunk/firmware_files/rootfs/usr/bin/fold
+   trunk/firmware_files/rootfs/usr/bin/free
+   trunk/firmware_files/rootfs/usr/bin/ftpget
+   trunk/firmware_files/rootfs/usr/bin/ftpput
+   trunk/firmware_files/rootfs/usr/bin/head
+   trunk/firmware_files/rootfs/usr/bin/hexdump
+   trunk/firmware_files/rootfs/usr/bin/killall
+   trunk/firmware_files/rootfs/usr/bin/length
+   trunk/firmware_files/rootfs/usr/bin/logger
+   trunk/firmware_files/rootfs/usr/bin/logname
+   trunk/firmware_files/rootfs/usr/bin/md5sum
+   trunk/firmware_files/rootfs/usr/bin/mesg
+   trunk/firmware_files/rootfs/usr/bin/nc
+   trunk/firmware_files/rootfs/usr/bin/nslookup
+   trunk/firmware_files/rootfs/usr/bin/printf
+   trunk/firmware_files/rootfs/usr/bin/rdate
+   trunk/firmware_files/rootfs/usr/bin/realpath
+   trunk/firmware_files/rootfs/usr/bin/seq
+   trunk/firmware_files/rootfs/usr/bin/sort
+   trunk/firmware_files/rootfs/usr/bin/tail
+   trunk/firmware_files/rootfs/usr/bin/tee
+   trunk/firmware_files/rootfs/usr/bin/telnet
+   trunk/firmware_files/rootfs/usr/bin/test
+   trunk/firmware_files/rootfs/usr/bin/tftp
+   trunk/firmware_files/rootfs/usr/bin/time
+   trunk/firmware_files/rootfs/usr/bin/tr
+   trunk/firmware_files/rootfs/usr/bin/traceroute
+   trunk/firmware_files/rootfs/usr/bin/uniq
+   trunk/firmware_files/rootfs/usr/bin/uptime
+   trunk/firmware_files/rootfs/usr/bin/uudecode
+   trunk/firmware_files/rootfs/usr/bin/uuencode
+   trunk/firmware_files/rootfs/usr/bin/wc
+   trunk/firmware_files/rootfs/usr/bin/wget
+   trunk/firmware_files/rootfs/usr/bin/which
+   trunk/firmware_files/rootfs/usr/bin/whoami
+   trunk/firmware_files/rootfs/usr/bin/xargs
+   trunk/firmware_files/rootfs/usr/bin/yes
+Log:
+filesystem image updates
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/[
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/[	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/[	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/[[
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/[[	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/[[	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/awk
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/awk	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/awk	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/basename
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/basename	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/basename	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/clear
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/clear	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/clear	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/cmp
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/cmp	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/cmp	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/crontab
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/crontab	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/crontab	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/cut
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/cut	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/cut	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/dirname
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/dirname	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/dirname	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/du
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/du	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/du	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/env
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/env	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/env	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/expr
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/expr	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/expr	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/find
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/find	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/find	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/fold
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/fold	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/fold	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/free
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/free	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/free	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/ftpget
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/ftpget	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/ftpget	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/ftpput
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/ftpput	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/ftpput	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/head
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/head	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/head	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/hexdump
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/hexdump	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/hexdump	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/killall
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/killall	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/killall	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/length
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/length	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/length	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/logger
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/logger	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/logger	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/logname
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/logname	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/logname	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/md5sum
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/md5sum	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/md5sum	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/mesg
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/mesg	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/mesg	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/nc
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/nc	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/nc	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/nslookup
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/nslookup	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/nslookup	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/printf
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/printf	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/printf	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/rdate
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/rdate	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/rdate	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/realpath
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/realpath	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/realpath	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/seq
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/seq	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/seq	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/sort
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/sort	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/sort	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/tail
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/tail	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/tail	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/tee
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/tee	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/tee	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/telnet
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/telnet	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/telnet	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/test
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/test	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/test	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/tftp
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/tftp	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/tftp	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/time
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/time	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/time	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/tr
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/tr	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/tr	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/traceroute
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/traceroute	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/traceroute	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/uniq
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/uniq	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/uniq	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/uptime
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/uptime	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/uptime	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/uudecode
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/uudecode	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/uudecode	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/uuencode
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/uuencode	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/uuencode	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/wc
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/wc	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/wc	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/wget
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/wget	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/wget	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/which
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/which	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/which	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/whoami
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/whoami	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/whoami	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/xargs
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/xargs	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/xargs	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+Deleted: trunk/firmware_files/rootfs/usr/bin/yes
+===================================================================
+--- trunk/firmware_files/rootfs/usr/bin/yes	2006-09-17 21:01:06 UTC (rev 259)
++++ trunk/firmware_files/rootfs/usr/bin/yes	2006-09-17 21:05:33 UTC (rev 260)
+@@ -1 +0,0 @@
+-link ../../bin/busybox
+\ No newline at end of file
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000045.html">[Wl530g-svncheckins] r259 - trunk/firmware_files/rootfs/bin
+</A></li>
+	<LI>Next message: <A HREF="000047.html">[Wl530g-svncheckins] r261 - trunk/firmware_files/rootfs/usr/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

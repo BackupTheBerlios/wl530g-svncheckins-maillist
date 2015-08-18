@@ -1,0 +1,32 @@
+From jcollake at mail.berlios.de  Sun Aug  3 21:17:57 2008
+From: jcollake at mail.berlios.de (jcollake at mail.berlios.de)
+Date: Sun, 3 Aug 2008 21:17:57 +0200
+Subject: [Wl530g-svncheckins] r404 -
+	trunk/Marvell/Src/uClinux-dist/user/ez-ipupdate
+Message-ID: <200808031917.m73JHvYs002676@sheep.berlios.de>
+
+Author: jcollake
+Date: 2008-08-03 21:17:54 +0200 (Sun, 03 Aug 2008)
+New Revision: 404
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user/ez-ipupdate/ez-ipupdate.c
+Log:
+change default ez-ipupdate dyndns server for zoneedit - thanks to Qiu Yu.
+
+Modified: trunk/Marvell/Src/uClinux-dist/user/ez-ipupdate/ez-ipupdate.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/ez-ipupdate/ez-ipupdate.c	2006-10-13 19:00:06 UTC (rev 403)
++++ trunk/Marvell/Src/uClinux-dist/user/ez-ipupdate/ez-ipupdate.c	2008-08-03 19:17:54 UTC (rev 404)
+@@ -102,7 +102,7 @@
+ #define HN_DEFAULT_PORT "80"
+ #define HN_REQUEST "/vanity/update"
+ 
+-#define ZONEEDIT_DEFAULT_SERVER "www.zoneedit.com"
++#define ZONEEDIT_DEFAULT_SERVER "dynamic.zoneedit.com"
+ #define ZONEEDIT_DEFAULT_PORT "80"
+ #define ZONEEDIT_REQUEST "/auth/dynamic.html"
+ 
+
+
+

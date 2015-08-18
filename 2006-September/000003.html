@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r217 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r217%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609160024.k8G0OkiX001462%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000002.html">
+   <LINK REL="Next"  HREF="000004.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r217 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r217%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609160024.k8G0OkiX001462%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r217 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 02:24:46 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000002.html">[Wl530g-svncheckins] r216 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000004.html">[Wl530g-svncheckins] r218 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-16 02:24:43 +0200 (Sat, 16 Sep 2006)
+New Revision: 217
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+Log:
+added many new nvram variables to set more hostapd.conf options.
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-15 23:33:06 UTC (rev 216)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-16 00:24:43 UTC (rev 217)
+@@ -180,8 +180,11 @@
+ 	FILE *fp;
+ 	char *tmpstr;
+ 	int mode;
+-	char szBuffer[64];	
+ 
++#define WL_NVRAM_VALUE_BUFFER_SIZE 64	
++
++	char szBuffer[WL_NVRAM_VALUE_BUFFER_SIZE];	
++
+ 	// create hostapd.conf
+ 	fp=fopen(&quot;/tmp/hostapd.conf&quot;,&quot;w&quot;);
+ 	if (fp==NULL)
+@@ -191,22 +194,33 @@
+ 
+ 	if (HAVE_MFG_DATA) fprintf(fp, &quot;manuf_file=%s\n&quot;, MFG_DEV);
+ 	else fprintf(fp, &quot;manuf_file=/etc/mfg_data\n&quot;);
+-	fprintf(fp, &quot;interface=wlan0\n&quot;);
+-	fprintf(fp, &quot;logger_syslog=-1\n&quot;);
+-	fprintf(fp, &quot;logger_syslog_level=4\n&quot;);	
+-	fprintf(fp, &quot;logger_stdout=-1\n&quot;);	
+-	fprintf(fp, &quot;logger_stdout_level=4\n&quot;);	
+-	fprintf(fp, &quot;debug=0\n&quot;);
+-	fprintf(fp, &quot;dump_file=/tmp/hostapd.dump\n&quot;);	
+-	fprintf(fp, &quot;daemonize=1\n&quot;);
++	fprintf(fp, &quot;interface=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_interface&quot;,&quot;wlan0&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));	
++	fprintf(fp, &quot;logger_syslog=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_logger_syslog&quot;,&quot;-1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));	
++	fprintf(fp, &quot;logger_syslog_level=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_logger_syslog_level&quot;,&quot;4&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));	
++	fprintf(fp, &quot;logger_stdout=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_logger_stdout&quot;,&quot;-1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;logger_stdout_level=%s\n&quot;,	\
++		nvram_safe_get_with_default(&quot;wl_logger_stdout_level&quot;,&quot;4&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;debug=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_debug&quot;,&quot;0&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;dump_file=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_dump_file&quot;,&quot;/tmp/hostapd.dump&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;daemonize=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_daemonize&quot;,&quot;1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
+ 
+ #ifdef WPA2 // Those setting starts from V2.0
+ 	if (nvram_match(&quot;wl_radio_x&quot;, &quot;1&quot;))
+ 		fprintf(fp, &quot;wireless_enable=1\n&quot;);
+ 	else fprintf(fp, &quot;wireless_enable=0\n&quot;);
+-	fprintf(fp, &quot;auto_link=0\n&quot;);
+-	fprintf(fp, &quot;ssid_patch=0\n&quot;);
+-	fprintf(fp, &quot;speed_booster=0\n&quot;);
++	fprintf(fp, &quot;auto_link=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_auto_link&quot;,&quot;0&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;ssid_patch=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_ssid_patch&quot;,&quot;0&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
++	fprintf(fp, &quot;speed_booster=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_speed_boster&quot;,&quot;0&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
+ #endif
+ 
+ 	if (nvram_match(&quot;wl_gmode&quot;, &quot;1&quot;)) //Auto
+@@ -258,7 +272,8 @@
+ 		fprintf(fp, &quot;g_protect=0\n&quot;);
+ 	}
+ 		
+-	fprintf(fp, &quot;iw_mode=%s\n&quot;,nvram_safe_get_with_default(&quot;iw_mode&quot;,&quot;3&quot;,szBuffer,sizeof(szBuffer)));	
++	fprintf(fp, &quot;iw_mode=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;iw_mode&quot;,&quot;3&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));	
+ 
+ 	if (nvram_match(&quot;wl_rate&quot;, &quot;0&quot;))
+ 	{
+@@ -314,13 +329,18 @@
+ 	fprintf(fp, &quot;dtim_period=%s\n&quot;, nvram_safe_get(&quot;wl_dtim&quot;)); 	
+ 	fprintf(fp, &quot;rts_threshold=%s\n&quot;, nvram_safe_get(&quot;wl_rts&quot;)); 		
+ 	fprintf(fp, &quot;fragment_threshold=%s\n&quot;, nvram_safe_get(&quot;wl_frag&quot;)); 	
+-	fprintf(fp, &quot;short_retry_limit=7\n&quot;); 		
+-	fprintf(fp, &quot;long_retry_limit=4\n&quot;);	
+-	fprintf(fp, &quot;current_tx_power_level=1\n&quot;);	
+-	fprintf(fp, &quot;short_preamble=1\n&quot;); 			
++	fprintf(fp, &quot;short_retry_limit=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_short_retry_limit&quot;,&quot;7&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));		
++	fprintf(fp, &quot;long_retry_limit=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_long_retry_limit&quot;,&quot;4&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));		
++	fprintf(fp, &quot;current_tx_power_level=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_current_tx_power_level&quot;,&quot;1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));			
++	fprintf(fp, &quot;short_preamble=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_short_preamble&quot;,&quot;1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));	
+ 	fprintf(fp, &quot;channel=%s\n&quot;, nvram_safe_get(&quot;wl_channel&quot;)); 		
+ 	fprintf(fp, &quot;hide_ssid=%s\n&quot;, nvram_safe_get(&quot;wl_closed&quot;)); 	
+-	fprintf(fp, &quot;minimal_eap=0\n&quot;);
++	fprintf(fp, &quot;minimal_eap=%s\n&quot;, \
++		nvram_safe_get_with_default(&quot;wl_minimal_eap&quot;,&quot;1&quot;,szBuffer,WL_NVRAM_VALUE_BUFFER_SIZE));
+ 		
+ 	if (nvram_match(&quot;wl_auth_mode&quot;,&quot;shared&quot;))
+ 	{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000002.html">[Wl530g-svncheckins] r216 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000004.html">[Wl530g-svncheckins] r218 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

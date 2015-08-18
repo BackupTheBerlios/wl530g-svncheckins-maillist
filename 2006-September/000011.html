@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r225 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r225%20-%20trunk&In-Reply-To=%3C200609161655.k8GGt5AV018019%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000009.html">
+   <LINK REL="Next"  HREF="000012.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r225 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r225%20-%20trunk&In-Reply-To=%3C200609161655.k8GGt5AV018019%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r225 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 18:55:05 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000009.html">[Wl530g-svncheckins] r224 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000012.html">[Wl530g-svncheckins] r226 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-16 18:55:02 +0200 (Sat, 16 Sep 2006)
+New Revision: 225
+
+Modified:
+   trunk/readme.txt
+Log:
+more edits
+
+
+Modified: trunk/readme.txt
+===================================================================
+--- trunk/readme.txt	2006-09-16 14:55:28 UTC (rev 224)
++++ trunk/readme.txt	2006-09-16 16:55:02 UTC (rev 225)
+@@ -11,11 +11,25 @@
+ 
+ HowTo compile your own packages and/or kernel:
+ 
+-1.) Follow the instructios in Marvell/ReadMe.txt but put built files in the
+-    above mentioned directory instead of the 'filesystem' directory it
+-    mentions.
+-2.) The kernel can be replaced by storing the new zImage as 
++1.) Download and install toolchains:
++     wget <A HREF="http://ftp.snapgear.org/pub/snapgear/tools/arm-elf/arm-elf-tools-20030314.sh">http://ftp.snapgear.org/pub/snapgear/tools/arm-elf/arm-elf-tools-20030314.sh</A>
++     sh ./arm-elf-tools-20030314.sh
++    If this fails, use dd to extract the tar.gz to / (root).
++2.) Go to Marvell/Src/uClinux-dist.
++3.) Run 'make menuconfig' to configure the kernel and user packages to build.
++4.) Copy built packages the changed into firmware filesystem (firmware_files/rootfs).
++5.) The kernel can be replaced by storing the new zImage as 
+     firmware_files/image_parts/segment1. Note that the size should be
+     &lt;= 0xA0000 bytes.
++6.) Some packages aren't in the primary makefile and can be found in:
++     uClinux-dist/user.asus
++    At present, you must build these packages individually and install 
++    any you want into the firmware filesystem. You should place new packages
++    in the user.asus directory as well.
+ 
++For help, visit the forums. 
++
++I'm happily extending write access to anyone willing to help with development.
++If you are interested, email me. 
++
+ - jeremy collake &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">jeremy.collake at gmail.com</A>&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000009.html">[Wl530g-svncheckins] r224 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000012.html">[Wl530g-svncheckins] r226 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

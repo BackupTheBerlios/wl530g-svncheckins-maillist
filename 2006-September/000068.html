@@ -1,0 +1,1358 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r282 - in trunk/firmware_files/rootfs: bin sbin
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r282%20-%20in%20trunk/firmware_files/rootfs%3A%20bin%20sbin&In-Reply-To=%3C200609180137.k8I1bA8X012424%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000067.html">
+   <LINK REL="Next"  HREF="000069.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r282 - in trunk/firmware_files/rootfs: bin sbin</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r282%20-%20in%20trunk/firmware_files/rootfs%3A%20bin%20sbin&In-Reply-To=%3C200609180137.k8I1bA8X012424%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r282 - in trunk/firmware_files/rootfs: bin sbin">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 03:37:10 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000067.html">[Wl530g-svncheckins] r281 - in trunk/Marvell/Src/uClinux-dist: .	user
+</A></li>
+        <LI>Next message: <A HREF="000069.html">[Wl530g-svncheckins] r283 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 03:33:44 +0200 (Mon, 18 Sep 2006)
+New Revision: 282
+
+Added:
+   trunk/firmware_files/rootfs/bin/[
+   trunk/firmware_files/rootfs/bin/[[
+   trunk/firmware_files/rootfs/bin/arping
+   trunk/firmware_files/rootfs/bin/awk
+   trunk/firmware_files/rootfs/bin/basename
+   trunk/firmware_files/rootfs/bin/busybox
+   trunk/firmware_files/rootfs/bin/cat
+   trunk/firmware_files/rootfs/bin/chmod
+   trunk/firmware_files/rootfs/bin/clear
+   trunk/firmware_files/rootfs/bin/cp
+   trunk/firmware_files/rootfs/bin/crontab
+   trunk/firmware_files/rootfs/bin/cut
+   trunk/firmware_files/rootfs/bin/date
+   trunk/firmware_files/rootfs/bin/dd
+   trunk/firmware_files/rootfs/bin/df
+   trunk/firmware_files/rootfs/bin/dmesg
+   trunk/firmware_files/rootfs/bin/du
+   trunk/firmware_files/rootfs/bin/echo
+   trunk/firmware_files/rootfs/bin/env
+   trunk/firmware_files/rootfs/bin/expr
+   trunk/firmware_files/rootfs/bin/false
+   trunk/firmware_files/rootfs/bin/find
+   trunk/firmware_files/rootfs/bin/fold
+   trunk/firmware_files/rootfs/bin/free
+   trunk/firmware_files/rootfs/bin/grep
+   trunk/firmware_files/rootfs/bin/head
+   trunk/firmware_files/rootfs/bin/kill
+   trunk/firmware_files/rootfs/bin/killall
+   trunk/firmware_files/rootfs/bin/ln
+   trunk/firmware_files/rootfs/bin/logger
+   trunk/firmware_files/rootfs/bin/ls
+   trunk/firmware_files/rootfs/bin/mkdir
+   trunk/firmware_files/rootfs/bin/mkfifo
+   trunk/firmware_files/rootfs/bin/mktemp
+   trunk/firmware_files/rootfs/bin/more
+   trunk/firmware_files/rootfs/bin/mount
+   trunk/firmware_files/rootfs/bin/msh
+   trunk/firmware_files/rootfs/bin/mv
+   trunk/firmware_files/rootfs/bin/nc
+   trunk/firmware_files/rootfs/bin/netstat
+   trunk/firmware_files/rootfs/bin/nslookup
+   trunk/firmware_files/rootfs/bin/pidof
+   trunk/firmware_files/rootfs/bin/ping
+   trunk/firmware_files/rootfs/bin/ps
+   trunk/firmware_files/rootfs/bin/pwd
+   trunk/firmware_files/rootfs/bin/rm
+   trunk/firmware_files/rootfs/bin/rmdir
+   trunk/firmware_files/rootfs/bin/sed
+   trunk/firmware_files/rootfs/bin/seq
+   trunk/firmware_files/rootfs/bin/sh
+   trunk/firmware_files/rootfs/bin/sleep
+   trunk/firmware_files/rootfs/bin/sort
+   trunk/firmware_files/rootfs/bin/strings
+   trunk/firmware_files/rootfs/bin/tail
+   trunk/firmware_files/rootfs/bin/tar
+   trunk/firmware_files/rootfs/bin/tee
+   trunk/firmware_files/rootfs/bin/test
+   trunk/firmware_files/rootfs/bin/tftp
+   trunk/firmware_files/rootfs/bin/time
+   trunk/firmware_files/rootfs/bin/top
+   trunk/firmware_files/rootfs/bin/touch
+   trunk/firmware_files/rootfs/bin/tr
+   trunk/firmware_files/rootfs/bin/traceroute
+   trunk/firmware_files/rootfs/bin/true
+   trunk/firmware_files/rootfs/bin/umount
+   trunk/firmware_files/rootfs/bin/uname
+   trunk/firmware_files/rootfs/bin/uniq
+   trunk/firmware_files/rootfs/bin/uptime
+   trunk/firmware_files/rootfs/bin/usleep
+   trunk/firmware_files/rootfs/bin/wc
+   trunk/firmware_files/rootfs/bin/wget
+   trunk/firmware_files/rootfs/bin/which
+   trunk/firmware_files/rootfs/bin/yes
+   trunk/firmware_files/rootfs/sbin/chroot
+   trunk/firmware_files/rootfs/sbin/crond
+   trunk/firmware_files/rootfs/sbin/ifconfig
+   trunk/firmware_files/rootfs/sbin/insmod
+   trunk/firmware_files/rootfs/sbin/klogd
+   trunk/firmware_files/rootfs/sbin/logread
+   trunk/firmware_files/rootfs/sbin/lsmod
+   trunk/firmware_files/rootfs/sbin/modprobe
+   trunk/firmware_files/rootfs/sbin/pivot_root
+   trunk/firmware_files/rootfs/sbin/rdate
+   trunk/firmware_files/rootfs/sbin/sysctl
+   trunk/firmware_files/rootfs/sbin/syslogd
+   trunk/firmware_files/rootfs/sbin/vconfig
+Log:
+added back busybox 1.2.1 - now the filesystem is all clean and shiny.
+
+
+Added: trunk/firmware_files/rootfs/bin/[
+===================================================================
+--- trunk/firmware_files/rootfs/bin/[	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/[	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/[
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/[[
+===================================================================
+--- trunk/firmware_files/rootfs/bin/[[	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/[[	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/[[
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/arping
+===================================================================
+--- trunk/firmware_files/rootfs/bin/arping	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/arping	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/arping
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/awk
+===================================================================
+--- trunk/firmware_files/rootfs/bin/awk	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/awk	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/awk
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/basename
+===================================================================
+--- trunk/firmware_files/rootfs/bin/basename	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/basename	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/basename
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/busybox
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/busybox
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/firmware_files/rootfs/bin/cat
+===================================================================
+--- trunk/firmware_files/rootfs/bin/cat	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/cat	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/cat
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/chmod
+===================================================================
+--- trunk/firmware_files/rootfs/bin/chmod	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/chmod	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/chmod
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/clear
+===================================================================
+--- trunk/firmware_files/rootfs/bin/clear	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/clear	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/clear
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/cp
+===================================================================
+--- trunk/firmware_files/rootfs/bin/cp	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/cp	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/cp
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/crontab
+===================================================================
+--- trunk/firmware_files/rootfs/bin/crontab	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/crontab	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/crontab
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/cut
+===================================================================
+--- trunk/firmware_files/rootfs/bin/cut	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/cut	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/cut
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/date
+===================================================================
+--- trunk/firmware_files/rootfs/bin/date	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/date	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/date
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/dd
+===================================================================
+--- trunk/firmware_files/rootfs/bin/dd	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/dd	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/dd
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/df
+===================================================================
+--- trunk/firmware_files/rootfs/bin/df	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/df	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/df
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/dmesg
+===================================================================
+--- trunk/firmware_files/rootfs/bin/dmesg	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/dmesg	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/dmesg
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/du
+===================================================================
+--- trunk/firmware_files/rootfs/bin/du	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/du	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/du
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/echo
+===================================================================
+--- trunk/firmware_files/rootfs/bin/echo	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/echo	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/echo
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/env
+===================================================================
+--- trunk/firmware_files/rootfs/bin/env	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/env	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/env
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/expr
+===================================================================
+--- trunk/firmware_files/rootfs/bin/expr	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/expr	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/expr
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/false
+===================================================================
+--- trunk/firmware_files/rootfs/bin/false	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/false	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/false
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/find
+===================================================================
+--- trunk/firmware_files/rootfs/bin/find	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/find	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/find
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/fold
+===================================================================
+--- trunk/firmware_files/rootfs/bin/fold	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/fold	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/fold
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/free
+===================================================================
+--- trunk/firmware_files/rootfs/bin/free	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/free	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/free
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/grep
+===================================================================
+--- trunk/firmware_files/rootfs/bin/grep	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/grep	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/grep
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/head
+===================================================================
+--- trunk/firmware_files/rootfs/bin/head	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/head	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/head
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/kill
+===================================================================
+--- trunk/firmware_files/rootfs/bin/kill	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/kill	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/kill
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/killall
+===================================================================
+--- trunk/firmware_files/rootfs/bin/killall	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/killall	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/killall
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/ln
+===================================================================
+--- trunk/firmware_files/rootfs/bin/ln	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/ln	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/ln
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/logger
+===================================================================
+--- trunk/firmware_files/rootfs/bin/logger	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/logger	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/logger
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/ls
+===================================================================
+--- trunk/firmware_files/rootfs/bin/ls	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/ls	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/ls
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/mkdir
+===================================================================
+--- trunk/firmware_files/rootfs/bin/mkdir	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/mkdir	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/mkdir
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/mkfifo
+===================================================================
+--- trunk/firmware_files/rootfs/bin/mkfifo	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/mkfifo	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/mkfifo
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/mktemp
+===================================================================
+--- trunk/firmware_files/rootfs/bin/mktemp	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/mktemp	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/mktemp
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/more
+===================================================================
+--- trunk/firmware_files/rootfs/bin/more	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/more	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/more
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/mount
+===================================================================
+--- trunk/firmware_files/rootfs/bin/mount	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/mount	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/mount
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/msh
+===================================================================
+--- trunk/firmware_files/rootfs/bin/msh	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/msh	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/msh
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/mv
+===================================================================
+--- trunk/firmware_files/rootfs/bin/mv	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/mv	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/mv
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/nc
+===================================================================
+--- trunk/firmware_files/rootfs/bin/nc	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/nc	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/nc
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/netstat
+===================================================================
+--- trunk/firmware_files/rootfs/bin/netstat	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/netstat	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/netstat
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/nslookup
+===================================================================
+--- trunk/firmware_files/rootfs/bin/nslookup	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/nslookup	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/nslookup
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/pidof
+===================================================================
+--- trunk/firmware_files/rootfs/bin/pidof	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/pidof	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/pidof
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/ping
+===================================================================
+--- trunk/firmware_files/rootfs/bin/ping	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/ping	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/ping
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/ps
+===================================================================
+--- trunk/firmware_files/rootfs/bin/ps	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/ps	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/ps
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/pwd
+===================================================================
+--- trunk/firmware_files/rootfs/bin/pwd	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/pwd	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/pwd
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/rm
+===================================================================
+--- trunk/firmware_files/rootfs/bin/rm	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/rm	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/rm
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/rmdir
+===================================================================
+--- trunk/firmware_files/rootfs/bin/rmdir	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/rmdir	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/rmdir
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/sed
+===================================================================
+--- trunk/firmware_files/rootfs/bin/sed	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/sed	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/sed
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/seq
+===================================================================
+--- trunk/firmware_files/rootfs/bin/seq	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/seq	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/seq
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/sh
+===================================================================
+--- trunk/firmware_files/rootfs/bin/sh	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/sh	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/sh
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/sleep
+===================================================================
+--- trunk/firmware_files/rootfs/bin/sleep	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/sleep	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/sleep
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/sort
+===================================================================
+--- trunk/firmware_files/rootfs/bin/sort	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/sort	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/sort
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/strings
+===================================================================
+--- trunk/firmware_files/rootfs/bin/strings	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/strings	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/strings
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/tail
+===================================================================
+--- trunk/firmware_files/rootfs/bin/tail	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/tail	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/tail
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/tar
+===================================================================
+--- trunk/firmware_files/rootfs/bin/tar	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/tar	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/tar
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/tee
+===================================================================
+--- trunk/firmware_files/rootfs/bin/tee	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/tee	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/tee
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/test
+===================================================================
+--- trunk/firmware_files/rootfs/bin/test	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/test	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/test
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/tftp
+===================================================================
+--- trunk/firmware_files/rootfs/bin/tftp	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/tftp	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/tftp
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/time
+===================================================================
+--- trunk/firmware_files/rootfs/bin/time	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/time	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/time
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/top
+===================================================================
+--- trunk/firmware_files/rootfs/bin/top	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/top	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/top
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/touch
+===================================================================
+--- trunk/firmware_files/rootfs/bin/touch	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/touch	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/touch
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/tr
+===================================================================
+--- trunk/firmware_files/rootfs/bin/tr	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/tr	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/tr
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/traceroute
+===================================================================
+--- trunk/firmware_files/rootfs/bin/traceroute	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/traceroute	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/traceroute
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/true
+===================================================================
+--- trunk/firmware_files/rootfs/bin/true	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/true	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/true
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/umount
+===================================================================
+--- trunk/firmware_files/rootfs/bin/umount	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/umount	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/umount
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/uname
+===================================================================
+--- trunk/firmware_files/rootfs/bin/uname	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/uname	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/uname
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/uniq
+===================================================================
+--- trunk/firmware_files/rootfs/bin/uniq	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/uniq	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/uniq
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/uptime
+===================================================================
+--- trunk/firmware_files/rootfs/bin/uptime	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/uptime	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/uptime
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/usleep
+===================================================================
+--- trunk/firmware_files/rootfs/bin/usleep	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/usleep	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/usleep
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/wc
+===================================================================
+--- trunk/firmware_files/rootfs/bin/wc	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/wc	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/wc
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/wget
+===================================================================
+--- trunk/firmware_files/rootfs/bin/wget	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/wget	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/wget
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/which
+===================================================================
+--- trunk/firmware_files/rootfs/bin/which	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/which	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/which
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/bin/yes
+===================================================================
+--- trunk/firmware_files/rootfs/bin/yes	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/bin/yes	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/bin/yes
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/chroot
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/chroot	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/chroot	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/chroot
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/crond
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/crond	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/crond	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/crond
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/ifconfig
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/ifconfig	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/ifconfig	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/ifconfig
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/insmod
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/insmod	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/insmod	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/insmod
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/klogd
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/klogd	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/klogd	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/klogd
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/logread
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/logread	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/logread	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/logread
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/lsmod
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/lsmod	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/lsmod	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/lsmod
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/modprobe
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/modprobe	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/modprobe	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/modprobe
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/pivot_root
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/pivot_root	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/pivot_root	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/pivot_root
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/rdate
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/rdate	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/rdate	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/rdate
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/sysctl
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/sysctl	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/sysctl	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/sysctl
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/syslogd
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/syslogd	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/syslogd	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/syslogd
+___________________________________________________________________
+Name: svn:special
+   + *
+
+Added: trunk/firmware_files/rootfs/sbin/vconfig
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/vconfig	2006-09-18 01:21:51 UTC (rev 281)
++++ trunk/firmware_files/rootfs/sbin/vconfig	2006-09-18 01:33:44 UTC (rev 282)
+@@ -0,0 +1 @@
++link ../bin/busybox
+\ No newline at end of file
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/vconfig
+___________________________________________________________________
+Name: svn:special
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000067.html">[Wl530g-svncheckins] r281 - in trunk/Marvell/Src/uClinux-dist: .	user
+</A></li>
+	<LI>Next message: <A HREF="000069.html">[Wl530g-svncheckins] r283 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

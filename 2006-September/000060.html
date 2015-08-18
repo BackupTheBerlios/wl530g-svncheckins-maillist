@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r274 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r274%20-%20trunk&In-Reply-To=%3C200609172359.k8HNxf9A001132%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000059.html">
+   <LINK REL="Next"  HREF="000061.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r274 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r274%20-%20trunk&In-Reply-To=%3C200609172359.k8HNxf9A001132%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r274 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 01:59:41 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000059.html">[Wl530g-svncheckins] r273 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000061.html">[Wl530g-svncheckins] r275 - trunk/Marvell/Src/uClinux-dist/config
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 01:59:39 +0200 (Mon, 18 Sep 2006)
+New Revision: 274
+
+Removed:
+   trunk/notes.txt
+Log:
+remove this trash
+
+
+Deleted: trunk/notes.txt
+===================================================================
+--- trunk/notes.txt	2006-09-17 23:59:11 UTC (rev 273)
++++ trunk/notes.txt	2006-09-17 23:59:39 UTC (rev 274)
+@@ -1,48 +0,0 @@
+- /* operation mode, 0: ap, 1: p2p */
+-
+-		HOSTAPD_LEVEL_DEBUG_VERBOSE = 0,
+-		HOSTAPD_LEVEL_DEBUG = 1,
+-		HOSTAPD_LEVEL_INFO = 2,
+-		HOSTAPD_LEVEL_NOTICE = 3,
+-		HOSTAPD_LEVEL_WARNING = 4
+-
+-wl_iwmode 
+- : 1 = adhoc mode
+- : 2 = client mode
+- : 3 = AP mode
+- : 4 = Network
+-
+-wl_mode_x  
+- : 0 = AP mode  - WDS
+- : 1 = p2p mode - WDS
+-
+-wl_logger_syslog_level
+-wl_logger_stdout_level
+- : 0 = debug - verbose
+- : 1 = debug
+- : 2 = info
+- : 3 = notice
+- : 4 = warning
+-
+-
+-The new nvram variables are below. They are unset by default, so don't expect to see them in 'nvram show' unless you set them.
+-
+-VARIABLE 			DEFAULT VALUE
+-
+-wl_iwmode 			3
+-wl_short_retry_limit 		7 
+-wl_long_retry_limit 		4 
+-wl_current_tx_power_level	1 
+-wl_short_preamble 		1 
+-wl_minimal_eap 		1 
+-wl_interface 			wlan0 
+-wl_logger_syslog 		-1 
+-wl_logger_syslog_level 		1
+-wl_logger_stdout 		-1 
+-wl_logger_stdout_level		4 
+-wl_debug			0
+-wl_dump_file			/tmp/hostapd.dump 
+-wl_daemonize			1 
+-wl_auto_link			0 
+-wl_ssid_patch			0 
+-wl_speed_boster			0 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000059.html">[Wl530g-svncheckins] r273 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000061.html">[Wl530g-svncheckins] r275 - trunk/Marvell/Src/uClinux-dist/config
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

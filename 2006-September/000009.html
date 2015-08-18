@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r224 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r224%20-%20trunk&In-Reply-To=%3C200609161455.k8GEtUo6030942%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000010.html">
+   <LINK REL="Next"  HREF="000011.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r224 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r224%20-%20trunk&In-Reply-To=%3C200609161455.k8GEtUo6030942%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r224 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 16:55:30 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000010.html">[Wl530g-svncheckins] r223 - in trunk: . firmware_files firmware_files/asus.orig firmware_files/asus.orig/1946 firmware_files/asus.orig/1946/image_parts firmware_files/asus.orig/1946/rootfs firmware_files/asus.orig/1946/rootfs/bin firmware_files/asus.orig/1946/rootfs/etc firmware_files/asus.orig/1946/rootfs/etc/config firmware_files/asus.orig/1946/rootfs/etc/temp firmware_files/asus.orig/1946/rootfs/lib firmware_files/asus.orig/1946/rootfs/sbin firmware_files/asus.orig/1946/rootfs/usr firmware_files/asus.orig/1946/rootfs/usr/sbin firmware_files/asus.orig/1946/rootfs/www firmware_files/asus.orig/1946/rootfs/www/graph firmware_files/image_parts firmware_files/rootfs firmware_files/rootfs/bin firmware_files/rootfs/etc firmware_files/rootfs/etc/config firmware_files/rootfs/etc/init.d firmware_files/rootfs/etc/temp firmware_files/rootfs/lib firmware_files/rootfs/sbin firmware_files/rootfs/usr firmware_files/rootfs/usr/bin firmware_files/rootfs/usr/sbin firmware_files/rootfs/www firmware_files! /rootfs/www/graph
+</A></li>
+        <LI>Next message: <A HREF="000011.html">[Wl530g-svncheckins] r225 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-16 16:55:28 +0200 (Sat, 16 Sep 2006)
+New Revision: 224
+
+Modified:
+   trunk/readme.txt
+Log:
+edit readme.txt to reflect new way to build firmware images.
+
+Modified: trunk/readme.txt
+===================================================================
+--- trunk/readme.txt	2006-09-16 14:20:29 UTC (rev 223)
++++ trunk/readme.txt	2006-09-16 14:55:28 UTC (rev 224)
+@@ -1,15 +1,21 @@
++This buildroot is still a mess. It's getting better, but you must manually
++put new files into the firmware filesystem, which has its advantages and
++disadvantages. I'm working on getting all Makefiles set up so they install
++to the firmware filesystem (instead of romfs), and do so appropriately.
+ 
+-This buildroot is a total mess right now, mostly because the vendor firmware was a total mess. As things progress, it'll be cleaned up. For now, you're going to have to manually copy built target files to the firmware filesystem before and invoke ./create_firmware.sh. Not really that much trouble since for any given build most files won't change, but eventually it will all be automated.
++HowTo build a firmware image (doesn't require compiling):
+ 
+-jr has completed patches for uClinux 2.4.32, but I haven't integrated them in yet.
++1.) edit the files in firmware_files/rootfs however you wish.
++    These are the files the firmware image contains.
++2.) run create_firmware_image.sh to build a firmware with today's date.
+ 
+-HowTo:
++HowTo compile your own packages and/or kernel:
+ 
+-1.) extract latest firmware image with extract_firmware.sh
+-2.) go build whatever new packages you want, and/or kernel
+-3.) if desired, install built packages into extracted filesystem (working_dir/rootfs/).
+-4.) if desired, install new kernel into extracted filesystem (working_dir/image_parts/segment1)
+-5.) rebuild firmware image with ./create_firmware_image.sh or use the firmware mod kit.
++1.) Follow the instructios in Marvell/ReadMe.txt but put built files in the
++    above mentioned directory instead of the 'filesystem' directory it
++    mentions.
++2.) The kernel can be replaced by storing the new zImage as 
++    firmware_files/image_parts/segment1. Note that the size should be
++    &lt;= 0xA0000 bytes.
+ 
+-
+ - jeremy collake &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">jeremy.collake at gmail.com</A>&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000010.html">[Wl530g-svncheckins] r223 - in trunk: . firmware_files firmware_files/asus.orig firmware_files/asus.orig/1946 firmware_files/asus.orig/1946/image_parts firmware_files/asus.orig/1946/rootfs firmware_files/asus.orig/1946/rootfs/bin firmware_files/asus.orig/1946/rootfs/etc firmware_files/asus.orig/1946/rootfs/etc/config firmware_files/asus.orig/1946/rootfs/etc/temp firmware_files/asus.orig/1946/rootfs/lib firmware_files/asus.orig/1946/rootfs/sbin firmware_files/asus.orig/1946/rootfs/usr firmware_files/asus.orig/1946/rootfs/usr/sbin firmware_files/asus.orig/1946/rootfs/www firmware_files/asus.orig/1946/rootfs/www/graph firmware_files/image_parts firmware_files/rootfs firmware_files/rootfs/bin firmware_files/rootfs/etc firmware_files/rootfs/etc/config firmware_files/rootfs/etc/init.d firmware_files/rootfs/etc/temp firmware_files/rootfs/lib firmware_files/rootfs/sbin firmware_files/rootfs/usr firmware_files/rootfs/usr/bin firmware_files/rootfs/usr/sbin firmware_files/rootfs/www firmware_files! /rootfs/www/graph
+</A></li>
+	<LI>Next message: <A HREF="000011.html">[Wl530g-svncheckins] r225 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

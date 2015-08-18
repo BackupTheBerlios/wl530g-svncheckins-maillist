@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r281 - in trunk/Marvell/Src/uClinux-dist: .	user
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r281%20-%20in%20trunk/Marvell/Src/uClinux-dist%3A%20.%0A%09user&In-Reply-To=%3C200609180121.k8I1Lu4x011386%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000066.html">
+   <LINK REL="Next"  HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r281 - in trunk/Marvell/Src/uClinux-dist: .	user</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r281%20-%20in%20trunk/Marvell/Src/uClinux-dist%3A%20.%0A%09user&In-Reply-To=%3C200609180121.k8I1Lu4x011386%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r281 - in trunk/Marvell/Src/uClinux-dist: .	user">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 03:21:56 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000066.html">[Wl530g-svncheckins] r280 - trunk/Marvell/Src/uClinux-dist/user
+</A></li>
+        <LI>Next message: <A HREF="000068.html">[Wl530g-svncheckins] r282 - in trunk/firmware_files/rootfs: bin sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 03:21:51 +0200 (Mon, 18 Sep 2006)
+New Revision: 281
+
+Added:
+   trunk/Marvell/Src/uClinux-dist/config.in
+Modified:
+   trunk/Marvell/Src/uClinux-dist/Makefile
+   trunk/Marvell/Src/uClinux-dist/user/Makefile
+Log:
+start of adding some small level of integration of busybox 1.2.1 config into make system.
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/Makefile	2006-09-18 01:15:53 UTC (rev 280)
++++ trunk/Marvell/Src/uClinux-dist/Makefile	2006-09-18 01:21:51 UTC (rev 281)
+@@ -38,7 +38,7 @@
+ ROMFSDIR = $(ROOTDIR)/romfs
+ ROMFSINST= romfs-inst.sh
+ SCRIPTSDIR = $(ROOTDIR)/config/scripts
+-TFTPDIR    = ../tftpboot
++TFTPDIR    = $(ROOTDIR)/tftpboot
+ 
+ 
+ LINUX_CONFIG  = $(ROOTDIR)/$(LINUXDIR)/.config
+@@ -65,7 +65,7 @@
+ MAKEARCH_KERNEL = $(MAKEARCH)
+ endif
+ 
+-DIRS    = $(VENDOR_TOPDIRS) lib user
++DIRS    = $(VENDOR_TOPDIRS) lib user user.asus
+ VENDDIR = $(ROOTDIR)/vendors/$(CONFIG_VENDOR)/$(CONFIG_PRODUCT)/.
+ 
+ export VENDOR PRODUCT ROOTDIR LINUXDIR HOSTCC CONFIG_SHELL
+@@ -155,6 +155,9 @@
+ 	@if egrep &quot;^CONFIG_DEFAULTS_MODULES=y&quot; .config &gt; /dev/null; then \
+ 		$(MAKE) modules_menuconfig; \
+ 	 fi
++	@if egrep &quot;^CONFIG_DEFAULTS_BUSYBOX_NEW=y&quot; .config &gt; /dev/null; then \
++		$(MAKE) -C user/busybox-1.2.1 menuconfig; \
++	 fi			
+ 	@if egrep &quot;^CONFIG_DEFAULTS_VENDOR=y&quot; .config &gt; /dev/null; then \
+ 		$(MAKE) config_menuconfig; \
+ 	 fi
+@@ -299,6 +302,7 @@
+ # This one removes all executables from the tree and forces their relinking
+ .PHONY: relink
+ relink:
++	find user.asus -name '*.gdb' | sed 's/^\(.*\)\.gdb/\1 \1.gdb/' | xargs rm -f
+ 	find user -name '*.gdb' | sed 's/^\(.*\)\.gdb/\1 \1.gdb/' | xargs rm -f
+ 	find prop -name '*.gdb' | sed 's/^\(.*\)\.gdb/\1 \1.gdb/' | xargs rm -f
+ 	find $(VENDDIR) -name '*.gdb' | sed 's/^\(.*\)\.gdb/\1 \1.gdb/' | xargs rm -f
+
+Added: trunk/Marvell/Src/uClinux-dist/config.in
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/config.in	2006-09-18 01:15:53 UTC (rev 280)
++++ trunk/Marvell/Src/uClinux-dist/config.in	2006-09-18 01:21:51 UTC (rev 281)
+@@ -0,0 +1,99 @@
++mainmenu_name 'uClinux Configuration'
++mainmenu_option next_comment
++comment 'Target Platform Selection'
++comment 'Choose a Vendor/Product combination.'
++choice 'Vendor/Product' &quot;3com/PalmIIIx CONFIG_DEFAULTS_3COM_PALMIIIX \
++3com/Xcopilot CONFIG_DEFAULTS_3COM_XCOPILOT \
++ADI/Coyote CONFIG_DEFAULTS_ADI_COYOTE \
++Arcturus/uC5272 CONFIG_DEFAULTS_ARCTURUS_UC5272 \
++Arcturus/uCdimm CONFIG_DEFAULTS_ARCTURUS_UCDIMM \
++Arcturus/uCdimm+mtd CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD \
++Arcturus/uCquicc CONFIG_DEFAULTS_ARCTURUS_UCQUICC \
++Arcturus/uCsimm CONFIG_DEFAULTS_ARCTURUS_UCSIMM \
++Arnewsh/M5206 CONFIG_DEFAULTS_ARNEWSH_M5206 \
++Arnewsh/M5307 CONFIG_DEFAULTS_ARNEWSH_M5307 \
++Atmel/AT91 CONFIG_DEFAULTS_ATMEL_AT91 \
++Conexant/Humber CONFIG_DEFAULTS_CONEXANT_HUMBER \
++Conexant/P52 CONFIG_DEFAULTS_CONEXANT_P52 \
++Cwlinux/cwez328 CONFIG_DEFAULTS_CWLINUX_CWEZ328 \
++Cwlinux/cwvz328 CONFIG_DEFAULTS_CWLINUX_CWVZ328 \
++Cytek/NETmp3 CONFIG_DEFAULTS_CYTEK_NETMP3 \
++Exys/de2 CONFIG_DEFAULTS_EXYS_DE2 \
++Feith/Cleopatra2 CONFIG_DEFAULTS_FEITH_CLEOPATRA2 \
++Feith/Cleopatra CONFIG_DEFAULTS_FEITH_CLEOPATRA \
++GDB/ARMulator CONFIG_DEFAULTS_GDB_ARMULATOR \
++GDB/ARMulator-EB CONFIG_DEFAULTS_GDB_ARMULATOR_EB \
++Hitachi/BigSurIV CONFIG_DEFAULTS_HITACHI_BIGSURIV \
++Hitachi/EDOSK2674 CONFIG_DEFAULTS_HITACHI_EDOSK2674 \
++Hitachi/KeyWest CONFIG_DEFAULTS_HITACHI_KEYWEST \
++Insight/XC2V1K_Microblaze CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE \
++Intel/IXDP425 CONFIG_DEFAULTS_INTEL_IXDP425 \
++LEOX/TSIM CONFIG_DEFAULTS_LEOX_TSIM \
++Marvell/Firefox CONFIG_DEFAULTS_MARVELL_FIREFOX \
++Marvell/Libertas CONFIG_DEFAULTS_MARVELL_LIBERTAS \
++Mecel/FR1000 CONFIG_DEFAULTS_MECEL_FR1000 \
++Midas/RTE-NB85E-CB CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB \
++Midas/RTE-V850E-MA1-CB CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB \
++Motorola/M5206eC3 CONFIG_DEFAULTS_MOTOROLA_M5206EC3 \
++Motorola/M5206eLITE CONFIG_DEFAULTS_MOTOROLA_M5206ELITE \
++Motorola/M5249C3 CONFIG_DEFAULTS_MOTOROLA_M5249C3 \
++Motorola/M5272C3 CONFIG_DEFAULTS_MOTOROLA_M5272C3 \
++Motorola/M5282C3 CONFIG_DEFAULTS_MOTOROLA_M5282C3 \
++Motorola/M5307C3 CONFIG_DEFAULTS_MOTOROLA_M5307C3 \
++Motorola/M5407C3 CONFIG_DEFAULTS_MOTOROLA_M5407C3 \
++NEC/Anna CONFIG_DEFAULTS_NEC_ANNA \
++NEC/v850e-sim-gdb CONFIG_DEFAULTS_NEC_V850E_SIM_GDB \
++Netburner/CFV240 CONFIG_DEFAULTS_NETBURNER_CFV240 \
++NetSilicon/NET+ARM CONFIG_DEFAULTS_NETSILICON_NET_ARM \
++Nintendo/GBA CONFIG_DEFAULTS_NINTENDO_GBA \
++OPENcores/or32 CONFIG_DEFAULTS_OPENCORES_OR32 \
++Promise/SX6 CONFIG_DEFAULTS_PROMISE_SX6 \
++Samsung/4510B CONFIG_DEFAULTS_SAMSUNG_4510B \
++SecureEdge/DISKtel CONFIG_DEFAULTS_SECUREEDGE_DISKTEL \
++SecureEdge/eLIA CONFIG_DEFAULTS_SECUREEDGE_ELIA \
++SecureEdge/MP3 CONFIG_DEFAULTS_SECUREEDGE_MP3 \
++SecureEdge/NETtel1500 CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 \
++SecureEdge/NETtel3540 CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 \
++SecureEdge/SecureEdge1100 CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 \
++SecureEdge/SecureEdge2540 CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 \
++SecureEdge/SecureEdge2570 CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 \
++SecureEdge/SecureEdge2580 CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 \
++SecureEdge/SecureEdge2580-JFFS CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS \
++SecureEdge/SecureEdgeEdna CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA \
++SecureEdge/SecureEdgeNAS CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS \
++SecureEdge/SecureEdgePCMCIA CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA \
++SecureEdge/SecureEdgeVPN CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN \
++senTec/COBRA5272 CONFIG_DEFAULTS_SENTEC_COBRA5272 \
++SnapGear/LITE CONFIG_DEFAULTS_SNAPGEAR_LITE \
++SnapGear/PRO CONFIG_DEFAULTS_SNAPGEAR_PRO \
++SnapGear/SE3400 CONFIG_DEFAULTS_SNAPGEAR_SE3400 \
++SnapGear/SE4000 CONFIG_DEFAULTS_SNAPGEAR_SE4000 \
++SnapGear/SME530 CONFIG_DEFAULTS_SNAPGEAR_SME530 \
++SnapGear/SME550 CONFIG_DEFAULTS_SNAPGEAR_SME550 \
++SnapGear/SOHO+ CONFIG_DEFAULTS_SNAPGEAR_SOHO_ \
++SWARM/SWARM CONFIG_DEFAULTS_SWARM_SWARM \
++TeleIP/rsc CONFIG_DEFAULTS_TELEIP_RSC \
++Triscend/A7DB CONFIG_DEFAULTS_TRISCEND_A7DB \
++Triscend/DevA7 CONFIG_DEFAULTS_TRISCEND_DEVA7 \
++Via/EPIA CONFIG_DEFAULTS_VIA_EPIA \
++Weiss/SM2010 CONFIG_DEFAULTS_WEISS_SM2010 \
++&quot; Marvell/Libertas
++comment 'Kernel is linux-2.4.x'
++define_bool CONFIG_DEFAULTS_KERNEL_2_4 y
++choice 'Libc Version' &quot;glibc CONFIG_DEFAULTS_LIBC_GLIBC \
++uC-libc CONFIG_DEFAULTS_LIBC_UC_LIBC \
++uClibc CONFIG_DEFAULTS_LIBC_UCLIBC \
++uClibc-0.9.19.patch.gz CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_19_PATCH_GZ \
++uClibc-0.9.26-exec_alloc.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_EXEC_ALLOC_PATCH \
++uClibc-0.9.26-m68k.config CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_M68K_CONFIG \
++uClibc-0.9.26-ptrace-lvalue.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_PTRACE_LVALUE_PATCH \
++uClibc-0.9.26-syscalls-inline.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_SYSCALLS_INLINE_PATCH \
++uClibc-0.9.26.tar.bz2 CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_TAR_BZ2 \
++uClibc-20030314.tar.gz CONFIG_DEFAULTS_LIBC_UCLIBC_20030314_TAR_GZ \
++uClibc-new CONFIG_DEFAULTS_LIBC_UCLIBC_NEW \
++&quot; uClibc-new
++bool 'Default all settings (lose changes)'	CONFIG_DEFAULTS_OVERRIDE
++bool 'Customize Kernel Settings'			CONFIG_DEFAULTS_KERNEL
++bool 'Customize Vendor/User Settings'		CONFIG_DEFAULTS_VENDOR
++bool 'Update Default Vendor Settings'		CONFIG_DEFAULTS_VENDOR_UPDATE
++endmenu
+
+Modified: trunk/Marvell/Src/uClinux-dist/user/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/Makefile	2006-09-18 01:15:53 UTC (rev 280)
++++ trunk/Marvell/Src/uClinux-dist/user/Makefile	2006-09-18 01:21:51 UTC (rev 281)
+@@ -332,21 +332,33 @@
+ 		[ ! -d $$i ] || make -C $$i || exit $? ; \
+ 	done
+ 
++	# always build busybox 1.2.1 for now
++	make -C busybox-1.2.1
++
+ romfs:
+ 	for i in $(dir_v) $(sort $(dir_y)) ; do \
+ 		[ ! -d $$i ] || make -C $$i romfs || exit $? ; \
+ 	done
+ 
++	# install busybox 1.2.1 (todo: get rid of stupid shell script)
++	cd budybox-1.2.1
++	./install_firmware.sh
++	cd ..
++
+ clean:
+ 	-for i in $(dir_v) $(sort $(dir_y) $(dir_n) $(dir_)) ; do \
+ 		[ ! -d $$i ] || make -C $$i clean &amp;&amp; rm $$i/*.gdb &amp;&amp; rm $$i/*.elf; \
+ 	done
++
++	make -C busybox-1.2.1 clean
+ 	
+ convert:
+ 	-for i in $(dir_v) $(sort $(dir_y) $(dir_n) $(dir_)) ; do \
+ 		[ ! -d $$i ] || make -C $$i convert; \
+ 	done
+ 
++	make -C busybox-1.2.1 convert
++
+ prune:
+ 	-for i in $(sort $(dir_n) $(dir_)) ; do \
+ 		found=0; \
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000066.html">[Wl530g-svncheckins] r280 - trunk/Marvell/Src/uClinux-dist/user
+</A></li>
+	<LI>Next message: <A HREF="000068.html">[Wl530g-svncheckins] r282 - in trunk/firmware_files/rootfs: bin sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

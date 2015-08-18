@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r299 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r299%20-%20trunk&In-Reply-To=%3C200609200033.k8K0X6HT000878%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000084.html">
+   <LINK REL="Next"  HREF="000086.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r299 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r299%20-%20trunk&In-Reply-To=%3C200609200033.k8K0X6HT000878%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r299 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep 20 02:33:06 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000084.html">[Wl530g-svncheckins] r298 - trunk/Marvell/Src/uClinux-dist/user.asus
+</A></li>
+        <LI>Next message: <A HREF="000086.html">[Wl530g-svncheckins] r300 - trunk/firmware_files/rootfs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-20 02:33:00 +0200 (Wed, 20 Sep 2006)
+New Revision: 299
+
+Modified:
+   trunk/changes.txt
+   trunk/create_firmware_image.sh
+   trunk/readme.txt
+Log:
+lazy
+
+Modified: trunk/changes.txt
+===================================================================
+--- trunk/changes.txt	2006-09-19 14:51:08 UTC (rev 298)
++++ trunk/changes.txt	2006-09-20 00:33:00 UTC (rev 299)
+@@ -1,4 +1,33 @@
+ 
++09/19/06 (3)
++  * important fix: new syslogd didn't have max log size set correctly. This would cause all available RAM to eventually be eaten up by syslog.log. This fix adds proper circular buffer support. Read the log with 'logread'. Web UI needs updating as well, I'll do that shortly.
++
++
++09/19/06 (2)
++
++  * fixed lame msh error in /etc/init.d/S10conntrack.
++  * fixed telnetd and mvmfgd path in inetd.conf.
++
++09/19/06
++
++  * added 'max_conntrack' nvram variable to set maximum number of connections (default value is 1008).
++  * added web UI setting for maximum connections in 'IP settings/Misc'.
++  * changed network parameters to common p2p friendly values (same that will be used in OpenWrt WR RC6). See /etc/sysctl.conf.
++  * create /etc/groups and /etc/passwd from within rc instead of /etc/init.d/S10login (deleted).
++  * add /jffs/etc/on_ppp_up and /jffs/etc/on_ppp_down for invocation when a PPP connection is established and closed, respectively.
++  * set /proc/sys/kernel/hostname appropriately at startup.
++  * set initial ramfs size to 1.5MB (was 2MB).
++  * added /rom folder.
++  * unlinked /mnt from /tmp.
++  * busybox: mount (NFS) - set default rsize and wsize to 8KB each - was 32KB each.
++  * busybox: added ftpput and ftpget.
++  * busybox.find: add -xdev and -type options.
++  * busybox.grep: add regex (egrep) and context switches.
++  * added stand-alone cat, echo, rmdir, rm, yes, true, false, date, uname, whoami, pwd, and basename. Removed these utilities from busybox. This results in less RAM usage since an entire instance of busybox need not be created when these simple applets are run.
++  * changed firmware upgrade failure message in web UI to suggest rescue mode and list free RAM as a possible cause.
++  * clipped out some useless code in general.js.
++  * many other misc. changes and additions.
++
+ 09/17/06
+ 
+   * addition: busybox 1.2.1 is here with all the beloved gifts it has to offer! Almost all existing applets enhanced in some way or another (i.e. tab file/dirname completion), and many new applets are available (i.e. netstat).
+
+Modified: trunk/create_firmware_image.sh
+===================================================================
+--- trunk/create_firmware_image.sh	2006-09-19 14:51:08 UTC (rev 298)
++++ trunk/create_firmware_image.sh	2006-09-20 00:33:00 UTC (rev 299)
+@@ -2,12 +2,23 @@
+ #
+ # This script builds a new firmware image.
+ #
++rmsvn()
++{
++for i in $(find $1 | grep .svn); do
++	rm -rf $i
++done
++}
++
+ current_date=$(date +%m%d%y)
+ OUTPUT_FILE=wl530g_db90h_&quot;$current_date&quot;_en.bin
+ echo &quot; Final output image will be $OUTPUT_FILE&quot;
+ echo &quot; Log for $OUTPUT_FILE&quot; &gt; build.log
+ echo &quot; Exporting filesystem ...&quot;
+-svn export firmware_files/ build_temp/
++rm -rf build_temp
++#svn export firmware_files/ build_temp/
++mkdir build_temp
++cp -r firmware_files/* build_temp
++rmsvn build_temp/
+ echo &quot; Extracting devfs ...&quot;
+ cd build_temp
+ tar -xzvf dev.tar.gz -C rootfs/ 2&gt;&amp;1 &gt;&gt; ../build.log
+@@ -28,4 +39,4 @@
+ ln -s $OUTPUT_FILE latest_db90h_firmware_image.bin
+ cd ..
+ rm -rf firmware_images/temp
+-rm -rf build_temp
++#rm -rf build_temp
+
+Modified: trunk/readme.txt
+===================================================================
+--- trunk/readme.txt	2006-09-19 14:51:08 UTC (rev 298)
++++ trunk/readme.txt	2006-09-20 00:33:00 UTC (rev 299)
+@@ -16,7 +16,7 @@
+ 
+ 1.) Download and install toolchains built specifically for this firmware:
+     <A HREF="http://sukkamehulinko.romikselle.com/wl530g/arm-elf-tools-20060917.tar.gz">http://sukkamehulinko.romikselle.com/wl530g/arm-elf-tools-20060917.tar.gz</A>   
+-    	tar -xzvf ./arm-elf-tools-20060917.tar.gz
++    	tar -xzvf arm-elf-tools-20060917.tar.gz
+     If this fails, use dd to extract the tar.gz to / (root).
+ 2.) Go to Marvell/Src/uClinux-dist.
+ 3.) Run 'make menuconfig' to configure the kernel and user packages to build.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000084.html">[Wl530g-svncheckins] r298 - trunk/Marvell/Src/uClinux-dist/user.asus
+</A></li>
+	<LI>Next message: <A HREF="000086.html">[Wl530g-svncheckins] r300 - trunk/firmware_files/rootfs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

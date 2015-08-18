@@ -1,0 +1,2505 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r214 - in	trunk/Marvell/Src/uClinux-dist/user/busybox: . libbb
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r214%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/user/busybox%3A%20.%20libbb&In-Reply-To=%3C200609152117.k8FLHHY7013246%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000001.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r214 - in	trunk/Marvell/Src/uClinux-dist/user/busybox: . libbb</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r214%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/user/busybox%3A%20.%20libbb&In-Reply-To=%3C200609152117.k8FLHHY7013246%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r214 - in	trunk/Marvell/Src/uClinux-dist/user/busybox: . libbb">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 15 23:17:18 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000001.html">[Wl530g-svncheckins] r215 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-15 23:17:09 +0200 (Fri, 15 Sep 2006)
+New Revision: 214
+
+Added:
+   trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/getopt_ulflags.c
+   trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/llist.c
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/libbb.h
+   trunk/Marvell/Src/uClinux-dist/user/busybox/ls.c
+Log:
+ported 'ls' from BusyBox 1.2.1, featuring color typing. I'm not using Busybox 1.2.1 yet because I haven't tracked down an 'Illegal instruction' error with the msh and ash shells.
+
+
+Added: trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/getopt_ulflags.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/getopt_ulflags.c	2006-09-15 03:39:45 UTC (rev 213)
++++ trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/getopt_ulflags.c	2006-09-15 21:17:09 UTC (rev 214)
+@@ -0,0 +1,532 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * universal getopt_ulflags implementation for busybox
++ *
++ * Copyright (C) 2003-2005  Vladimir Oleynik  &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">dzo at simtreas.ru</A>&gt;
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
++ */
++
++#include &lt;getopt.h&gt;
++#include &lt;string.h&gt;
++#include &lt;assert.h&gt;
++#include &lt;stdlib.h&gt;
++#include &quot;libbb.h&quot;
++
++/*                  Documentation
++
++unsigned long
++bb_getopt_ulflags (int argc, char **argv, const char *applet_opts, ...)
++
++	The command line options must be declared in const char
++	*applet_opts as a string of chars, for example:
++
++	flags = bb_getopt_ulflags(argc, argv, &quot;rnug&quot;);
++
++	If one of the given options is found, a flag value is added to
++	the return value (an unsigned long).
++
++	The flag value is determined by the position of the char in
++	applet_opts string.  For example, in the above case:
++
++	flags = bb_getopt_ulflags(argc, argv, &quot;rnug&quot;);
++
++	&quot;r&quot; will add 1    (bit 0)
++	&quot;n&quot; will add 2    (bit 1)
++	&quot;u  will add 4    (bit 2)
++	&quot;g&quot; will add 8    (bit 3)
++
++	and so on.  You can also look at the return value as a bit
++	field and each option sets one bit.
++
++ &quot;:&quot;    If one of the options requires an argument, then add a &quot;:&quot;
++	after the char in applet_opts and provide a pointer to store
++	the argument.  For example:
++
++	char *pointer_to_arg_for_a;
++	char *pointer_to_arg_for_b;
++	char *pointer_to_arg_for_c;
++	char *pointer_to_arg_for_d;
++
++	flags = bb_getopt_ulflags(argc, argv, &quot;a:b:c:d:&quot;,
++			&amp;pointer_to_arg_for_a, &amp;pointer_to_arg_for_b,
++			&amp;pointer_to_arg_for_c, &amp;pointer_to_arg_for_d);
++
++	The type of the pointer (char* or llist_t*) may be controlled
++	by the &quot;::&quot; special separator that is set in the external string
++	bb_opt_complementally (see below for more info).
++
++ &quot;+&quot;    If the first character in the applet_opts string is a plus,
++	then option processing will stop as soon as a non-option is
++	encountered in the argv array.  Useful for applets like env
++	which should not process arguments to subprograms:
++	env -i ls -d /
++	Here we want env to process just the '-i', not the '-d'.
++
++const struct option *bb_applet_long_options
++
++	This struct allows you to define long options.  The syntax for
++	declaring the array is just like that of getopt's longopts.
++	(see getopt(3))
++
++	static const struct option applet_long_options[] = {
++		{ &quot;verbose&quot;, 0, 0, 'v' },
++		{ 0, 0, 0, 0 }
++	};
++	bb_applet_long_options = applet_long_options;
++
++	The last member of struct option (val) typically is set to
++	matching short option from applet_opts. If there is no matching
++	char in applet_opts, then:
++	- return bit have next position after short options
++	- if has_arg is not &quot;no_argument&quot;, use ptr for arg also
++	- bb_opt_complementally affects it too
++
++	Note: a good applet will make long options configurable via the
++	config process and not a required feature.  The current standard
++	is to name the config option CONFIG_FEATURE_&lt;applet&gt;_LONG_OPTIONS.
++
++const char *bb_opt_complementally
++	this should be bb_opt_complementary, but we'll just keep it as
++	bb_opt_complementally due to the Russian origins
++
++ &quot;:&quot;    The colon (&quot;:&quot;) is used to separate groups of two or more chars
++	and/or groups of chars and special characters (stating some
++	conditions to be checked).
++
++ &quot;abc&quot;  If groups of two or more chars are specified, the first char
++	is the main option and the other chars are secondary options.
++	Their flags will be turned on if the main option is found even
++	if they are not specifed on the command line.  For example:
++
++	bb_opt_complementally = &quot;abc&quot;;
++
++	flags = bb_getopt_ulflags(argc, argv, &quot;abcd&quot;)
++
++	If getopt() finds &quot;-a&quot; on the command line, then
++	bb_getopt_ulflags's return value will be as if &quot;-a -b -c&quot; were
++	found.
++
++ &quot;ww&quot;   Adjacent double options have a counter associated which indicates
++	the number of occurences of the option.
++	For example the ps applet needs:
++	if w is given once, GNU ps sets the width to 132,
++	if w is given more than once, it is &quot;unlimited&quot;
++
++	int w_counter = 0;
++	bb_opt_complementally = &quot;ww&quot;;
++	bb_getopt_ulflags(argc, argv, &quot;w&quot;, &amp;w_counter);
++
++	if(w_counter)
++		width = (w_counter == 1) ? 132 : INT_MAX;
++	else
++		get_terminal_width(...&amp;width...);
++
++	w_counter is a pointer to an integer. It has to be passed to
++	bb_getopt_ulflags() after all other option argument sinks.
++	For example: accept multiple -v to indicate the level of verbosity
++	and for each -b optarg, add optarg to my_b. Finally, if b is given,
++	turn off c and vice versa:
++
++	llist_t *my_b = NULL;
++	int verbose_level = 0;
++	bb_opt_complementally = &quot;vv:b::b-c:c-b&quot;;
++	f = bb_getopt_ulflags(argc, argv, &quot;vb:c&quot;, &amp;my_b, &amp;verbose_level);
++	if((f &amp; 2))     // -c after -b unsets -b flag
++		while(my_b) { dosomething_with(my_b-&gt;data) ; my_b = my_b-&gt;link; }
++	if(my_b)        // but llist is stored if -b is specified
++		free_llist(my_b);
++	if(verbose_level) bb_printf(&quot;verbose level is %d\n&quot;, verbose_level);
++
++Special characters:
++
++ &quot;-&quot;    A dash between two options causes the second of the two
++	to be unset (and ignored) if it is given on the command line.
++
++	[FIXME: what if they are the same? like &quot;x-x&quot;? Is it ever useful?]
++
++	For example:
++	The du applet has the options &quot;-s&quot; and &quot;-d depth&quot;.  If
++	bb_getopt_ulflags finds -s, then -d is unset or if it finds -d
++	then -s is unset.  (Note:  busybox implements the GNU
++	&quot;--max-depth&quot; option as &quot;-d&quot;.)  To obtain this behavior, you
++	set bb_opt_complementally = &quot;s-d:d-s&quot;.  Only one flag value is
++	added to bb_getopt_ulflags's return value depending on the
++	position of the options on the command line.  If one of the
++	two options requires an argument pointer (&quot;:&quot; in applet_opts
++	as in &quot;d:&quot;) optarg is set accordingly.
++
++	char *smax_print_depth;
++
++	bb_opt_complementally = &quot;s-d:d-s:x-x&quot;;
++	opt = bb_getopt_ulflags(argc, argv, &quot;sd:x&quot;, &amp;smax_print_depth);
++
++	if (opt &amp; 2)
++		max_print_depth = atoi(smax_print_depth);
++	if (opt &amp; 4)
++		printf(&quot;Detected odd -x usage\n&quot;);
++
++ &quot;-&quot;    A dash as the first char in a bb_opt_complementally group forces
++	all arguments to be treated as options, even if they have
++	no leading dashes. Next char in this case can't be a digit (0-9),
++	use ':' or end of line. For example:
++
++	bb_opt_complementally = &quot;-:w-x:x-w&quot;;
++	bb_getopt_ulflags(argc, argv, &quot;wx&quot;);
++
++	Allows any arguments to be given without a dash (./program w x)
++	as well as with a dash (./program -x).
++
++ &quot;-N&quot;   A dash as the first char in a bb_opt_complementally group followed
++	by a single digit (0-9) means that at least N non-option
++	arguments must be present on the command line
++
++ &quot;V-&quot;   An option with dash before colon or end-of-line results in
++	bb_show_usage being called if this option is encountered.
++	This is typically used to implement &quot;print verbose usage message
++	and exit&quot; option.
++
++ &quot;--&quot;   A double dash between two options, or between an option and a group
++	of options, means that they are mutually exclusive.  Unlike
++	the &quot;-&quot; case above, an error will be forced if the options
++	are used together.
++
++	For example:
++	The cut applet must have only one type of list specified, so
++	-b, -c and -f are mutally exclusive and should raise an error
++	if specified together.  In this case you must set
++	bb_opt_complementally = &quot;b--cf:c--bf:f--bc&quot;.  If two of the
++	mutually exclusive options are found, bb_getopt_ulflags's
++	return value will have the error flag set (BB_GETOPT_ERROR) so
++	that we can check for it:
++
++	if (flags &amp; BB_GETOPT_ERROR)
++		bb_show_usage();
++
++ &quot;?&quot;    A &quot;?&quot; as the first char in a bb_opt_complementally group means:
++	if BB_GETOPT_ERROR is detected, don't return, call bb_show_usage
++	and exit instead. Next char after '?' can't be a digit.
++
++ &quot;?N&quot;   A &quot;?&quot; as the first char in a bb_opt_complementally group followed
++	by a single digit (0-9) means that at most N arguments must be present
++	on the command line.
++
++ &quot;::&quot;   A double colon after a char in bb_opt_complementally means that the
++	option can occur multiple times. Each occurrence will be saved as
++	a llist_t element instead of char*.
++
++	For example:
++	The grep applet can have one or more &quot;-e pattern&quot; arguments.
++	In this case you should use bb_getopt_ulflags() as follows:
++
++	llist_t *patterns = NULL;
++
++	(this pointer must be initializated to NULL if the list is empty
++	as required by *llist_add_to(llist_t *old_head, char *new_item).)
++
++	bb_opt_complementally = &quot;e::&quot;;
++
++	bb_getopt_ulflags(argc, argv, &quot;e:&quot;, &amp;patterns);
++	$ grep -e user -e root /etc/passwd
++	root:x:0:0:root:/root:/bin/bash
++	user:x:500:500::/home/user:/bin/bash
++
++ &quot;--&quot;   A double dash at the beginning of bb_opt_complementally means the
++	argv[1] string should always be treated as options, even if it isn't
++	prefixed with a &quot;-&quot;.  This is to support the special syntax in applets
++	such as &quot;ar&quot; and &quot;tar&quot;:
++	tar xvf foo.tar
++
++ &quot;?&quot;    An &quot;?&quot; between an option and a group of options means that
++	at least one of them is required to occur if the first option
++	occurs in preceding command line arguments.
++
++	For example from &quot;id&quot; applet:
++
++	// Don't allow -n -r -rn -ug -rug -nug -rnug
++	bb_opt_complementally = &quot;r?ug:n?ug:?u--g:g--u&quot;;
++	flags = bb_getopt_ulflags(argc, argv, &quot;rnug&quot;);
++
++	This example allowed only:
++	$ id; id -u; id -g; id -ru; id -nu; id -rg; id -ng; id -rnu; id -rng
++
++ &quot;X&quot;    A bb_opt_complementally group with just a single letter means
++	that this this option is required. If more than one such group exists,
++	at least one option is required to occur (not all of them).
++	For example from &quot;start-stop-daemon&quot; applet:
++
++	// Don't allow -KS -SK, but -S or -K is required
++	bb_opt_complementally = &quot;K:S:?K--S:S--K&quot;;
++	flags = bb_getopt_ulflags(argc, argv, &quot;KS...);
++
++
++ &quot;x--x&quot; give error if double or more used -x option
++
++ Don't forget to use ':'. For example &quot;?322-22-23X-x-a&quot; is interpreted as
++ &quot;?3:22:-2:2-2:2-3Xa:2--x&quot;: max 3 args; count uses of '-2'; min 2 args;
++ if there is a '-2' option then unset '-3', '-X' and '-a'; if there is
++ a '-2' and after it a '-x' then error out.
++
++*/
++
++
++
++/* this should be bb_opt_complementary, but we'll just keep it as
++   bb_opt_complementally due to the Russian origins */
++const char *bb_opt_complementally;
++
++typedef struct {
++	int opt;
++	int list_flg;
++	unsigned long switch_on;
++	unsigned long switch_off;
++	unsigned long incongruously;
++	unsigned long requires;
++	void **optarg;               /* char **optarg or llist_t **optarg */
++	int *counter;
++} t_complementally;
++
++/* You can set bb_applet_long_options for parse called long options */
++#if ENABLE_GETOPT_LONG
++static const struct option bb_default_long_options[] = {
++/*      { &quot;help&quot;, 0, NULL, '?' }, */
++	{ 0, 0, 0, 0 }
++};
++
++const struct option *bb_applet_long_options = bb_default_long_options;
++#endif
++
++unsigned long
++bb_getopt_ulflags (int argc, char **argv, const char *applet_opts, ...)
++{
++	unsigned long flags = 0;
++	unsigned long requires = 0;
++	t_complementally complementally[sizeof(flags) * 8 + 1];
++	int c;
++	const unsigned char *s;
++	t_complementally *on_off;
++	va_list p;
++#if ENABLE_GETOPT_LONG
++	const struct option *l_o;
++#endif
++	unsigned long trigger;
++#ifdef CONFIG_PS
++	char **pargv = NULL;
++#endif
++	int min_arg = 0;
++	int max_arg = -1;
++
++#define SHOW_USAGE_IF_ERROR     1
++#define ALL_ARGV_IS_OPTS        2
++#define FIRST_ARGV_IS_OPT       4
++#define FREE_FIRST_ARGV_IS_OPT  8
++	int spec_flgs = 0;
++
++	va_start (p, applet_opts);
++
++	c = 0;
++	on_off = complementally;
++	memset(on_off, 0, sizeof(complementally));
++
++	/* skip GNU extension */
++	s = (const unsigned char *)applet_opts;
++	if(*s == '+' || *s == '-')
++		s++;
++	for (; *s; s++) {
++		if(c &gt;= (int)(sizeof(flags)*8))
++			break;
++		on_off-&gt;opt = *s;
++		on_off-&gt;switch_on = (1 &lt;&lt; c);
++		if (s[1] == ':') {
++			on_off-&gt;optarg = va_arg (p, void **);
++			do
++				s++;
++			while (s[1] == ':');
++		}
++		on_off++;
++		c++;
++	}
++
++#if ENABLE_GETOPT_LONG
++	for(l_o = bb_applet_long_options; l_o-&gt;name; l_o++) {
++		if(l_o-&gt;flag)
++			continue;
++		for(on_off = complementally; on_off-&gt;opt != 0; on_off++)
++			if(on_off-&gt;opt == l_o-&gt;val)
++				break;
++		if(on_off-&gt;opt == 0) {
++			if(c &gt;= (int)(sizeof(flags)*8))
++				break;
++			on_off-&gt;opt = l_o-&gt;val;
++			on_off-&gt;switch_on = (1 &lt;&lt; c);
++			if(l_o-&gt;has_arg != no_argument)
++				on_off-&gt;optarg = va_arg (p, void **);
++			c++;
++		}
++	}
++#endif /* ENABLE_GETOPT_LONG */
++	for (s = (const unsigned char *)bb_opt_complementally; s &amp;&amp; *s; s++) {
++		t_complementally *pair;
++		unsigned long *pair_switch;
++
++		if (*s == ':')
++			continue;
++		c = s[1];
++		if(*s == '?') {
++			if(c &lt; '0' || c &gt; '9') {
++				spec_flgs |= SHOW_USAGE_IF_ERROR;
++			} else {
++				max_arg = c - '0';
++				s++;
++			}
++			continue;
++		}
++		if(*s == '-') {
++			if(c &lt; '0' || c &gt; '9') {
++				if(c == '-') {
++					spec_flgs |= FIRST_ARGV_IS_OPT;
++					s++;
++				} else
++					spec_flgs |= ALL_ARGV_IS_OPTS;
++			} else {
++				min_arg = c - '0';
++				s++;
++			}
++			continue;
++		}
++		for (on_off = complementally; on_off-&gt;opt; on_off++)
++			if (on_off-&gt;opt == *s)
++				break;
++		if(c == ':' &amp;&amp; s[2] == ':') {
++			on_off-&gt;list_flg++;
++			continue;
++		}
++		if(c == ':' || c == '\0') {
++			requires |= on_off-&gt;switch_on;
++			continue;
++		}
++		if(c == '-' &amp;&amp; (s[2] == ':' || s[2] == '\0')) {
++			flags |= on_off-&gt;switch_on;
++			on_off-&gt;incongruously |= on_off-&gt;switch_on;
++			s++;
++			continue;
++		}
++		if(c == *s) {
++			on_off-&gt;counter = va_arg (p, int *);
++			s++;
++		}
++		pair = on_off;
++		pair_switch = &amp;(pair-&gt;switch_on);
++		for(s++; *s &amp;&amp; *s != ':'; s++) {
++			if(*s == '?') {
++				pair_switch = &amp;(pair-&gt;requires);
++			} else if (*s == '-') {
++				if(pair_switch == &amp;(pair-&gt;switch_off))
++					pair_switch = &amp;(pair-&gt;incongruously);
++				else
++					pair_switch = &amp;(pair-&gt;switch_off);
++			} else {
++			    for (on_off = complementally; on_off-&gt;opt; on_off++)
++				if (on_off-&gt;opt == *s) {
++				    *pair_switch |= on_off-&gt;switch_on;
++				    break;
++				}
++			}
++		}
++		s--;
++	}
++	va_end (p);
++
++#if defined(CONFIG_AR) || defined(CONFIG_TAR)
++	if((spec_flgs &amp; FIRST_ARGV_IS_OPT)) {
++		if(argv[1] &amp;&amp; argv[1][0] != '-' &amp;&amp; argv[1][0] != '\0') {
++			argv[1] = bb_xasprintf(&quot;-%s&quot;, argv[1]);
++			if(ENABLE_FEATURE_CLEAN_UP)
++				spec_flgs |= FREE_FIRST_ARGV_IS_OPT;
++		}
++	}
++#endif
++#if ENABLE_GETOPT_LONG
++	while ((c = getopt_long (argc, argv, applet_opts,
++				 bb_applet_long_options, NULL)) &gt;= 0) {
++#else
++	while ((c = getopt (argc, argv, applet_opts)) &gt;= 0) {
++#endif /* ENABLE_GETOPT_LONG */
++#ifdef CONFIG_PS
++loop_arg_is_opt:
++#endif
++		for (on_off = complementally; on_off-&gt;opt != c; on_off++) {
++			/* c==0 if long opt have non NULL flag */
++			if(on_off-&gt;opt == 0 &amp;&amp; c != 0)
++				bb_show_usage ();
++		}
++		if(flags &amp; on_off-&gt;incongruously) {
++			if((spec_flgs &amp; SHOW_USAGE_IF_ERROR))
++				bb_show_usage ();
++			flags |= BB_GETOPT_ERROR;
++		}
++		trigger = on_off-&gt;switch_on &amp; on_off-&gt;switch_off;
++		flags &amp;= ~(on_off-&gt;switch_off ^ trigger);
++		flags |= on_off-&gt;switch_on ^ trigger;
++		flags ^= trigger;
++		if(on_off-&gt;counter)
++			(*(on_off-&gt;counter))++;
++		if(on_off-&gt;list_flg) {
++			llist_add_to((llist_t **)(on_off-&gt;optarg), optarg);
++		} else if (on_off-&gt;optarg) {
++			*(char **)(on_off-&gt;optarg) = optarg;
++		}
++#ifdef CONFIG_PS
++		if(pargv != NULL)
++			break;
++#endif
++	}
++
++#ifdef CONFIG_PS
++	if((spec_flgs &amp; ALL_ARGV_IS_OPTS)) {
++		/* process argv is option, for example &quot;ps&quot; applet */
++		if(pargv == NULL)
++			pargv = argv + optind;
++		while(*pargv) {
++			c = **pargv;
++			if(c == '\0') {
++				pargv++;
++			} else {
++				(*pargv)++;
++				goto loop_arg_is_opt;
++			}
++		}
++	}
++#endif
++
++#if (defined(CONFIG_AR) || defined(CONFIG_TAR)) &amp;&amp; \
++				defined(CONFIG_FEATURE_CLEAN_UP)
++	if((spec_flgs &amp; FREE_FIRST_ARGV_IS_OPT))
++		free(argv[1]);
++#endif
++	/* check depending requires for given options */
++	for (on_off = complementally; on_off-&gt;opt; on_off++) {
++		if(on_off-&gt;requires &amp;&amp; (flags &amp; on_off-&gt;switch_on) &amp;&amp;
++					(flags &amp; on_off-&gt;requires) == 0)
++			bb_show_usage ();
++	}
++	if(requires &amp;&amp; (flags &amp; requires) == 0)
++		bb_show_usage ();
++	argc -= optind;
++	if(argc &lt; min_arg || (max_arg &gt;= 0 &amp;&amp; argc &gt; max_arg))
++		bb_show_usage ();
++	return flags;
++}
+
+Modified: trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/libbb.h
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/libbb.h	2006-09-15 03:39:45 UTC (rev 213)
++++ trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/libbb.h	2006-09-15 21:17:09 UTC (rev 214)
+@@ -340,4 +340,40 @@
+ extern size_t xstrlen(const char *string);
+ #define strlen(x)	xstrlen(x)
+ 
++/* *** jmc: stuff from 1.2.1 *************************** */
++#define BB_GETOPT_ERROR 0x80000000UL
++#define ENABLE_GETOPT_LONG 1
++
++typedef struct llist_s {
++	char *data;
++	struct llist_s *link;
++} llist_t;
++extern void llist_add_to(llist_t **old_head, void *data);
++extern void llist_add_to_end(llist_t **list_head, void *data);
++extern void *llist_pop(llist_t **elm);
++extern void llist_free(llist_t *elm, void (*freeit)(void *data));
++
++#ifndef bb_show_usage
++#define bb_show_usage show_usage
++#endif
++
++#ifndef bb_perror_msg
++#define bb_perror_msg perror_msg
++#endif
++
++#ifndef bb_perror_msg_and_die
++#define bb_perror_msg_and_die perror_msg_and_die
++#endif
++
++#ifndef bb_mode_string
++#define bb_mode_string mode_string
++#endif
++
++#define L_llist_add_to
++#define L_llist_add_to_end
++#define L_llist_pop
++#define L_llist_free
++
++/* *** end stuff from 1.21 ***************************** */
++
+ #endif /* __LIBBB_H__ */
+
+Added: trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/llist.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/llist.c	2006-09-15 03:39:45 UTC (rev 213)
++++ trunk/Marvell/Src/uClinux-dist/user/busybox/libbb/llist.c	2006-09-15 21:17:09 UTC (rev 214)
+@@ -0,0 +1,71 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * linked list helper functions.
++ *
++ * Copyright (C) 2003 Glenn McGrath
++ * Copyright (C) 2005 Vladimir Oleynik
++ * Copyright (C) 2005 Bernhard Fischer
++ * Copyright (C) 2006 Rob Landley &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">rob at landley.net</A>&gt;
++ *
++ * Licensed under the GPL v2, see the file LICENSE in this tarball.
++ */
++#include &lt;stdlib.h&gt;
++#include &quot;libbb.h&quot;
++
++#ifdef L_llist_add_to
++/* Add data to the start of the linked list.  */
++void llist_add_to(llist_t **old_head, void *data)
++{
++	llist_t *new_head = xmalloc(sizeof(llist_t));
++	new_head-&gt;data = data;
++	new_head-&gt;link = *old_head;
++	*old_head = new_head;
++}
++#endif
++
++#ifdef L_llist_add_to_end
++/* Add data to the end of the linked list.  */
++void llist_add_to_end(llist_t **list_head, void *data)
++{
++	llist_t *new_item = xmalloc(sizeof(llist_t));
++	new_item-&gt;data = data;
++	new_item-&gt;link = NULL;
++
++	if (!*list_head) *list_head = new_item;
++	else {
++		llist_t *tail = *list_head;
++		while (tail-&gt;link) tail = tail-&gt;link;
++		tail-&gt;link = new_item;
++	}
++}
++#endif
++
++#ifdef L_llist_pop
++/* Remove first element from the list and return it */
++void *llist_pop(llist_t **head)
++{
++	void *data;
++
++	if(!*head) data = *head;
++	else {
++		void *next = (*head)-&gt;link;
++		data = (*head)-&gt;data;
++		free(*head);
++		*head = next;
++	}
++
++	return data;
++}
++#endif
++
++#ifdef L_llist_free
++/* Recursively free all elements in the linked list.  If freeit != NULL
++ * call it on each datum in the list */
++void llist_free(llist_t *elm, void (*freeit)(void *data))
++{
++	while (elm) {
++		void *data = llist_pop(&amp;elm);
++		if (freeit) freeit(data);
++	}
++}
++#endif
+
+Modified: trunk/Marvell/Src/uClinux-dist/user/busybox/ls.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/busybox/ls.c	2006-09-15 03:39:45 UTC (rev 213)
++++ trunk/Marvell/Src/uClinux-dist/user/busybox/ls.c	2006-09-15 21:17:09 UTC (rev 214)
+@@ -3,19 +3,7 @@
+  * tiny-ls.c version 0.1.0: A minimalist 'ls'
+  * Copyright (C) 1996 Brian Candler &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">B.Candler at pobox.com</A>&gt;
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Licensed under GPLv2 or later, see file LICENSE in this tarball for details.
+  */
+ 
+ /*
+@@ -41,206 +29,276 @@
+  * 1. requires lstat (BSD) - how do you do it without?
+  */
+ 
+-enum {
+-	TERMINAL_WIDTH = 80,		/* use 79 if terminal has linefold bug */
+-	COLUMN_WIDTH = 14,			/* default if AUTOWIDTH not defined */
+-	COLUMN_GAP = 2,				/* includes the file type char */
+-};
+ 
+-
+-/************************************************************************/
+-
+-#include &lt;sys/types.h&gt;
+-#include &lt;sys/stat.h&gt;
+-#include &lt;stdio.h&gt;
++#include &quot;busybox.h&quot;
+ #include &lt;unistd.h&gt;
+-#include &lt;dirent.h&gt;
+ #include &lt;errno.h&gt;
+-#include &lt;stdio.h&gt;
+ #include &lt;string.h&gt;
+-#include &lt;stdlib.h&gt;
+ #include &lt;fcntl.h&gt;
+ #include &lt;signal.h&gt;
+-#include &lt;termios.h&gt;
++#include &lt;getopt.h&gt; /* struct option */
+ #include &lt;sys/ioctl.h&gt;
+-#include &quot;busybox.h&quot;
+-
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
++#include &lt;sys/sysmacros.h&gt;     /* major() and minor() */
+ #include &lt;time.h&gt;
+-#endif
+ 
+-#ifndef MAJOR
+-#define MAJOR(dev) (((dev)&gt;&gt;8)&amp;0xff)
+-#define MINOR(dev) ((dev)&amp;0xff)
+-#endif
+ 
+-/* what is the overall style of the listing */
++/* ********************************************************** */
++/* jmc */
++/* temp trash to port this 1.21 code into 0.60 */
++/* since this is temporary, i just threw it in instead of doing 'right' */
++#include &lt;stdlib.h&gt;  /* for free */
++#include &lt;sys/types.h&gt;
++#include &lt;dirent.h&gt;
++
++static const struct option bb_default_long_options[] = {
++/*      { &quot;help&quot;, 0, NULL, '?' }, */
++	{ 0, 0, 0, 0 }
++};
++
++extern const struct option *bb_applet_long_options;
++
++unsigned long
++bb_getopt_ulflags (int argc, char **argv, const char *applet_opts, ...);
++extern const struct option *bb_applet_long_options;
++#define EXIT_SUCCESS 0
++#define EXIT_FAILURE 1
++#define ENABLE_FEATURE_LS_SORTFILES 1
++#define BB_FEATURE_LS_SORTFILES 1
++#define ENABLE_FEATURE_LS_RECURSIVE 0
++#define ENABLE_FEATURE_LS_TIMESTAMPS 0
++#define ENABLE_FEATURE_CLEAN_UP 1
++#define CONFIG_FEATURE_LS_COLOR 1
++#define CONFIG_FEATURE_LS_COLOR_IS_DEFAULT 1
++
++#define USE_FEATURE_LS_FILETYPES(...)  __VA_ARGS__
++#define USE_FEATURE_LS_FOLLOWLINKS(...)  __VA_ARGS__
++#define USE_FEATURE_LS_RECURSIVE(...)  __VA_ARGS__
++#define USE_FEATURE_LS_SORTFILES(...)  __VA_ARGS__
++#define USE_FEATURE_LS_TIMESTAMPS(...)  __VA_ARGS__
++#define USE_FEATURE_LS_USERNAME(...)
++#define USE_FEATURE_LS_COLOR(...)  __VA_ARGS__
++#define USE_FEATURE_LS_COLOR_IS_DEFAULT(...)  __VA_ARGS__
++#define USE_FEATURE_LSMOD_PRETTY_2_6_OUTPUT(...)
++
++DIR *bb_opendir(const char *path)
++{
++	DIR *dp;
++
++	if ((dp = opendir(path)) == NULL) {
++		bb_perror_msg(&quot;unable to open `%s'&quot;, path);
++		return NULL;
++	}
++	return dp;
++}
++
++DIR *bb_xopendir(const char *path)
++{
++	DIR *dp;
++
++	if ((dp = opendir(path)) == NULL) {
++		bb_perror_msg_and_die(&quot;unable to open `%s'&quot;, path);
++	}
++	return dp;
++}
++/* end hack to get this 1.21 code working in 0.60 */
++/* ********************************************************** */
++
++
++
+ enum {
+-STYLE_AUTO = 0,
+-STYLE_LONG = 1,		/* one record per line, extended info */
+-STYLE_SINGLE = 2,		/* one record per line */
+-STYLE_COLUMNS = 3		/* fill columns */
++	TERMINAL_WIDTH = 80,	/* use 79 if terminal has linefold bug */
++	COLUMN_GAP = 2,		/* includes the file type char */
+ };
+ 
++/************************************************************************/
++
++/* what is the overall style of the listing */
++#define STYLE_COLUMNS   (1U&lt;&lt;21)	/* fill columns */
++#define STYLE_LONG      (2U&lt;&lt;21)	/* one record per line, extended info */
++#define STYLE_SINGLE    (3U&lt;&lt;21)	/* one record per line */
++
++#define STYLE_MASK                 STYLE_SINGLE
++#define STYLE_ONE_RECORD_FLAG      STYLE_LONG
++
+ /* 51306 lrwxrwxrwx  1 root     root         2 May 11 01:43 /bin/view -&gt; vi* */
+ /* what file information will be listed */
+-#define LIST_INO		(1&lt;&lt;0)
+-#define LIST_BLOCKS		(1&lt;&lt;1)
+-#define LIST_MODEBITS	(1&lt;&lt;2)
+-#define LIST_NLINKS		(1&lt;&lt;3)
+-#define LIST_ID_NAME	(1&lt;&lt;4)
+-#define LIST_ID_NUMERIC	(1&lt;&lt;5)
+-#define LIST_SIZE		(1&lt;&lt;6)
+-#define LIST_DEV		(1&lt;&lt;7)
+-#define LIST_DATE_TIME	(1&lt;&lt;8)
+-#define LIST_FULLTIME	(1&lt;&lt;9)
+-#define LIST_FILENAME	(1&lt;&lt;10)
+-#define LIST_SYMLINK	(1&lt;&lt;11)
+-#define LIST_FILETYPE	(1&lt;&lt;12)
+-#define LIST_EXEC		(1&lt;&lt;13)
++#define LIST_INO	(1U&lt;&lt;0)
++#define LIST_BLOCKS	(1U&lt;&lt;1)
++#define LIST_MODEBITS	(1U&lt;&lt;2)
++#define LIST_NLINKS	(1U&lt;&lt;3)
++#define LIST_ID_NAME	(1U&lt;&lt;4)
++#define LIST_ID_NUMERIC	(1U&lt;&lt;5)
++#define LIST_CONTEXT	(1U&lt;&lt;6)
++#define LIST_SIZE	(1U&lt;&lt;7)
++#define LIST_DEV	(1U&lt;&lt;8)
++#define LIST_DATE_TIME	(1U&lt;&lt;9)
++#define LIST_FULLTIME	(1U&lt;&lt;10)
++#define LIST_FILENAME	(1U&lt;&lt;11)
++#define LIST_SYMLINK	(1U&lt;&lt;12)
++#define LIST_FILETYPE	(1U&lt;&lt;13)
++#define LIST_EXEC	(1U&lt;&lt;14)
+ 
++#define LIST_MASK       ((LIST_EXEC &lt;&lt; 1) - 1)
++
+ /* what files will be displayed */
+-#define DISP_NORMAL		(0)		/* show normal filenames */
+-#define DISP_DIRNAME	(1&lt;&lt;0)	/* 2 or more items? label directories */
+-#define DISP_HIDDEN		(1&lt;&lt;1)	/* show filenames starting with .  */
+-#define DISP_DOT		(1&lt;&lt;2)	/* show . and .. */
+-#define DISP_NOLIST		(1&lt;&lt;3)	/* show directory as itself, not contents */
+-#define DISP_RECURSIVE	(1&lt;&lt;4)	/* show directory and everything below it */
+-#define DISP_ROWS		(1&lt;&lt;5)	/* print across rows */
++#define DISP_DIRNAME	(1U&lt;&lt;15)	/* 2 or more items? label directories */
++#define DISP_HIDDEN	(1U&lt;&lt;16)	/* show filenames starting with .  */
++#define DISP_DOT	(1U&lt;&lt;17)	/* show . and .. */
++#define DISP_NOLIST	(1U&lt;&lt;18)	/* show directory as itself, not contents */
++#define DISP_RECURSIVE	(1U&lt;&lt;19)	/* show directory and everything below it */
++#define DISP_ROWS	(1U&lt;&lt;20)	/* print across rows */
+ 
+-#ifdef BB_FEATURE_LS_SORTFILES
++#define DISP_MASK       (((DISP_ROWS &lt;&lt; 1) - 1) &amp; ~(DISP_DIRNAME - 1))
++
++// CONFIG_FEATURE_LS_SORTFILES
+ /* how will the files be sorted */
+-static const int SORT_FORWARD = 0;		/* sort in reverse order */
+-static const int SORT_REVERSE = 1;		/* sort in reverse order */
+-static const int SORT_NAME = 2;		/* sort by file name */
+-static const int SORT_SIZE = 3;		/* sort by file size */
+-static const int SORT_ATIME = 4;		/* sort by last access time */
+-static const int SORT_CTIME = 5;		/* sort by last change time */
+-static const int SORT_MTIME = 6;		/* sort by last modification time */
+-static const int SORT_VERSION = 7;		/* sort by version */
+-static const int SORT_EXT = 8;		/* sort by file name extension */
+-static const int SORT_DIR = 9;		/* sort by file or directory */
+-#endif
++#define SORT_ORDER_FORWARD   0		/* sort in reverse order */
++#define SORT_ORDER_REVERSE   (1U&lt;&lt;27)	/* sort in reverse order */
+ 
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
++#define SORT_NAME      0		/* sort by file name */
++#define SORT_SIZE      (1U&lt;&lt;28)		/* sort by file size */
++#define SORT_ATIME     (2U&lt;&lt;28)		/* sort by last access time */
++#define SORT_CTIME     (3U&lt;&lt;28)		/* sort by last change time */
++#define SORT_MTIME     (4U&lt;&lt;28)		/* sort by last modification time */
++#define SORT_VERSION   (5U&lt;&lt;28)		/* sort by version */
++#define SORT_EXT       (6U&lt;&lt;28)		/* sort by file name extension */
++#define SORT_DIR       (7U&lt;&lt;28)		/* sort by file or directory */
++
++#define SORT_MASK      (7U&lt;&lt;28)
++
+ /* which of the three times will be used */
+-static const int TIME_MOD = 0;
+-static const int TIME_CHANGE = 1;
+-static const int TIME_ACCESS = 2;
++#define TIME_CHANGE    ((1U&lt;&lt;23) * ENABLE_FEATURE_LS_TIMESTAMPS)
++#define TIME_ACCESS    ((1U&lt;&lt;24) * ENABLE_FEATURE_LS_TIMESTAMPS)
++#define TIME_MASK      ((3U&lt;&lt;23) * ENABLE_FEATURE_LS_TIMESTAMPS)
++
++#ifdef CONFIG_FEATURE_LS_FOLLOWLINKS
++#define FOLLOW_LINKS   (1U&lt;&lt;25)
+ #endif
++#ifdef CONFIG_FEATURE_HUMAN_READABLE
++#define LS_DISP_HR     (1U&lt;&lt;26)
++#endif
+ 
+-#define LIST_SHORT		(LIST_FILENAME)
+-#define LIST_ISHORT		(LIST_INO | LIST_FILENAME)
+-#define LIST_LONG		(LIST_MODEBITS | LIST_NLINKS | LIST_ID_NAME | \
+-						LIST_SIZE | LIST_DATE_TIME | LIST_FILENAME | \
+-						LIST_SYMLINK)
+-#define LIST_ILONG		(LIST_INO | LIST_LONG)
++#define LIST_SHORT	(LIST_FILENAME)
++#define LIST_ISHORT	(LIST_INO | LIST_FILENAME)
++#define LIST_LONG	(LIST_MODEBITS | LIST_NLINKS | LIST_ID_NAME | LIST_SIZE | \
++						LIST_DATE_TIME | LIST_FILENAME | LIST_SYMLINK)
++#define LIST_ILONG	(LIST_INO | LIST_LONG)
+ 
+-static const int SPLIT_DIR = 0;
+-static const int SPLIT_FILE = 1;
+-static const int SPLIT_SUBDIR = 2;
++#define SPLIT_DIR      1
++#define SPLIT_FILE     0
++#define SPLIT_SUBDIR   2
+ 
+ #define TYPEINDEX(mode) (((mode) &gt;&gt; 12) &amp; 0x0f)
+ #define TYPECHAR(mode)  (&quot;0pcCd?bB-?l?s???&quot; [TYPEINDEX(mode)])
+-#if defined(BB_FEATURE_LS_FILETYPES) || defined(BB_FEATURE_LS_COLOR)
+-#define APPCHAR(mode)   (&quot;\0|\0\0/\0\0\0\0\0@\0=\0\0\0&quot; [TYPEINDEX(mode)])
++
++#if defined(CONFIG_FEATURE_LS_FILETYPES) || defined(CONFIG_FEATURE_LS_COLOR)
++# define APPCHAR(mode)   (&quot;\0|\0\0/\0\0\0\0\0@\0=\0\0\0&quot; [TYPEINDEX(mode)])
+ #endif
++
+ /* colored LS support by JaWi, <A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">janwillem.janssen at lxtreme.nl</A> */
+-#ifdef BB_FEATURE_LS_COLOR
++#ifdef CONFIG_FEATURE_LS_COLOR
++
+ static int show_color = 0;
+-#define COLOR(mode)   (&quot;\000\043\043\043\042\000\043\043&quot;\
+-					   &quot;\000\000\044\000\043\000\000\040&quot; [TYPEINDEX(mode)])
+-#define ATTR(mode)   (&quot;\00\00\01\00\01\00\01\00&quot;\
+-					  &quot;\00\00\01\00\01\00\00\01&quot; [TYPEINDEX(mode)])
++
++/* long option entry used only for --color, which has no short option
++ * equivalent.  */
++static const struct option ls_color_opt[] =
++{
++	{&quot;color&quot;, optional_argument, NULL, 1},
++	{NULL, 0, NULL, 0}
++};
++
++#define COLOR(mode)	(&quot;\000\043\043\043\042\000\043\043&quot;\
++			 &quot;\000\000\044\000\043\000\000\040&quot; [TYPEINDEX(mode)])
++#define ATTR(mode)	(&quot;\00\00\01\00\01\00\01\00&quot;\
++			 &quot;\00\00\01\00\01\00\00\01&quot; [TYPEINDEX(mode)])
+ #endif
+ 
+ /*
+  * a directory entry and its stat info are stored here
+  */
+-struct dnode {				/* the basic node */
+-    char *name;				/* the dir entry name */
+-    char *fullname;			/* the dir entry name */
+-    struct stat dstat;		/* the file stat info */
+-    struct dnode *next;		/* point at the next node */
++struct dnode {			/* the basic node */
++	char *name;		/* the dir entry name */
++	char *fullname;		/* the dir entry name */
++	int   allocated;
++	struct stat dstat;	/* the file stat info */
++#ifdef CONFIG_SELINUX
++	security_context_t sid;
++#endif
++	struct dnode *next;	/* point at the next node */
+ };
+ typedef struct dnode dnode_t;
+ 
+-static struct dnode **list_dir(char *);
++static struct dnode **list_dir(const char *);
+ static struct dnode **dnalloc(int);
+ static int list_single(struct dnode *);
+ 
+-static unsigned int disp_opts;
+-static unsigned int style_fmt;
+-static unsigned int list_fmt;
+-#ifdef BB_FEATURE_LS_SORTFILES
+-static unsigned int sort_opts;
+-static unsigned int sort_order;
+-#endif
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-static unsigned int time_fmt;
+-#endif
+-#ifdef BB_FEATURE_LS_FOLLOWLINKS
+-static unsigned int follow_links=FALSE;
+-#endif
++static unsigned int all_fmt;
+ 
+-static unsigned short column = 0;
+-#ifdef BB_FEATURE_AUTOWIDTH
+-static unsigned short terminal_width = TERMINAL_WIDTH;
+-static unsigned short column_width = COLUMN_WIDTH;
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++static int terminal_width = TERMINAL_WIDTH;
+ static unsigned short tabstops = COLUMN_GAP;
+ #else
+-static unsigned short column_width = COLUMN_WIDTH;
++#define tabstops COLUMN_GAP
++#define terminal_width TERMINAL_WIDTH
+ #endif
+ 
+ static int status = EXIT_SUCCESS;
+ 
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-static unsigned long ls_disp_hr = 0;
++static struct dnode *my_stat(char *fullname, char *name)
++{
++	struct stat dstat;
++	struct dnode *cur;
++#ifdef CONFIG_SELINUX
++	security_context_t sid=NULL;
+ #endif
+ 
+-static int my_stat(struct dnode *cur)
+-{
+-#ifdef BB_FEATURE_LS_FOLLOWLINKS
+-	if (follow_links == TRUE) {
+-		if (stat(cur-&gt;fullname, &amp;cur-&gt;dstat)) {
+-			perror_msg(&quot;%s&quot;, cur-&gt;fullname);
++#ifdef CONFIG_FEATURE_LS_FOLLOWLINKS
++	if (all_fmt &amp; FOLLOW_LINKS) {
++#ifdef CONFIG_SELINUX
++		if (is_selinux_enabled())  {
++			 getfilecon(fullname,&amp;sid);
++		}
++#endif
++		if (stat(fullname, &amp;dstat)) {
++			bb_perror_msg(&quot;%s&quot;, fullname);
+ 			status = EXIT_FAILURE;
+-			free(cur-&gt;fullname);
+-			free(cur);
+-			return -1;
++			return 0;
+ 		}
+ 	} else
+ #endif
+-	if (lstat(cur-&gt;fullname, &amp;cur-&gt;dstat)) {
+-		perror_msg(&quot;%s&quot;, cur-&gt;fullname);
+-		status = EXIT_FAILURE;
+-		free(cur-&gt;fullname);
+-		free(cur);
+-		return -1;
++	{
++#ifdef CONFIG_SELINUX
++	        if  (is_selinux_enabled())  {
++		  lgetfilecon(fullname,&amp;sid);
++		}
++#endif
++		if (lstat(fullname, &amp;dstat)) {
++			bb_perror_msg(&quot;%s&quot;, fullname);
++			status = EXIT_FAILURE;
++			return 0;
++		}
+ 	}
+-	return 0;
+-}
+ 
+-static void newline(void)
+-{
+-    if (column &gt; 0) {
+-        putchar('\n');
+-        column = 0;
+-    }
++	cur = (struct dnode *) xmalloc(sizeof(struct dnode));
++	cur-&gt;fullname = fullname;
++	cur-&gt;name = name;
++	cur-&gt;dstat = dstat;
++#ifdef CONFIG_SELINUX
++	cur-&gt;sid = sid;
++#endif
++	return cur;
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-#ifdef BB_FEATURE_LS_COLOR
++#ifdef CONFIG_FEATURE_LS_COLOR
+ static char fgcolor(mode_t mode)
+ {
+-	/* Check if the file is missing */
+-	if ( errno == ENOENT ) {
+-		errno = 0;
+-		/* Color it red! */
+-	    return '\037';
++	/* Check wheter the file is existing (if so, color it red!) */
++	if (errno == ENOENT) {
++		return '\037';
+ 	}
+-	if ( LIST_EXEC &amp;&amp; S_ISREG( mode )
+-	    &amp;&amp; ( mode &amp; ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ) 
++	if (S_ISREG(mode) &amp;&amp; (mode &amp; (S_IXUSR | S_IXGRP | S_IXOTH)))
+ 		return COLOR(0xF000);	/* File is executable ... */
+ 	return COLOR(mode);
+ }
+@@ -248,83 +306,63 @@
+ /*----------------------------------------------------------------------*/
+ static char bgcolor(mode_t mode)
+ {
+-	if ( LIST_EXEC &amp;&amp; S_ISREG( mode )
+-	    &amp;&amp; ( mode &amp; ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ) 
++	if (S_ISREG(mode) &amp;&amp; (mode &amp; (S_IXUSR | S_IXGRP | S_IXOTH)))
+ 		return ATTR(0xF000);	/* File is executable ... */
+ 	return ATTR(mode);
+ }
+ #endif
+ 
+ /*----------------------------------------------------------------------*/
+-#if defined(BB_FEATURE_LS_FILETYPES) || defined(BB_FEATURE_LS_COLOR)
++#if defined(CONFIG_FEATURE_LS_FILETYPES) || defined(CONFIG_FEATURE_LS_COLOR)
+ static char append_char(mode_t mode)
+ {
+-	if ( !(list_fmt &amp; LIST_FILETYPE))
++	if (!(all_fmt &amp; LIST_FILETYPE))
+ 		return '\0';
+-	if ((list_fmt &amp; LIST_EXEC) &amp;&amp; S_ISREG(mode)
+-	    &amp;&amp; (mode &amp; (S_IXUSR | S_IXGRP | S_IXOTH))) return '*';
+-		return APPCHAR(mode);
++	if (S_ISDIR(mode))
++		return '/';
++	if (!(all_fmt &amp; LIST_EXEC))
++		return '\0';
++	if (S_ISREG(mode) &amp;&amp; (mode &amp; (S_IXUSR | S_IXGRP | S_IXOTH)))
++		return '*';
++	return APPCHAR(mode);
+ }
+ #endif
+ 
+ /*----------------------------------------------------------------------*/
+-static void nexttabstop( void )
+-{
+-	static short nexttab= 0;
+-	int n=0;
+ 
+-	if (column &gt; 0) {
+-		n= nexttab - column;
+-		if (n &lt; 1) n= 1;
+-		while (n--) {
+-			putchar(' ');
+-			column++;
+-		}
+-	}
+-	nexttab= column + column_width + COLUMN_GAP; 
+-}
++#define countdirs(A,B) count_dirs((A), (B), 1)
++#define countsubdirs(A,B) count_dirs((A), (B), 0)
+ 
+-/*----------------------------------------------------------------------*/
+-static int is_subdir(struct dnode *dn)
++static int count_dirs(struct dnode **dn, int nfiles, int notsubdirs)
+ {
+-	return (S_ISDIR(dn-&gt;dstat.st_mode) &amp;&amp; strcmp(dn-&gt;name, &quot;.&quot;) != 0 &amp;&amp;
+-			strcmp(dn-&gt;name, &quot;..&quot;) != 0);
+-}
+-
+-static int countdirs(struct dnode **dn, int nfiles)
+-{
+ 	int i, dirs;
+ 
+-	if (dn==NULL || nfiles &lt; 1) return(0);
+-	dirs= 0;
+-	for (i=0; i&lt;nfiles; i++) {
+-		if (S_ISDIR(dn[i]-&gt;dstat.st_mode)) dirs++;
++	if (dn == NULL || nfiles &lt; 1)
++		return (0);
++	dirs = 0;
++	for (i = 0; i &lt; nfiles; i++) {
++		if (S_ISDIR(dn[i]-&gt;dstat.st_mode)
++			&amp;&amp; (notsubdirs ||
++			((dn[i]-&gt;name[0] != '.') || (dn[i]-&gt;name[1]
++						&amp;&amp; ((dn[i]-&gt;name[1] != '.')
++						|| dn[i]-&gt;name[2])))))
++			dirs++;
+ 	}
+-	return(dirs);
++	return (dirs);
+ }
+ 
+-static int countsubdirs(struct dnode **dn, int nfiles)
+-{
+-	int i, subdirs;
+-
+-	if (dn == NULL || nfiles &lt; 1) return 0;
+-	subdirs = 0;
+-	for (i = 0; i &lt; nfiles; i++)
+-		if (is_subdir(dn[i]))
+-			subdirs++;
+-	return subdirs;
+-}
+-
+ static int countfiles(struct dnode **dnp)
+ {
+ 	int nfiles;
+ 	struct dnode *cur;
+ 
+-	if (dnp == NULL) return(0);
+-	nfiles= 0;
+-	for (cur= dnp[0];  cur-&gt;next != NULL ; cur= cur-&gt;next) nfiles++;
++	if (dnp == NULL)
++		return (0);
++	nfiles = 0;
++	for (cur = dnp[0]; cur-&gt;next != NULL; cur = cur-&gt;next)
++		nfiles++;
+ 	nfiles++;
+-	return(nfiles);
++	return (nfiles);
+ }
+ 
+ /* get memory to hold an array of pointers */
+@@ -332,28 +370,31 @@
+ {
+ 	struct dnode **p;
+ 
+-	if (num &lt; 1) return(NULL);
++	if (num &lt; 1)
++		return (NULL);
+ 
+-	p= (struct dnode **)xcalloc((size_t)num, (size_t)(sizeof(struct dnode *)));
+-	return(p);
++	p = (struct dnode **) xcalloc((size_t) num, (size_t) (sizeof(struct dnode *)));
++	return (p);
+ }
+ 
+-#ifdef BB_FEATURE_LS_RECURSIVE
+-static void dfree(struct dnode **dnp)
++#ifdef CONFIG_FEATURE_LS_RECURSIVE
++static void dfree(struct dnode **dnp, int nfiles)
+ {
+-	struct dnode *cur, *next;
++	int i;
+ 
+-	if(dnp == NULL) return;
++	if (dnp == NULL)
++		return;
+ 
+-	cur=dnp[0];
+-	while (cur != NULL) {
+-		if (cur-&gt;fullname != NULL) free(cur-&gt;fullname);	/* free the filename */
+-		next= cur-&gt;next;
+-		free(cur);				/* free the dnode */
+-		cur= next;
++	for (i = 0; i &lt; nfiles; i++) {
++		struct dnode *cur = dnp[i];
++		if(cur-&gt;allocated)
++			free(cur-&gt;fullname);	/* free the filename */
++		free(cur);		/* free the dnode */
+ 	}
+-	free(dnp);	/* free the array holding the dnode pointers */
++	free(dnp);			/* free the array holding the dnode pointers */
+ }
++#else
++#define dfree(...)
+ #endif
+ 
+ static struct dnode **splitdnarray(struct dnode **dn, int nfiles, int which)
+@@ -361,569 +402,682 @@
+ 	int dncnt, i, d;
+ 	struct dnode **dnp;
+ 
+-	if (dn==NULL || nfiles &lt; 1) return(NULL);
++	if (dn == NULL || nfiles &lt; 1)
++		return (NULL);
+ 
+ 	/* count how many dirs and regular files there are */
+ 	if (which == SPLIT_SUBDIR)
+ 		dncnt = countsubdirs(dn, nfiles);
+ 	else {
+-		dncnt= countdirs(dn, nfiles); /* assume we are looking for dirs */
++		dncnt = countdirs(dn, nfiles);	/* assume we are looking for dirs */
+ 		if (which == SPLIT_FILE)
+-			dncnt= nfiles - dncnt;  /* looking for files */
++			dncnt = nfiles - dncnt;	/* looking for files */
+ 	}
+ 
+ 	/* allocate a file array and a dir array */
+-	dnp= dnalloc(dncnt);
++	dnp = dnalloc(dncnt);
+ 
+ 	/* copy the entrys into the file or dir array */
+-	for (d= i=0; i&lt;nfiles; i++) {
+-		if (which == SPLIT_DIR) {
+-			if (S_ISDIR(dn[i]-&gt;dstat.st_mode)) {
+-				dnp[d++]= dn[i];
+-			}  /* else skip the file */
+-		} else if (which == SPLIT_SUBDIR) {
+-			if (is_subdir(dn[i])) {
+-				dnp[d++]= dn[i];
+-			}  /* else skip the file or dir */
+-		} else {
+-			if (!(S_ISDIR(dn[i]-&gt;dstat.st_mode))) {
+-				dnp[d++]= dn[i];
+-			}  /* else skip the dir */
++	for (d = i = 0; i &lt; nfiles; i++) {
++		if (S_ISDIR(dn[i]-&gt;dstat.st_mode)) {
++			if (which &amp; (SPLIT_DIR|SPLIT_SUBDIR)) {
++				if ((which &amp; SPLIT_DIR)
++					|| ((dn[i]-&gt;name[0] != '.')
++						|| (dn[i]-&gt;name[1]
++							&amp;&amp; ((dn[i]-&gt;name[1] != '.')
++								|| dn[i]-&gt;name[2])))) {
++									dnp[d++] = dn[i];
++								}
++			}
++		} else if (!(which &amp; (SPLIT_DIR|SPLIT_SUBDIR))) {
++			dnp[d++] = dn[i];
+ 		}
+ 	}
+-	return(dnp);
++	return (dnp);
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-#ifdef BB_FEATURE_LS_SORTFILES
+-static int sortcmp(struct dnode *d1, struct dnode *d2)
++#ifdef CONFIG_FEATURE_LS_SORTFILES
++static int sortcmp(const void *a, const void *b)
+ {
+-	int cmp, dif;
++	struct dnode *d1 = *(struct dnode **)a;
++	struct dnode *d2 = *(struct dnode **)b;
++	unsigned int sort_opts = all_fmt &amp; SORT_MASK;
++	int dif;
+ 
+-	cmp= 0;
++	dif = 0;			/* assume SORT_NAME */
+ 	if (sort_opts == SORT_SIZE) {
+-		dif= (int)(d1-&gt;dstat.st_size - d2-&gt;dstat.st_size);
++		dif = (int) (d2-&gt;dstat.st_size - d1-&gt;dstat.st_size);
+ 	} else if (sort_opts == SORT_ATIME) {
+-		dif= (int)(d1-&gt;dstat.st_atime - d2-&gt;dstat.st_atime);
++		dif = (int) (d2-&gt;dstat.st_atime - d1-&gt;dstat.st_atime);
+ 	} else if (sort_opts == SORT_CTIME) {
+-		dif= (int)(d1-&gt;dstat.st_ctime - d2-&gt;dstat.st_ctime);
++		dif = (int) (d2-&gt;dstat.st_ctime - d1-&gt;dstat.st_ctime);
+ 	} else if (sort_opts == SORT_MTIME) {
+-		dif= (int)(d1-&gt;dstat.st_mtime - d2-&gt;dstat.st_mtime);
++		dif = (int) (d2-&gt;dstat.st_mtime - d1-&gt;dstat.st_mtime);
+ 	} else if (sort_opts == SORT_DIR) {
+-		dif= S_ISDIR(d1-&gt;dstat.st_mode) - S_ISDIR(d2-&gt;dstat.st_mode);
+-	/* } else if (sort_opts == SORT_VERSION) { */
+-	/* } else if (sort_opts == SORT_EXT) { */
+-	} else {    /* assume SORT_NAME */
+-		dif= 0;
++		dif = S_ISDIR(d2-&gt;dstat.st_mode) - S_ISDIR(d1-&gt;dstat.st_mode);
++		/* } else if (sort_opts == SORT_VERSION) { */
++		/* } else if (sort_opts == SORT_EXT) { */
+ 	}
+ 
+-	if (dif &gt; 0) cmp= -1;
+-	if (dif &lt; 0) cmp=  1;
+ 	if (dif == 0) {
+ 		/* sort by name- may be a tie_breaker for time or size cmp */
+-		dif= strcmp(d1-&gt;name, d2-&gt;name);
+-		if (dif &gt; 0) cmp=  1;
+-		if (dif &lt; 0) cmp= -1;
++		if (ENABLE_LOCALE_SUPPORT) dif = strcoll(d1-&gt;name, d2-&gt;name);
++		else dif = strcmp(d1-&gt;name, d2-&gt;name);
+ 	}
+ 
+-	if (sort_order == SORT_REVERSE) {
+-		cmp=  -1 * cmp;
++	if (all_fmt &amp; SORT_ORDER_REVERSE) {
++		dif = -dif;
+ 	}
+-	return(cmp);
++	return (dif);
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-static void shellsort(struct dnode **dn, int size)
++static void dnsort(struct dnode **dn, int size)
+ {
+-	struct dnode *temp;
+-	int gap, i, j;
+-
+-	/* shell short the array */
+-	if(dn==NULL || size &lt; 2) return;
+-
+-	for (gap= size/2; gap&gt;0; gap /=2) {
+-		for (i=gap; i&lt;size; i++) {
+-			for (j= i-gap; j&gt;=0; j-=gap) {
+-				if (sortcmp(dn[j], dn[j+gap]) &lt;= 0)
+-					break;
+-				/* they are out of order, swap them */
+-				temp= dn[j];
+-				dn[j]= dn[j+gap];
+-				dn[j+gap]= temp;
+-			}
+-		}
+-	}
++	qsort(dn, size, sizeof *dn, sortcmp);
+ }
++#else
++#define sortcmp(a, b) 0
++#define dnsort(dn, size)
+ #endif
+ 
++
+ /*----------------------------------------------------------------------*/
+ static void showfiles(struct dnode **dn, int nfiles)
+ {
+ 	int i, ncols, nrows, row, nc;
+-#ifdef BB_FEATURE_AUTOWIDTH
+-	int len;
+-#endif
++	int column = 0;
++	int nexttab = 0;
++	int column_width = 0; /* for STYLE_LONG and STYLE_SINGLE not used */
+ 
+-	if(dn==NULL || nfiles &lt; 1) return;
++	if (dn == NULL || nfiles &lt; 1)
++		return;
+ 
+-#ifdef BB_FEATURE_AUTOWIDTH
+-	/* find the longest file name-  use that as the column width */
+-	column_width= 0;
+-	for (i=0; i&lt;nfiles; i++) {
+-		len= strlen(dn[i]-&gt;name) +
+-			((list_fmt &amp; LIST_INO) ? 8 : 0) +
+-			((list_fmt &amp; LIST_BLOCKS) ? 5 : 0)
+-			;
+-		if (column_width &lt; len) 
+-			column_width= len;
+-	}
+-	if (column_width &gt;= 1)
+-		ncols = (int)(terminal_width / (column_width + COLUMN_GAP));
+-	else {
++	if (all_fmt &amp; STYLE_ONE_RECORD_FLAG) {
+ 		ncols = 1;
+-		column_width = COLUMN_WIDTH;
+-	}
+-#else
+-	ncols= TERMINAL_WIDTH;
++	} else {
++		/* find the longest file name-  use that as the column width */
++		for (i = 0; i &lt; nfiles; i++) {
++			int len = strlen(dn[i]-&gt;name) +
++#ifdef CONFIG_SELINUX
++			((all_fmt &amp; LIST_CONTEXT) ? 33 : 0) +
+ #endif
+-	switch (style_fmt) {
+-		case STYLE_LONG:	/* one record per line, extended info */
+-		case STYLE_SINGLE:	/* one record per line */
+-			ncols= 1;
+-			break;
++			((all_fmt &amp; LIST_INO) ? 8 : 0) +
++			((all_fmt &amp; LIST_BLOCKS) ? 5 : 0);
++			if (column_width &lt; len)
++				column_width = len;
++		}
++		column_width += tabstops;
++		ncols = (int) (terminal_width / column_width);
+ 	}
+ 
+ 	if (ncols &gt; 1) {
+ 		nrows = nfiles / ncols;
++		if ((nrows * ncols) &lt; nfiles)
++			nrows++;                /* round up fractionals */
+ 	} else {
+ 		nrows = nfiles;
+ 		ncols = 1;
+ 	}
+-	if ((nrows * ncols) &lt; nfiles) nrows++; /* round up fractionals */
+ 
+-	if (nrows &gt; nfiles) nrows= nfiles;
+-	for (row=0; row&lt;nrows; row++) {
+-		for (nc=0; nc&lt;ncols; nc++) {
++	for (row = 0; row &lt; nrows; row++) {
++		for (nc = 0; nc &lt; ncols; nc++) {
+ 			/* reach into the array based on the column and row */
+-			i= (nc * nrows) + row;		/* assume display by column */
+-			if (disp_opts &amp; DISP_ROWS)
+-				i= (row * ncols) + nc;	/* display across row */
++			i = (nc * nrows) + row;	/* assume display by column */
++			if (all_fmt &amp; DISP_ROWS)
++				i = (row * ncols) + nc;	/* display across row */
+ 			if (i &lt; nfiles) {
+-				nexttabstop();
+-				list_single(dn[i]);
++				if (column &gt; 0) {
++					nexttab -= column;
++					while (nexttab--) {
++						putchar(' ');
++						column++;
++					}
+ 			}
++				nexttab = column + column_width;
++				column += list_single(dn[i]);
+ 		}
+-		newline();
++		}
++		putchar('\n');
++		column = 0;
+ 	}
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-static void showdirs(struct dnode **dn, int ndirs)
++static void showdirs(struct dnode **dn, int ndirs, int first)
+ {
+ 	int i, nfiles;
+ 	struct dnode **subdnp;
+-#ifdef BB_FEATURE_LS_RECURSIVE
+ 	int dndirs;
+ 	struct dnode **dnd;
+-#endif
+ 
+-	if (dn==NULL || ndirs &lt; 1) return;
++	if (dn == NULL || ndirs &lt; 1)
++		return;
+ 
+-	for (i=0; i&lt;ndirs; i++) {
+-		if (disp_opts &amp; (DISP_DIRNAME | DISP_RECURSIVE)) {
+-			printf(&quot;\n%s:\n&quot;, dn[i]-&gt;fullname);
++	for (i = 0; i &lt; ndirs; i++) {
++		if (all_fmt &amp; (DISP_DIRNAME | DISP_RECURSIVE)) {
++			if (!first)
++				printf(&quot;\n&quot;);
++			first = 0;
++			printf(&quot;%s:\n&quot;, dn[i]-&gt;fullname);
+ 		}
+-		subdnp= list_dir(dn[i]-&gt;fullname);
+-		nfiles= countfiles(subdnp);
++		subdnp = list_dir(dn[i]-&gt;fullname);
++		nfiles = countfiles(subdnp);
+ 		if (nfiles &gt; 0) {
+ 			/* list all files at this level */
+-#ifdef BB_FEATURE_LS_SORTFILES
+-			shellsort(subdnp, nfiles);
+-#endif
++			if (ENABLE_FEATURE_LS_SORTFILES) dnsort(subdnp, nfiles);
+ 			showfiles(subdnp, nfiles);
+-#ifdef BB_FEATURE_LS_RECURSIVE
+-			if (disp_opts &amp; DISP_RECURSIVE) {
+-				/* recursive- list the sub-dirs */
+-				dnd= splitdnarray(subdnp, nfiles, SPLIT_SUBDIR);
+-				dndirs= countsubdirs(subdnp, nfiles);
+-				if (dndirs &gt; 0) {
+-#ifdef BB_FEATURE_LS_SORTFILES
+-					shellsort(dnd, dndirs);
+-#endif
+-					showdirs(dnd, dndirs);
+-					free(dnd);  /* free the array of dnode pointers to the dirs */
++			if (ENABLE_FEATURE_LS_RECURSIVE) {
++				if (all_fmt &amp; DISP_RECURSIVE) {
++					/* recursive- list the sub-dirs */
++					dnd = splitdnarray(subdnp, nfiles, SPLIT_SUBDIR);
++					dndirs = countsubdirs(subdnp, nfiles);
++					if (dndirs &gt; 0) {
++						if (ENABLE_FEATURE_LS_SORTFILES) dnsort(dnd, dndirs);
++						showdirs(dnd, dndirs, 0);
++						/* free the array of dnode pointers to the dirs */
++						free(dnd);
++					}
+ 				}
++				/* free the dnodes and the fullname mem */
++				dfree(subdnp, nfiles);
+ 			}
+-			dfree(subdnp);  /* free the dnodes and the fullname mem */
+-#endif
+ 		}
+ 	}
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-static struct dnode **list_dir(char *path)
++static struct dnode **list_dir(const char *path)
+ {
+ 	struct dnode *dn, *cur, **dnp;
+ 	struct dirent *entry;
+ 	DIR *dir;
+ 	int i, nfiles;
+ 
+-	if (path==NULL) return(NULL);
++	if (path == NULL)
++		return (NULL);
+ 
+-	dn= NULL;
+-	nfiles= 0;
+-	dir = opendir(path);
++	dn = NULL;
++	nfiles = 0;
++	dir = bb_opendir(path);
+ 	if (dir == NULL) {
+-		perror_msg(&quot;%s&quot;, path);
+ 		status = EXIT_FAILURE;
+-		return(NULL);	/* could not open the dir */
++		return (NULL);	/* could not open the dir */
+ 	}
+ 	while ((entry = readdir(dir)) != NULL) {
++		char *fullname;
++
+ 		/* are we going to list the file- it may be . or .. or a hidden file */
+-		if ((strcmp(entry-&gt;d_name, &quot;.&quot;)==0) &amp;&amp; !(disp_opts &amp; DISP_DOT))
++		if (entry-&gt;d_name[0] == '.') {
++			if ((entry-&gt;d_name[1] == 0 || (
++				entry-&gt;d_name[1] == '.'
++				&amp;&amp; entry-&gt;d_name[2] == 0))
++					&amp;&amp; !(all_fmt &amp; DISP_DOT))
+ 			continue;
+-		if ((strcmp(entry-&gt;d_name, &quot;..&quot;)==0) &amp;&amp; !(disp_opts &amp; DISP_DOT))
++			if (!(all_fmt &amp; DISP_HIDDEN))
+ 			continue;
+-		if ((entry-&gt;d_name[0] ==  '.') &amp;&amp; !(disp_opts &amp; DISP_HIDDEN))
++		}
++		fullname = concat_path_file(path, entry-&gt;d_name);
++		cur = my_stat(fullname, strrchr(fullname, '/') + 1);
++		if (!cur)
+ 			continue;
+-		cur= (struct dnode *)xmalloc(sizeof(struct dnode));
+-		cur-&gt;fullname = concat_path_file(path, entry-&gt;d_name);
+-		cur-&gt;name = cur-&gt;fullname +
+-				(strlen(cur-&gt;fullname) - strlen(entry-&gt;d_name));
+-		if (my_stat(cur))
+-			continue;
+-		cur-&gt;next= dn;
+-		dn= cur;
++		cur-&gt;allocated = 1;
++		cur-&gt;next = dn;
++		dn = cur;
+ 		nfiles++;
+ 	}
+ 	closedir(dir);
+ 
+ 	/* now that we know how many files there are
+-	** allocate memory for an array to hold dnode pointers
+-	*/
+-	if (nfiles &lt; 1) return(NULL);
+-	dnp= dnalloc(nfiles);
+-	for (i=0, cur=dn; i&lt;nfiles; i++) {
+-		dnp[i]= cur;   /* save pointer to node in array */
+-		cur= cur-&gt;next;
++	   ** allocate memory for an array to hold dnode pointers
++	 */
++	if (dn == NULL)
++		return (NULL);
++	dnp = dnalloc(nfiles);
++	for (i = 0, cur = dn; i &lt; nfiles; i++) {
++		dnp[i] = cur;	/* save pointer to node in array */
++		cur = cur-&gt;next;
+ 	}
+ 
+-	return(dnp);
++	return (dnp);
+ }
+ 
+ /*----------------------------------------------------------------------*/
+ static int list_single(struct dnode *dn)
+ {
+-	int i;
+-#ifdef BB_FEATURE_LS_USERNAME
+-	char scratch[BUFSIZ + 1];
++	int i, column = 0;
++
++#ifdef CONFIG_FEATURE_LS_USERNAME
++	char scratch[16];
+ #endif
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
++#ifdef CONFIG_FEATURE_LS_TIMESTAMPS
+ 	char *filetime;
+ 	time_t ttime, age;
+ #endif
+-#if defined (BB_FEATURE_LS_FILETYPES) || defined (BB_FEATURE_LS_COLOR)
++#if defined(CONFIG_FEATURE_LS_FILETYPES) || defined (CONFIG_FEATURE_LS_COLOR)
+ 	struct stat info;
+ 	char append;
+ #endif
+ 
+-	if (dn==NULL || dn-&gt;fullname==NULL) return(0);
++	if (dn-&gt;fullname == NULL)
++		return (0);
+ 
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-	ttime= dn-&gt;dstat.st_mtime;      /* the default time */
+-	if (time_fmt &amp; TIME_ACCESS) ttime= dn-&gt;dstat.st_atime;
+-	if (time_fmt &amp; TIME_CHANGE) ttime= dn-&gt;dstat.st_ctime;
+-	filetime= ctime(&amp;ttime);
++#ifdef CONFIG_FEATURE_LS_TIMESTAMPS
++	ttime = dn-&gt;dstat.st_mtime;	/* the default time */
++	if (all_fmt &amp; TIME_ACCESS)
++		ttime = dn-&gt;dstat.st_atime;
++	if (all_fmt &amp; TIME_CHANGE)
++		ttime = dn-&gt;dstat.st_ctime;
++	filetime = ctime(&amp;ttime);
+ #endif
+-#ifdef BB_FEATURE_LS_FILETYPES
++#ifdef CONFIG_FEATURE_LS_FILETYPES
+ 	append = append_char(dn-&gt;dstat.st_mode);
+ #endif
+ 
+-	for (i=0; i&lt;=31; i++) {
+-		switch (list_fmt &amp; (1&lt;&lt;i)) {
+-			case LIST_INO:
+-				printf(&quot;%7ld &quot;, (long int)dn-&gt;dstat.st_ino);
+-				column += 8;
+-				break;
+-			case LIST_BLOCKS:
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-				fprintf(stdout, &quot;%6s &quot;, make_human_readable_str(dn-&gt;dstat.st_blocks&gt;&gt;1, 
+-							KILOBYTE, (ls_disp_hr==TRUE)? 0: KILOBYTE));
+-#else
++	for (i = 0; i &lt;= 31; i++) {
++		switch (all_fmt &amp; (1 &lt;&lt; i)) {
++		case LIST_INO:
++			column += printf(&quot;%7ld &quot;, (long int) dn-&gt;dstat.st_ino);
++			break;
++		case LIST_BLOCKS:
+ #if _FILE_OFFSET_BITS == 64
+-				printf(&quot;%4lld &quot;, dn-&gt;dstat.st_blocks&gt;&gt;1);
++			column += printf(&quot;%4lld &quot;, (long long)dn-&gt;dstat.st_blocks &gt;&gt; 1);
+ #else
+-				printf(&quot;%4ld &quot;, dn-&gt;dstat.st_blocks&gt;&gt;1);
++			column += printf(&quot;%4ld &quot;, dn-&gt;dstat.st_blocks &gt;&gt; 1);
+ #endif
++			break;
++		case LIST_MODEBITS:
++			column += printf(&quot;%-10s &quot;, (char *) bb_mode_string(dn-&gt;dstat.st_mode));
++			break;
++		case LIST_NLINKS:
++			column += printf(&quot;%4ld &quot;, (long) dn-&gt;dstat.st_nlink);
++			break;
++		case LIST_ID_NAME:
++#ifdef CONFIG_FEATURE_LS_USERNAME
++			bb_getpwuid(scratch, dn-&gt;dstat.st_uid, sizeof(scratch));
++			printf(&quot;%-8.8s &quot;, scratch);
++			bb_getgrgid(scratch, dn-&gt;dstat.st_gid, sizeof(scratch));
++			printf(&quot;%-8.8s&quot;, scratch);
++			column += 17;
++			break;
+ #endif
+-				column += 5;
+-				break;
+-			case LIST_MODEBITS:
+-				printf(&quot;%-10s &quot;, (char *)mode_string(dn-&gt;dstat.st_mode));
+-				column += 10;
+-				break;
+-			case LIST_NLINKS:
+-				printf(&quot;%4ld &quot;, (long)dn-&gt;dstat.st_nlink);
+-				column += 10;
+-				break;
+-			case LIST_ID_NAME:
+-#ifdef BB_FEATURE_LS_USERNAME
+-				my_getpwuid(scratch, dn-&gt;dstat.st_uid);
+-				printf(&quot;%-8.8s &quot;, scratch);
+-				my_getgrgid(scratch, dn-&gt;dstat.st_gid);
+-				printf(&quot;%-8.8s&quot;, scratch);
+-				column += 17;
+-				break;
++		case LIST_ID_NUMERIC:
++			column += printf(&quot;%-8d %-8d&quot;, dn-&gt;dstat.st_uid, dn-&gt;dstat.st_gid);
++			break;
++		case LIST_SIZE:
++		case LIST_DEV:
++			if (S_ISBLK(dn-&gt;dstat.st_mode) || S_ISCHR(dn-&gt;dstat.st_mode)) {
++				column += printf(&quot;%4d, %3d &quot;, (int) major(dn-&gt;dstat.st_rdev),
++					   (int) minor(dn-&gt;dstat.st_rdev));
++			} else {
++#ifdef CONFIG_FEATURE_HUMAN_READABLE
++				if (all_fmt &amp; LS_DISP_HR) {
++					column += printf(&quot;%9s &quot;,
++							make_human_readable_str(dn-&gt;dstat.st_size, 1, 0));
++				} else
+ #endif
+-			case LIST_ID_NUMERIC:
+-				printf(&quot;%-8ld %-8ld&quot;, (long)dn-&gt;dstat.st_uid, (long)dn-&gt;dstat.st_gid);
+-				column += 17;
+-				break;
+-			case LIST_SIZE:
+-			case LIST_DEV:
+-				if (S_ISBLK(dn-&gt;dstat.st_mode) || S_ISCHR(dn-&gt;dstat.st_mode)) {
+-					printf(&quot;%4d, %3d &quot;, (int)MAJOR(dn-&gt;dstat.st_rdev), (int)MINOR(dn-&gt;dstat.st_rdev));
+-				} else {
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-					if (ls_disp_hr==TRUE) {
+-						fprintf(stdout, &quot;%8s &quot;, make_human_readable_str(dn-&gt;dstat.st_size, 1, 0));
+-					} else 
+-#endif	
+-					{
++				{
+ #if _FILE_OFFSET_BITS == 64
+-						printf(&quot;%9lld &quot;, (long long)dn-&gt;dstat.st_size);
++					column += printf(&quot;%9lld &quot;, (long long) dn-&gt;dstat.st_size);
+ #else
+-						printf(&quot;%9ld &quot;, dn-&gt;dstat.st_size);
++					column += printf(&quot;%9ld &quot;, dn-&gt;dstat.st_size);
+ #endif
+-					}
+ 				}
+-				column += 10;
+-				break;
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-			case LIST_FULLTIME:
+-			case LIST_DATE_TIME:
+-				if (list_fmt &amp; LIST_FULLTIME) {
+-					printf(&quot;%24.24s &quot;, filetime);
+-					column += 25;
+-					break;
+-				}
++			}
++			break;
++#ifdef CONFIG_FEATURE_LS_TIMESTAMPS
++		case LIST_FULLTIME:
++			printf(&quot;%24.24s &quot;, filetime);
++			column += 25;
++			break;
++		case LIST_DATE_TIME:
++			if ((all_fmt &amp; LIST_FULLTIME) == 0) {
+ 				age = time(NULL) - ttime;
+-				printf(&quot;%6.6s &quot;, filetime+4);
++				printf(&quot;%6.6s &quot;, filetime + 4);
+ 				if (age &lt; 3600L * 24 * 365 / 2 &amp;&amp; age &gt; -15 * 60) {
+ 					/* hh:mm if less than 6 months old */
+-					printf(&quot;%5.5s &quot;, filetime+11);
++					printf(&quot;%5.5s &quot;, filetime + 11);
+ 				} else {
+-					printf(&quot; %4.4s &quot;, filetime+20);
++					printf(&quot; %4.4s &quot;, filetime + 20);
+ 				}
+ 				column += 13;
+-				break;
++			}
++			break;
+ #endif
+-			case LIST_FILENAME:
+-#ifdef BB_FEATURE_LS_COLOR
+-				errno = 0;
+-				if (show_color &amp;&amp; !lstat(dn-&gt;fullname, &amp;info)) {
+-				    printf( &quot;\033[%d;%dm&quot;, bgcolor(info.st_mode), 
+-								fgcolor(info.st_mode) );
++#ifdef CONFIG_SELINUX
++		case LIST_CONTEXT:
++			{
++				char context[80];
++				int len = 0;
++
++				if (dn-&gt;sid) {
++				  /*  I assume sid initilized with NULL  */
++				  len = strlen(dn-&gt;sid)+1;
++				  safe_strncpy(context, dn-&gt;sid, len);
++				  freecon(dn-&gt;sid);
++				}else {
++				  safe_strncpy(context, &quot;unknown&quot;, 8);
+ 				}
++				printf(&quot;%-32s &quot;, context);
++				column += MAX(33, len);
++			}
++			break;
+ #endif
+-				printf(&quot;%s&quot;, dn-&gt;name);
+-#ifdef BB_FEATURE_LS_COLOR
+-				if (show_color) {
+-					printf( &quot;\033[0m&quot; );
+-				}
++		case LIST_FILENAME:
++#ifdef CONFIG_FEATURE_LS_COLOR
++			errno = 0;
++			if (show_color &amp;&amp; !lstat(dn-&gt;fullname, &amp;info)) {
++				printf(&quot;\033[%d;%dm&quot;, bgcolor(info.st_mode),
++					   fgcolor(info.st_mode));
++			}
+ #endif
+-				column += strlen(dn-&gt;name);
+-				break;
+-			case LIST_SYMLINK:
+-				if (S_ISLNK(dn-&gt;dstat.st_mode)) {
+-					char *lpath = xreadlink(dn-&gt;fullname);
+-					if (lpath) {
+-						printf(&quot; -&gt; &quot;);
+-#if defined(BB_FEATURE_LS_FILETYPES) || defined(BB_FEATURE_LS_COLOR)
+-						if (!stat(dn-&gt;fullname, &amp;info)) {
+-							append = append_char(info.st_mode);
+-						}
++			column += printf(&quot;%s&quot;, dn-&gt;name);
++#ifdef CONFIG_FEATURE_LS_COLOR
++			if (show_color) {
++				printf(&quot;\033[0m&quot;);
++			}
+ #endif
+-#ifdef BB_FEATURE_LS_COLOR
+-						if (show_color) {
+-							errno = 0;
+-							printf( &quot;\033[%d;%dm&quot;, bgcolor(info.st_mode), 
+-									fgcolor(info.st_mode) );
+-						}
++			break;
++		case LIST_SYMLINK:
++			if (S_ISLNK(dn-&gt;dstat.st_mode)) {
++				char *lpath = xreadlink(dn-&gt;fullname);
++
++				if (lpath) {
++					printf(&quot; -&gt; &quot;);
++#if defined(CONFIG_FEATURE_LS_FILETYPES) || defined (CONFIG_FEATURE_LS_COLOR)
++					if (!stat(dn-&gt;fullname, &amp;info)) {
++						append = append_char(info.st_mode);
++					}
+ #endif
+-						printf(&quot;%s&quot;, lpath);
+-#ifdef BB_FEATURE_LS_COLOR
+-						if (show_color) {
+-							printf( &quot;\033[0m&quot; );
+-						}
++#ifdef CONFIG_FEATURE_LS_COLOR
++					if (show_color) {
++						errno = 0;
++						printf(&quot;\033[%d;%dm&quot;, bgcolor(info.st_mode),
++							   fgcolor(info.st_mode));
++					}
+ #endif
+-						column += strlen(lpath) + 4;
+-						free(lpath);
++					column += printf(&quot;%s&quot;, lpath) + 4;
++#ifdef CONFIG_FEATURE_LS_COLOR
++					if (show_color) {
++						printf(&quot;\033[0m&quot;);
+ 					}
++#endif
++					free(lpath);
+ 				}
+-				break;
+-#ifdef BB_FEATURE_LS_FILETYPES
+-			case LIST_FILETYPE:
+-				if (append != '\0') {
+-					printf(&quot;%1c&quot;, append);
+-					column++;
+-				}
+-				break;
++			}
++			break;
++#ifdef CONFIG_FEATURE_LS_FILETYPES
++		case LIST_FILETYPE:
++			if (append != '\0') {
++				printf(&quot;%1c&quot;, append);
++				column++;
++			}
++			break;
+ #endif
+ 		}
+ 	}
+ 
+-	return(0);
++	return column;
+ }
+ 
+ /*----------------------------------------------------------------------*/
+-extern int ls_main(int argc, char **argv)
+-{
+-	struct dnode **dnf, **dnd;
+-	int dnfiles, dndirs;
+-	struct dnode *dn, *cur, **dnp;
+-	int i, nfiles;
+-	int opt;
+-	int oi, ac;
+-	char **av;
+-#ifdef BB_FEATURE_AUTOWIDTH
+-	struct winsize win = { 0, 0, 0, 0 };
++
++/* &quot;[-]Cadil1&quot;, POSIX mandated options, busybox always supports */
++/* &quot;[-]gnsx&quot;, POSIX non-mandated options, busybox always supports */
++/* &quot;[-]Ak&quot; GNU options, busybox always supports */
++/* &quot;[-]FLRctur&quot;, POSIX mandated options, busybox optionally supports */
++/* &quot;[-]p&quot;, POSIX non-mandated options, busybox optionally supports */
++/* &quot;[-]SXvThw&quot;, GNU options, busybox optionally supports */
++/* &quot;[-]K&quot;, SELinux mandated options, busybox optionally supports */
++/* &quot;[-]e&quot;, I think we made this one up */
++
++#ifdef CONFIG_FEATURE_LS_TIMESTAMPS
++# define LS_STR_TIMESTAMPS	&quot;cetu&quot;
++#else
++# define LS_STR_TIMESTAMPS	&quot;&quot;
+ #endif
+ 
+-	disp_opts= DISP_NORMAL;
+-	style_fmt= STYLE_AUTO;
+-	list_fmt=  LIST_SHORT;
+-#ifdef BB_FEATURE_LS_SORTFILES
+-	sort_opts= SORT_NAME;
+-	sort_order=	SORT_FORWARD;
++#ifdef CONFIG_FEATURE_LS_FILETYPES
++# define LS_STR_FILETYPES	&quot;Fp&quot;
++#else
++# define LS_STR_FILETYPES	&quot;&quot;
+ #endif
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-	time_fmt= TIME_MOD;
++
++#ifdef CONFIG_FEATURE_LS_FOLLOWLINKS
++# define LS_STR_FOLLOW_LINKS	&quot;L&quot;
++#else
++# define LS_STR_FOLLOW_LINKS	&quot;&quot;
+ #endif
+-#ifdef BB_FEATURE_AUTOWIDTH
+-	ioctl(fileno(stdout), TIOCGWINSZ, &amp;win);
+-	if (win.ws_row &gt; 4)
+-		column_width = win.ws_row - 2;
+-	if (win.ws_col &gt; 0)
+-		terminal_width = win.ws_col - 1;
++
++#ifdef CONFIG_FEATURE_LS_RECURSIVE
++# define LS_STR_RECURSIVE	&quot;R&quot;
++#else
++# define LS_STR_RECURSIVE	&quot;&quot;
+ #endif
+-	nfiles=0;
+ 
+-#ifdef BB_FEATURE_LS_COLOR
+-	if (isatty(fileno(stdout)))
+-		show_color = 1;
++#ifdef CONFIG_FEATURE_HUMAN_READABLE
++# define LS_STR_HUMAN_READABLE	&quot;h&quot;
++#else
++# define LS_STR_HUMAN_READABLE	&quot;&quot;
+ #endif
+ 
+-	/* process options */
+-	while ((opt = getopt(argc, argv, &quot;1AaCdgilnsx&quot;
+-#ifdef BB_FEATURE_AUTOWIDTH
+-&quot;T:w:&quot;
++#ifdef CONFIG_SELINUX
++# define LS_STR_SELINUX	&quot;K&quot;
++#else
++# define LS_STR_SELINUX	&quot;&quot;
+ #endif
+-#ifdef BB_FEATURE_LS_FILETYPES
+-&quot;Fp&quot;
++
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++# define LS_STR_AUTOWIDTH	&quot;T:w:&quot;
++#else
++# define LS_STR_AUTOWIDTH	&quot;&quot;
+ #endif
+-#ifdef BB_FEATURE_LS_RECURSIVE
+-&quot;R&quot;
++
++static const char ls_options[]=&quot;Cadil1gnsxAk&quot; \
++	LS_STR_TIMESTAMPS \
++	USE_FEATURE_LS_SORTFILES(&quot;SXrv&quot;) \
++	LS_STR_FILETYPES \
++	LS_STR_FOLLOW_LINKS \
++	LS_STR_RECURSIVE \
++	LS_STR_HUMAN_READABLE \
++	LS_STR_SELINUX \
++	LS_STR_AUTOWIDTH;
++
++#define LIST_MASK_TRIGGER	0
++#define STYLE_MASK_TRIGGER	STYLE_MASK
++#define SORT_MASK_TRIGGER	SORT_MASK
++#define DISP_MASK_TRIGGER	DISP_ROWS
++
++static const unsigned opt_flags[] = {
++	LIST_SHORT | STYLE_COLUMNS,	/* C */
++	DISP_HIDDEN | DISP_DOT,		/* a */
++	DISP_NOLIST,				/* d */
++	LIST_INO,					/* i */
++	LIST_LONG | STYLE_LONG,		/* l - remember LS_DISP_HR in mask! */
++	LIST_SHORT | STYLE_SINGLE,	/* 1 */
++	0,							/* g - ingored */
++	LIST_ID_NUMERIC,			/* n */
++	LIST_BLOCKS,				/* s */
++	DISP_ROWS,					/* x */
++	DISP_HIDDEN,				/* A */
++#ifdef CONFIG_SELINUX
++	LIST_CONTEXT,				/* k */
++#else
++	0,							/* k - ingored */
+ #endif
+-#ifdef BB_FEATURE_LS_SORTFILES
+-&quot;rSvX&quot;
++#ifdef CONFIG_FEATURE_LS_TIMESTAMPS
++	TIME_CHANGE | (ENABLE_FEATURE_LS_SORTFILES * SORT_CTIME),	/* c */
++	LIST_FULLTIME,				/* e */
++	ENABLE_FEATURE_LS_SORTFILES * SORT_MTIME,	/* t */
++	TIME_ACCESS | (ENABLE_FEATURE_LS_SORTFILES * SORT_ATIME),	/* u */
+ #endif
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-&quot;cetu&quot;
++#ifdef CONFIG_FEATURE_LS_SORTFILES
++	SORT_SIZE,					/* S */
++	SORT_EXT,					/* X */
++	SORT_ORDER_REVERSE,			/* r */
++	SORT_VERSION,				/* v */
+ #endif
+-#ifdef BB_FEATURE_LS_FOLLOWLINKS
+-&quot;L&quot;
++#ifdef CONFIG_FEATURE_LS_FILETYPES
++	LIST_FILETYPE | LIST_EXEC,	/* F */
++	LIST_FILETYPE,				/* p */
+ #endif
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-&quot;h&quot;
++#ifdef CONFIG_FEATURE_LS_FOLLOWLINKS
++	FOLLOW_LINKS,				/* L */
+ #endif
+-&quot;k&quot;)) &gt; 0) {
+-		switch (opt) {
+-			case '1': style_fmt = STYLE_SINGLE; break;
+-			case 'A': disp_opts |= DISP_HIDDEN; break;
+-			case 'a': disp_opts |= DISP_HIDDEN | DISP_DOT; break;
+-			case 'C': style_fmt = STYLE_COLUMNS; break;
+-			case 'd': disp_opts |= DISP_NOLIST; break;
+-			case 'g': /* ignore -- for ftp servers */ break;
+-			case 'i': list_fmt |= LIST_INO; break;
+-			case 'l':
+-				style_fmt = STYLE_LONG;
+-				list_fmt |= LIST_LONG;
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-				ls_disp_hr = FALSE;
++#ifdef CONFIG_FEATURE_LS_RECURSIVE
++	DISP_RECURSIVE,				/* R */
+ #endif
+-			break;
+-			case 'n': list_fmt |= LIST_ID_NUMERIC; break;
+-			case 's': list_fmt |= LIST_BLOCKS; break;
+-			case 'x': disp_opts = DISP_ROWS; break;
+-#ifdef BB_FEATURE_LS_FILETYPES
+-			case 'F': list_fmt |= LIST_FILETYPE | LIST_EXEC; break;
+-			case 'p': list_fmt |= LIST_FILETYPE; break;
++#ifdef CONFIG_FEATURE_HUMAN_READABLE
++	LS_DISP_HR,					/* h */
+ #endif
+-#ifdef BB_FEATURE_LS_RECURSIVE
+-			case 'R': disp_opts |= DISP_RECURSIVE; break;
++#ifdef CONFIG_SELINUX
++	LIST_MODEBITS|LIST_NLINKS|LIST_CONTEXT|LIST_SIZE|LIST_DATE_TIME, /* K */
+ #endif
+-#ifdef BB_FEATURE_LS_SORTFILES
+-			case 'r': sort_order |= SORT_REVERSE; break;
+-			case 'S': sort_opts= SORT_SIZE; break;
+-			case 'v': sort_opts= SORT_VERSION; break;
+-			case 'X': sort_opts= SORT_EXT; break;
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++       0, 0,                    /* T, w - ignored */
+ #endif
+-#ifdef BB_FEATURE_LS_TIMESTAMPS
+-			case 'e': list_fmt |= LIST_FULLTIME; break;
+-			case 'c':
+-				time_fmt = TIME_CHANGE;
+-#ifdef BB_FEATURE_LS_SORTFILES
+-				sort_opts= SORT_CTIME;
++	(1U&lt;&lt;31)
++};
++
++
++/*----------------------------------------------------------------------*/
++
++int ls_main(int argc, char **argv)
++{
++	struct dnode **dnd;
++	struct dnode **dnf;
++	struct dnode **dnp;
++	struct dnode *dn;
++	struct dnode *cur;
++	long opt;
++	int nfiles = 0;
++	int dnfiles;
++	int dndirs;
++	int oi;
++	int ac;
++	int i;
++	char **av;
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++	char *tabstops_str = NULL;
++	char *terminal_width_str = NULL;
+ #endif
+-				break;
+-			case 'u':
+-				time_fmt = TIME_ACCESS;
+-#ifdef BB_FEATURE_LS_SORTFILES
+-				sort_opts= SORT_ATIME;
++#ifdef CONFIG_FEATURE_LS_COLOR
++	char *color_opt;
+ #endif
+-				break;
+-			case 't':
+-#ifdef BB_FEATURE_LS_SORTFILES
+-				sort_opts= SORT_MTIME;
++
++	all_fmt = LIST_SHORT |
++		(ENABLE_FEATURE_LS_SORTFILES * (SORT_NAME | SORT_ORDER_FORWARD));
++
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++	/* Obtain the terminal width.  */
++	get_terminal_width_height(STDOUT_FILENO, &amp;terminal_width, NULL);
++	/* Go one less... */
++	terminal_width--;
+ #endif
+-				break;
++
++#ifdef CONFIG_FEATURE_LS_COLOR
++	bb_applet_long_options = ls_color_opt;
+ #endif
+-#ifdef BB_FEATURE_LS_FOLLOWLINKS
+-			case 'L': follow_links= TRUE; break;
++
++	/* process options */
++#ifdef CONFIG_FEATURE_AUTOWIDTH
++	opt = bb_getopt_ulflags(argc, argv, ls_options, &amp;tabstops_str, &amp;terminal_width_str
++#ifdef CONFIG_FEATURE_LS_COLOR
++		, &amp;color_opt
+ #endif
+-#ifdef BB_FEATURE_AUTOWIDTH
+-			case 'T': tabstops= atoi(optarg); break;
+-			case 'w': terminal_width= atoi(optarg); break;
++		);
++	if (tabstops_str) {
++		tabstops = atoi(tabstops_str);
++	}
++	if (terminal_width_str) {
++		terminal_width = atoi(terminal_width_str);
++	}
++#else
++	opt = bb_getopt_ulflags(argc, argv, ls_options
++#ifdef CONFIG_FEATURE_LS_COLOR
++		, &amp;color_opt
+ #endif
+-#ifdef BB_FEATURE_HUMAN_READABLE
+-			case 'h': ls_disp_hr = TRUE; break;
++		);
+ #endif
+-			case 'k': break;
+-			default:
+-				goto print_usage_message;
++	for (i = 0; opt_flags[i] != (1U&lt;&lt;31); i++) {
++		if (opt &amp; (1 &lt;&lt; i)) {
++			unsigned int flags = opt_flags[i];
++
++			if (flags &amp; LIST_MASK_TRIGGER) {
++				all_fmt &amp;= ~LIST_MASK;
++			}
++			if (flags &amp; STYLE_MASK_TRIGGER) {
++				all_fmt &amp;= ~STYLE_MASK;
++			}
++			if (ENABLE_FEATURE_LS_SORTFILES &amp;&amp; (flags &amp; SORT_MASK_TRIGGER)) {
++				all_fmt &amp;= ~SORT_MASK;
++			}
++			if (flags &amp; DISP_MASK_TRIGGER) {
++				all_fmt &amp;= ~DISP_MASK;
++			}
++			if (flags &amp; TIME_MASK) {
++				all_fmt &amp;= ~TIME_MASK;
++			}
++			if (flags &amp; LIST_CONTEXT) {
++				all_fmt |= STYLE_SINGLE;
++			}
++#ifdef CONFIG_FEATURE_HUMAN_READABLE
++			if (opt == 'l') {
++				all_fmt &amp;= ~LS_DISP_HR;
++			}
++#endif
++			all_fmt |= flags;
+ 		}
+ 	}
+ 
++#ifdef CONFIG_FEATURE_LS_COLOR
++	{
++		/* find color bit value - last position for short getopt */
++
++#if CONFIG_FEATURE_LS_COLOR_IS_DEFAULT
++		char *p;
++
++		if ((p = getenv (&quot;LS_COLORS&quot;)) != NULL &amp;&amp;
++			(*p == '\0' || (strcmp(p, &quot;none&quot;) == 0))) {
++			;
++		} else if (isatty(STDOUT_FILENO)) {
++			show_color = 1;
++		}
++#endif
++
++		if((opt &amp; (1 &lt;&lt; i))) {  /* next flag after short options */
++			if (color_opt == NULL || strcmp(&quot;always&quot;, color_opt) == 0)
++				show_color = 1;
++			else if (color_opt != NULL &amp;&amp; strcmp(&quot;never&quot;, color_opt) == 0)
++				show_color = 0;
++			else if (color_opt != NULL &amp;&amp; strcmp(&quot;auto&quot;, color_opt) == 0 &amp;&amp; isatty(STDOUT_FILENO))
++				show_color = 1;
++		}
++	}
++#endif
++
+ 	/* sort out which command line options take precedence */
+-#ifdef BB_FEATURE_LS_RECURSIVE
+-	if (disp_opts &amp; DISP_NOLIST)
+-		disp_opts &amp;= ~DISP_RECURSIVE;   /* no recurse if listing only dir */
++#ifdef CONFIG_FEATURE_LS_RECURSIVE
++	if (all_fmt &amp; DISP_NOLIST)
++		all_fmt &amp;= ~DISP_RECURSIVE;	/* no recurse if listing only dir */
+ #endif
+-#if defined (BB_FEATURE_LS_TIMESTAMPS) &amp;&amp; defined (BB_FEATURE_LS_SORTFILES)
+-	if (time_fmt &amp; TIME_CHANGE) sort_opts= SORT_CTIME;
+-	if (time_fmt &amp; TIME_ACCESS) sort_opts= SORT_ATIME;
++	if (ENABLE_FEATURE_LS_TIMESTAMPS &amp;&amp; ENABLE_FEATURE_LS_SORTFILES) {
++		if (all_fmt &amp; TIME_CHANGE)
++			all_fmt = (all_fmt &amp; ~SORT_MASK) | SORT_CTIME;
++		if (all_fmt &amp; TIME_ACCESS)
++			all_fmt = (all_fmt &amp; ~SORT_MASK) | SORT_ATIME;
++	}
++	if ((all_fmt &amp; STYLE_MASK) != STYLE_LONG) /* only for long list */
++		all_fmt &amp;= ~(LIST_ID_NUMERIC|LIST_FULLTIME|LIST_ID_NAME|LIST_ID_NUMERIC);
++#ifdef CONFIG_FEATURE_LS_USERNAME
++	if ((all_fmt &amp; STYLE_MASK) == STYLE_LONG &amp;&amp; (all_fmt &amp; LIST_ID_NUMERIC))
++		all_fmt &amp;= ~LIST_ID_NAME;	/* don't list names if numeric uid */
+ #endif
+-	if (style_fmt != STYLE_LONG)
+-			list_fmt &amp;= ~LIST_ID_NUMERIC;  /* numeric uid only for long list */
+-#ifdef BB_FEATURE_LS_USERNAME
+-	if (style_fmt == STYLE_LONG &amp;&amp; (list_fmt &amp; LIST_ID_NUMERIC))
+-			list_fmt &amp;= ~LIST_ID_NAME;  /* don't list names if numeric uid */
+-#endif
+ 
+ 	/* choose a display format */
+-	if (style_fmt == STYLE_AUTO)
+-		style_fmt = isatty(fileno(stdout)) ? STYLE_COLUMNS : STYLE_SINGLE;
++	if (!(all_fmt &amp; STYLE_MASK))
++		all_fmt |= (isatty(STDOUT_FILENO) ? STYLE_COLUMNS : STYLE_SINGLE);
+ 
+ 	/*
+ 	 * when there are no cmd line args we have to supply a default &quot;.&quot; arg.
+@@ -932,70 +1086,64 @@
+ 	 * just holds the pointers- we don't move the date the pointers
+ 	 * point to.
+ 	 */
+-	ac= argc - optind;   /* how many cmd line args are left */
++	ac = argc - optind;	/* how many cmd line args are left */
+ 	if (ac &lt; 1) {
+-		av= (char **)xcalloc((size_t)1, (size_t)(sizeof(char *)));
+-		av[0]= xstrdup(&quot;.&quot;);
+-		ac=1;
++		static const char * const dotdir[] = { &quot;.&quot; };
++
++		av = (char **) dotdir;
++		ac = 1;
+ 	} else {
+-		av= (char **)xcalloc((size_t)ac, (size_t)(sizeof(char *)));
+-		for (oi=0 ; oi &lt; ac; oi++) {
+-			av[oi]= argv[optind++];  /* copy pointer to real cmd line arg */
+-		}
++		av = argv + optind;
+ 	}
+ 
+ 	/* now, everything is in the av array */
+ 	if (ac &gt; 1)
+-		disp_opts |= DISP_DIRNAME;   /* 2 or more items? label directories */
++		all_fmt |= DISP_DIRNAME;	/* 2 or more items? label directories */
+ 
+ 	/* stuff the command line file names into an dnode array */
+-	dn=NULL;
+-	for (oi=0 ; oi &lt; ac; oi++) {
+-		cur= (struct dnode *)xmalloc(sizeof(struct dnode));
+-		cur-&gt;fullname= xstrdup(av[oi]);
+-		cur-&gt;name= cur-&gt;fullname;
+-		if (my_stat(cur))
++	dn = NULL;
++	for (oi = 0; oi &lt; ac; oi++) {
++		cur = my_stat(av[oi], av[oi]);
++		if (!cur)
+ 			continue;
+-		cur-&gt;next= dn;
+-		dn= cur;
++		cur-&gt;allocated = 0;
++		cur-&gt;next = dn;
++		dn = cur;
+ 		nfiles++;
+ 	}
+ 
+ 	/* now that we know how many files there are
+-	** allocate memory for an array to hold dnode pointers
+-	*/
+-	dnp= dnalloc(nfiles);
+-	for (i=0, cur=dn; i&lt;nfiles; i++) {
+-		dnp[i]= cur;   /* save pointer to node in array */
+-		cur= cur-&gt;next;
++	   ** allocate memory for an array to hold dnode pointers
++	 */
++	dnp = dnalloc(nfiles);
++	for (i = 0, cur = dn; i &lt; nfiles; i++) {
++		dnp[i] = cur;	/* save pointer to node in array */
++		cur = cur-&gt;next;
+ 	}
+ 
+-
+-	if (disp_opts &amp; DISP_NOLIST) {
+-#ifdef BB_FEATURE_LS_SORTFILES
+-		shellsort(dnp, nfiles);
+-#endif
+-		if (nfiles &gt; 0) showfiles(dnp, nfiles);
++	if (all_fmt &amp; DISP_NOLIST) {
++		if (ENABLE_FEATURE_LS_SORTFILES) dnsort(dnp, nfiles);
++		if (nfiles &gt; 0)
++			showfiles(dnp, nfiles);
+ 	} else {
+-		dnd= splitdnarray(dnp, nfiles, SPLIT_DIR);
+-		dnf= splitdnarray(dnp, nfiles, SPLIT_FILE);
+-		dndirs= countdirs(dnp, nfiles);
+-		dnfiles= nfiles - dndirs;
++		dnd = splitdnarray(dnp, nfiles, SPLIT_DIR);
++		dnf = splitdnarray(dnp, nfiles, SPLIT_FILE);
++		dndirs = countdirs(dnp, nfiles);
++		dnfiles = nfiles - dndirs;
+ 		if (dnfiles &gt; 0) {
+-#ifdef BB_FEATURE_LS_SORTFILES
+-			shellsort(dnf, dnfiles);
+-#endif
++			if (ENABLE_FEATURE_LS_SORTFILES) dnsort(dnf, dnfiles);
+ 			showfiles(dnf, dnfiles);
++			if (ENABLE_FEATURE_CLEAN_UP)
++				free(dnf);
+ 		}
+ 		if (dndirs &gt; 0) {
+-#ifdef BB_FEATURE_LS_SORTFILES
+-			shellsort(dnd, dndirs);
+-#endif
+-			showdirs(dnd, dndirs);
++			if (ENABLE_FEATURE_LS_SORTFILES) dnsort(dnd, dndirs);
++			showdirs(dnd, dndirs, dnfiles == 0);
++			if (ENABLE_FEATURE_CLEAN_UP)
++				free(dnd);
+ 		}
+ 	}
+-	return(status);
+-
+-  print_usage_message:
+-	show_usage();
++	if (ENABLE_FEATURE_CLEAN_UP)
++		dfree(dnp, nfiles);
++	return (status);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000001.html">[Wl530g-svncheckins] r215 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

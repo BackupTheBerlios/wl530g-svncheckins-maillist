@@ -1,0 +1,1194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r340 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r340%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609221324.k8MDOR1c004923%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000125.html">
+   <LINK REL="Next"  HREF="000127.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r340 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r340%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609221324.k8MDOR1c004923%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r340 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 15:24:27 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000125.html">[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www
+</A></li>
+        <LI>Next message: <A HREF="000127.html">[Wl530g-svncheckins] r341 - trunk/Marvell/Src/uClinux-dist/lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 15:24:22 +0200 (Fri, 22 Sep 2006)
+New Revision: 340
+
+Added:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c.new
+Log:
+beta code to enable dhcp+pptp and dhcp+pppoe
+
+Added: trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c.new
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c.new	2006-09-22 02:46:58 UTC (rev 339)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c.new	2006-09-22 13:24:22 UTC (rev 340)
+@@ -0,0 +1,1118 @@
++/*
++ * Network services
++ *
++ * Copyright 2004, Broadcom Corporation
++ * All Rights Reserved.
++ * 
++ * THIS SOFTWARE IS OFFERED &quot;AS IS&quot;, AND BROADCOM GRANTS NO WARRANTIES OF ANY
++ * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
++ * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
++ *
++ * $Id$
++ */
++
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;errno.h&gt;
++#include &lt;syslog.h&gt;															
++#include &lt;ctype.h&gt;
++#include &lt;string.h&gt;
++#include &lt;unistd.h&gt;
++#include &lt;sys/stat.h&gt;
++#include &lt;sys/ioctl.h&gt;
++#include &lt;sys/types.h&gt;
++#include &lt;sys/socket.h&gt;
++#include &lt;net/if.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;arpa/inet.h&gt;
++#include &lt;net/if_arp.h&gt;
++#include &lt;signal.h&gt;
++
++#include &lt;bcmnvram.h&gt;
++#include &lt;netconf.h&gt;
++#include &lt;shutils.h&gt;
++#include &lt;wlutils.h&gt;
++#include &lt;nvparse.h&gt;
++#include &lt;rc.h&gt;
++#include &lt;bcmutils.h&gt;
++
++static int
++add_routes(char *prefix, char *var, char *ifname)
++{
++	char word[80], *next;
++	char *ipaddr, *netmask, *gateway, *metric;
++	char tmp[100];
++
++	foreach(word, nvram_safe_get(strcat_r(prefix, var, tmp)), next) {
++
++		netmask = word;
++		ipaddr = strsep(&amp;netmask, &quot;:&quot;);
++		if (!ipaddr || !netmask)
++			continue;
++		gateway = netmask;
++		netmask = strsep(&amp;gateway, &quot;:&quot;);
++		if (!netmask || !gateway)
++			continue;
++		metric = gateway;
++		gateway = strsep(&amp;metric, &quot;:&quot;);
++		if (!gateway || !metric)
++			continue;
++
++		dprintf(&quot;\n\n\nadd %s %d %s %s %s\n\n\n&quot;, ifname, atoi(metric), ipaddr, gateway, netmask);
++		
++		route_add(ifname, atoi(metric) + 1, ipaddr, gateway, netmask);
++	}
++
++	return 0;
++}
++
++static int
++del_routes(char *prefix, char *var, char *ifname)
++{
++	char word[80], *next;
++	char *ipaddr, *netmask, *gateway, *metric;
++	char tmp[100];
++	
++	foreach(word, nvram_safe_get(strcat_r(prefix, var, tmp)), next) {
++		dprintf(&quot;add %s\n&quot;, word);
++		
++		netmask = word;
++		ipaddr = strsep(&amp;netmask, &quot;:&quot;);
++		if (!ipaddr || !netmask)
++			continue;
++		gateway = netmask;
++		netmask = strsep(&amp;gateway, &quot;:&quot;);
++		if (!netmask || !gateway)
++			continue;
++		metric = gateway;
++		gateway = strsep(&amp;metric, &quot;:&quot;);
++		if (!gateway || !metric)
++			continue;
++		
++		dprintf(&quot;add %s\n&quot;, ifname);
++		
++		route_del(ifname, atoi(metric) + 1, ipaddr, gateway, netmask);
++	}
++
++	return 0;
++}
++
++static int
++add_lan_routes(char *lan_ifname)
++{
++	return add_routes(&quot;lan_&quot;, &quot;route&quot;, lan_ifname);
++}
++
++static int
++del_lan_routes(char *lan_ifname)
++{
++	return del_routes(&quot;lan_&quot;, &quot;route&quot;, lan_ifname);
++}
++
++void
++start_lan(void)
++{
++	char *lan_ifname = nvram_safe_get(&quot;lan_ifname&quot;);
++	char name[80], *next;
++	int s;
++	struct ifreq ifr;
++
++	dprintf(&quot;%s\n&quot;, lan_ifname);
++
++ 	/* Bring up bridged interfaces */
++	if (strncmp(lan_ifname, &quot;br&quot;, 2) == 0) {
++		eval(&quot;brctl&quot;, &quot;addbr&quot;, lan_ifname);
++		eval(&quot;brctl&quot;, &quot;setfd&quot;, lan_ifname, &quot;0&quot;);
++		if (nvram_match(&quot;router_disable&quot;, &quot;1&quot;) || nvram_match(&quot;lan_stp&quot;, &quot;0&quot;))
++			eval(&quot;brctl&quot;, &quot;stp&quot;, lan_ifname, &quot;dis&quot;);
++#ifdef ASUS_EXT
++		foreach(name, nvram_safe_get(&quot;lan_ifnames_t&quot;), next) {
++#else
++		foreach(name, nvram_safe_get(&quot;lan_ifnames&quot;), next) {
++#endif
++			/* Bring up interface */
++			ifconfig(name, IFUP, NULL, NULL);
++			/* Set the logical bridge address to that of the first interface */
++			if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) &lt; 0)
++				continue;
++			strncpy(ifr.ifr_name, lan_ifname, IFNAMSIZ);
++			if (ioctl(s, SIOCGIFHWADDR, &amp;ifr) == 0 &amp;&amp;
++			    memcmp(ifr.ifr_hwaddr.sa_data, &quot;\0\0\0\0\0\0&quot;, ETHER_ADDR_LEN) == 0) {
++				strncpy(ifr.ifr_name, name, IFNAMSIZ);
++				if (ioctl(s, SIOCGIFHWADDR, &amp;ifr) == 0) {
++					strncpy(ifr.ifr_name, lan_ifname, IFNAMSIZ);
++					ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
++					ioctl(s, SIOCSIFHWADDR, &amp;ifr);
++				}
++			}
++			close(s);
++
++#ifdef ASUS_EXT
++			eval(&quot;brctl&quot;, &quot;addif&quot;, lan_ifname, name);
++#else
++			/* If not a wl i/f then simply add it to the bridge */
++			if (eval(&quot;wlconf&quot;, name, &quot;up&quot;))
++				eval(&quot;brctl&quot;, &quot;addif&quot;, lan_ifname, name);
++			else {
++				/* get the instance number of the wl i/f */
++				char wl_name[] = &quot;wlXXXXXXXXXX_mode&quot;;
++				int unit;
++#ifdef ASUS_EXT
++				sync_mac(name, nvram_safe_get(&quot;et0macaddr&quot;));
++#endif
++				wl_ioctl(name, WLC_GET_INSTANCE, &amp;unit, sizeof(unit));
++				snprintf(wl_name, sizeof(wl_name), &quot;wl%d_mode&quot;, unit);
++				/* Receive all multicast frames in WET mode */
++				if (nvram_match(wl_name, &quot;wet&quot;))
++					ifconfig(name, IFUP | IFF_ALLMULTI, NULL, NULL);
++				/* Do not attach the main wl i/f if in wds mode */
++				if (nvram_invmatch(wl_name, &quot;wds&quot;))
++					eval(&quot;brctl&quot;, &quot;addif&quot;, lan_ifname, name);
++			}
++#endif
++		}
++#ifdef WDS
++		if (nvram_invmatch(&quot;wl_wdsapply_x&quot;, &quot;0&quot;))
++		{
++			int count;
++			char wdsif[32];
++
++			for(count=0;count&lt;atoi(nvram_safe_get(&quot;wl_wdsnum_x&quot;));count++)
++			{
++				sprintf(wdsif, &quot;wlan0wds%d&quot;, count);
++				eval(&quot;brctl&quot;,&quot;addif&quot;,&quot;br0&quot;, wdsif);
++				eval(&quot;ifconfig&quot;, wdsif,&quot;up&quot;);
++			}
++		}
++#endif
++	}
++#ifdef REMOVE
++	/* specific non-bridged lan i/f */
++	else if (strcmp(lan_ifname, &quot;&quot;)) {
++		/* Bring up interface */
++		ifconfig(lan_ifname, IFUP, NULL, NULL);
++		/* config wireless i/f */
++		if (!eval(&quot;wlconf&quot;, lan_ifname, &quot;up&quot;)) {
++			char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++			int unit;
++			/* get the instance number of the wl i/f */
++			wl_ioctl(lan_ifname, WLC_GET_INSTANCE, &amp;unit, sizeof(unit));
++			snprintf(prefix, sizeof(prefix), &quot;wl%d_&quot;, unit);
++			/* Receive all multicast frames in WET mode */
++			if (nvram_match(strcat_r(prefix, &quot;mode&quot;, tmp), &quot;wet&quot;))
++				ifconfig(lan_ifname, IFUP | IFF_ALLMULTI, NULL, NULL);
++		}
++	}
++#endif
++
++	/* Get current LAN hardware address */
++	if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) &gt;= 0) {
++		char eabuf[32];
++		strncpy(ifr.ifr_name, lan_ifname, IFNAMSIZ);
++		if (ioctl(s, SIOCGIFHWADDR, &amp;ifr) == 0)
++			nvram_set(&quot;lan_hwaddr&quot;, ether_etoa(ifr.ifr_hwaddr.sa_data, eabuf));
++		close(s);
++	}
++
++
++#ifdef ASUS_EXT
++	/* 
++	* Configure DHCP connection. The DHCP client will run 
++	* 'udhcpc bound'/'udhcpc deconfig' upon finishing IP address 
++	* renew and release.
++	*/
++	if (nvram_match(&quot;router_disable&quot;, &quot;1&quot;))
++	{
++		if (nvram_match(&quot;lan_proto_x&quot;, &quot;1&quot;)) 
++		{
++			char *dhcp_argv[] = { &quot;udhcpc&quot;,
++					      &quot;-i&quot;, lan_ifname,
++					      &quot;-p&quot;, &quot;/var/run/udhcpc_lan.pid&quot;,
++					      &quot;-s&quot;, &quot;/tmp/landhcpc&quot;,
++					      NULL
++			};
++			pid_t pid;
++
++			symlink(&quot;/sbin/rc&quot;, &quot;/tmp/landhcpc&quot;);
++
++			/* Start dhcp daemon */
++			_eval(dhcp_argv, NULL, 0, &amp;pid);
++		}
++		else
++		{
++			/* Bring up and configure LAN interface */
++			ifconfig(lan_ifname, IFUP,
++		 		nvram_safe_get(&quot;lan_ipaddr&quot;), nvram_safe_get(&quot;lan_netmask&quot;));
++			lan_up(lan_ifname);
++		}
++	}
++	else
++	{
++		/* Bring up and configure LAN interface */
++		ifconfig(lan_ifname, IFUP,
++		 	nvram_safe_get(&quot;lan_ipaddr&quot;), nvram_safe_get(&quot;lan_netmask&quot;));
++		/* Install lan specific static routes */
++		add_lan_routes(lan_ifname);
++
++		update_lan_status(1);
++	}
++#else
++	/* Bring up and configure LAN interface */
++	ifconfig(lan_ifname, IFUP,
++		 nvram_safe_get(&quot;lan_ipaddr&quot;), nvram_safe_get(&quot;lan_netmask&quot;));
++
++	/* Install lan specific static routes */
++	add_lan_routes(lan_ifname);
++#endif
++
++#ifndef ASUS_EXT
++	/* Start syslogd if either log_ipaddr or log_ram_enable is set */
++	if (nvram_invmatch(&quot;log_ipaddr&quot;, &quot;&quot;) || nvram_match(&quot;log_ram_enable&quot;, &quot;1&quot;)) {
++		char *argv[] = {
++			&quot;syslogd&quot;,
++			NULL, 		/* -C */
++			NULL, NULL,	/* -R host */
++			NULL
++		};
++		int pid;
++		int argc = 1;
++		
++		if (nvram_match(&quot;log_ram_enable&quot;, &quot;1&quot;)) {
++			argv[argc++] = &quot;-C&quot;;
++		}
++		else if (!nvram_match(&quot;log_ram_enable&quot;, &quot;0&quot;)) {
++			nvram_set(&quot;log_ram_enable&quot;, &quot;0&quot;);
++		}
++				
++		if (nvram_invmatch(&quot;log_ipaddr&quot;, &quot;&quot;)) {
++			argv[argc++] = &quot;-R&quot;;
++			argv[argc++] = nvram_get(&quot;log_ipaddr&quot;);
++		}
++
++		_eval(argv, NULL, 0, &amp;pid);
++	}
++#endif
++
++	dprintf(&quot;%s %s\n&quot;,
++		nvram_safe_get(&quot;lan_ipaddr&quot;),
++		nvram_safe_get(&quot;lan_netmask&quot;));
++}
++
++void
++stop_lan(void)
++{
++	char *lan_ifname = nvram_safe_get(&quot;lan_ifname&quot;);
++	char name[80], *next;
++
++	dprintf(&quot;%s\n&quot;, lan_ifname);
++
++	/* Stop the syslogd daemon */
++	eval(&quot;killall&quot;, &quot;syslogd&quot;);
++
++	/* Remove static routes */
++	del_lan_routes(lan_ifname);
++
++	/* Bring down LAN interface */
++	ifconfig(lan_ifname, 0, NULL, NULL);
++
++	/* Bring down bridged interfaces */
++	if (strncmp(lan_ifname, &quot;br&quot;, 2) == 0) {
++#ifdef ASUS_EXT
++		foreach(name, nvram_safe_get(&quot;lan_ifnames_t&quot;), next) {
++#else
++		foreach(name, nvram_safe_get(&quot;lan_ifnames&quot;), next) {
++#endif
++			eval(&quot;wlconf&quot;, name, &quot;down&quot;);
++			ifconfig(name, 0, NULL, NULL);
++			eval(&quot;brctl&quot;, &quot;delif&quot;, lan_ifname, name);
++		}
++		eval(&quot;brctl&quot;, &quot;delbr&quot;, lan_ifname);
++	}
++	/* Bring down specific interface */
++	else if (strcmp(lan_ifname, &quot;&quot;))
++		eval(&quot;wlconf&quot;, lan_ifname, &quot;down&quot;);
++	
++	dprintf(&quot;done\n&quot;);
++}
++
++static int
++wan_prefix(char *ifname, char *prefix)
++{
++	int unit;
++	
++	if ((unit = wan_ifunit(ifname)) &lt; 0)
++		return -1;
++
++	sprintf(prefix, &quot;wan%d_&quot;, unit);
++	return 0;
++}
++
++static int
++add_wan_routes(char *wan_ifname)
++{
++	char prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return -1;
++
++	return add_routes(prefix, &quot;route&quot;, wan_ifname);
++}
++
++static int
++del_wan_routes(char *wan_ifname)
++{
++	char prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return -1;
++
++	return del_routes(prefix, &quot;route&quot;, wan_ifname);
++}
++
++int
++wan_valid(char *ifname)
++{
++	char name[80], *next;
++	
++	foreach(name, nvram_safe_get(&quot;wan_ifnames&quot;), next)
++		if (ifname &amp;&amp; !strcmp(ifname, name))
++			return 1;
++	return 0;
++}
++
++void
++start_wan(void)
++{
++	char *wan_ifname;
++	char *wan_proto;
++	int unit;
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++	char eabuf[32];
++	int s;
++	struct ifreq ifr;
++	pid_t pid;
++
++	/* check if we need to setup WAN */
++	if (nvram_match(&quot;router_disable&quot;, &quot;1&quot;))
++		return;
++
++#ifdef ASUS_EXT
++	update_wan_status(0);
++	/* start connection independent firewall */
++	//start_firewall_prev_ex();
++	start_firewall();
++#else
++	/* start connection independent firewall */
++	start_firewall();
++#endif
++
++	/* Create links */
++	mkdir(&quot;/tmp/ppp&quot;, 0777);
++	symlink(&quot;/sbin/rc&quot;, &quot;/tmp/ppp/ip-up&quot;);
++	symlink(&quot;/sbin/rc&quot;, &quot;/tmp/ppp/ip-down&quot;);	
++	symlink(&quot;/sbin/rc&quot;, &quot;/tmp/udhcpc&quot;);
++
++	//symlink(&quot;/dev/null&quot;, &quot;/tmp/ppp/connect-errors&quot;);
++
++	/* Start each configured and enabled wan connection and its undelying i/f */
++	for (unit = 0; unit &lt; MAX_NVPARSE; unit ++) 
++	{
++#ifdef ASUS_EXT // Only multiple pppoe is allowed 
++		if (unit&gt;0 &amp;&amp; nvram_invmatch(&quot;wan_proto&quot;, &quot;pppoe&quot;)) break;
++#endif
++
++		snprintf(prefix, sizeof(prefix), &quot;wan%d_&quot;, unit);
++
++		/* make sure the connection exists and is enabled */ 
++		wan_ifname = nvram_get(strcat_r(prefix, &quot;ifname&quot;, tmp));
++		if (!wan_ifname)
++			continue;
++		wan_proto = nvram_get(strcat_r(prefix, &quot;proto&quot;, tmp));
++		if (!wan_proto || !strcmp(wan_proto, &quot;disabled&quot;))
++			continue;
++
++		/* disable the connection if the i/f is not in wan_ifnames */
++		if (!wan_valid(wan_ifname)) {
++			nvram_set(strcat_r(prefix, &quot;proto&quot;, tmp), &quot;disabled&quot;);
++			continue;
++		}
++
++		dprintf(&quot;%s %s\n&quot;, wan_ifname, wan_proto);
++
++		/* Set i/f hardware address before bringing it up */
++		if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) &lt; 0)
++			continue;
++		strncpy(ifr.ifr_name, wan_ifname, IFNAMSIZ);
++
++		/* Since WAN interface may be already turned up (by vlan.c),
++		   if WAN hardware address is specified (and different than the current one),
++		   we need to make it down for synchronizing hwaddr. */
++		if (ioctl(s, SIOCGIFHWADDR, &amp;ifr)) {
++			close(s);
++			continue;
++		}
++		ether_atoe(nvram_safe_get(strcat_r(prefix, &quot;hwaddr&quot;, tmp)), eabuf);
++		if (bcmp(eabuf, ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN))
++		{
++			/* current hardware address is different than user specified */
++			ifconfig(wan_ifname, 0, NULL, NULL);
++		}
++
++		/* Configure i/f only once, specially for wireless i/f shared by multiple connections */
++		if (ioctl(s, SIOCGIFFLAGS, &amp;ifr)) {
++			close(s);
++			continue;
++		}
++		if (!(ifr.ifr_flags &amp; IFF_UP)) {
++			/* Sync connection nvram address and i/f hardware address */
++			memset(ifr.ifr_hwaddr.sa_data, 0, ETHER_ADDR_LEN);
++			if (!nvram_invmatch(strcat_r(prefix, &quot;hwaddr&quot;, tmp), &quot;&quot;) ||
++			    !ether_atoe(nvram_safe_get(strcat_r(prefix, &quot;hwaddr&quot;, tmp)), ifr.ifr_hwaddr.sa_data) ||
++			    !memcmp(ifr.ifr_hwaddr.sa_data, &quot;\0\0\0\0\0\0&quot;, ETHER_ADDR_LEN)) {
++				if (ioctl(s, SIOCGIFHWADDR, &amp;ifr)) {
++					close(s);
++					continue;
++				}
++				nvram_set(strcat_r(prefix, &quot;hwaddr&quot;, tmp), ether_etoa(ifr.ifr_hwaddr.sa_data, eabuf));
++			}
++			else {
++				ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
++				ioctl(s, SIOCSIFHWADDR, &amp;ifr);
++			}
++
++			/* Bring up i/f */
++			ifconfig(wan_ifname, IFUP, NULL, NULL);
++
++#ifdef BRCM
++			/* do wireless specific config */
++			eval(&quot;wlconf&quot;, wan_ifname, &quot;up&quot;);
++#endif
++		}
++	
++		close(s);
++
++		if (unit==0) 
++		{		
++			FILE *fp;
++
++			setup_ethernet(nvram_safe_get(&quot;wan_ifname&quot;));
++			start_pppoe_relay(nvram_safe_get(&quot;wan_ifname&quot;));
++
++			/* Enable Forwarding */
++			if ((fp = fopen(&quot;/proc/sys/net/ipv4/ip_forward&quot;, &quot;r+&quot;))) 			
++			{
++				fputc('1', fp);
++				fclose(fp);
++			} 
++			else
++			{	
++				perror(&quot;/proc/sys/net/ipv4/ip_forward&quot;);
++			}
++		}
++
++		if (nvram_match(&quot;wan_proto&quot;, &quot;pppoe&quot;) || nvram_match(&quot;wan_proto&quot;, &quot;pptp&quot;) || nvram_match(wan_proto, &quot;l2tp&quot;))
++		{
++			int demand = atoi(nvram_safe_get(strcat_r(prefix, &quot;pppoe_idletime&quot;, tmp)));
++			/* update demand option */
++			nvram_set(strcat_r(prefix, &quot;pppoe_demand&quot;, tmp), demand ? &quot;1&quot; : &quot;0&quot;);
++			/* Bring up  WAN interface */			
++				ifconfig(wan_ifname, IFUP, 
++					nvram_safe_get(&quot;wanx_ipaddr&quot;), 
++					nvram_safe_get(&quot;wanx_netmask&quot;));
++
++				/* ************* trial *************** */
++				/* this code was adopted from Oleg's WL-500g sources */
++				/* launch dhcp client and wait for lease forawhile */
++		 		if (nvram_match(strcat_r(prefix, &quot;pppoe_ipaddr&quot;, tmp), &quot;0.0.0.0&quot;)) 
++			 	{
++					char *wan_hostname = nvram_get(strcat_r(prefix, &quot;hostname&quot;, tmp));
++					char *dhcp_argv[] = 
++						{ &quot;udhcpc&quot;,
++						      &quot;-i&quot;, wan_ifname,
++						      &quot;-p&quot;, (sprintf(tmp, &quot;/var/run/udhcpc%d.pid&quot;, unit), tmp),
++						      &quot;-s&quot;, &quot;/tmp/udhcpc&quot;,
++						      &quot;-b&quot;,
++						      wan_hostname &amp;&amp; *wan_hostname ? &quot;-H&quot; : NULL,
++						      wan_hostname &amp;&amp; *wan_hostname ? wan_hostname : NULL,
++						      NULL
++						};
++					/* Start dhcp daemon */
++					_eval(dhcp_argv, NULL, 0, NULL);
++			 	} 
++				else 
++				{
++					/* should start firewall here instead of later ? */
++					if (strcmp(wan_proto, &quot;pptp&quot;) == 0 || strcmp(wan_proto, &quot;l2tp&quot;) == 0) 
++					{
++						/* add pptp server route */
++						if (nvram_invmatch(&quot;wan_heartbeat_x&quot;, &quot;&quot;)) 
++						{
++							route_add(wan_ifname, 0, nvram_safe_get(&quot;wan_heartbeat_x&quot;),
++								nvram_get(strcat_r(prefix, &quot;pppoe_gateway&quot;, tmp)),
++								 &quot;255.255.255.255&quot;);
++						} 
++						else 
++						{
++							route_add(wan_ifname, 0, 
++								nvram_safe_get(strcat_r(prefix, &quot;pppoe_gateway&quot;, tmp)),
++								NULL, &quot;255.255.255.255&quot;);
++						}
++					}				 
++			 	}		
++		 	
++		 	/* setup static wan routes via physical device */
++			add_routes(&quot;wan_&quot;, &quot;route&quot;, wan_ifname);
++			
++			start_pppd(prefix);
++
++			/* ppp interface name is referenced from this point on */
++			wan_ifname = nvram_safe_get(strcat_r(prefix, &quot;pppoe_ifname&quot;, tmp));
++			
++			/* Pretend that the WAN interface is up - update: actually it is now ;) */
++			if (nvram_match(strcat_r(prefix, &quot;pppoe_demand&quot;, tmp), &quot;1&quot;)) 
++			{
++				int timeout = 5;
++				/* Wait for pppx to be created */
++				while (ifconfig(wan_ifname, IFUP, NULL, NULL) &amp;&amp; timeout--)
++					sleep(1);
++
++				/* Retrieve IP info */
++				if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) &lt; 0)
++					continue;
++				strncpy(ifr.ifr_name, wan_ifname, IFNAMSIZ);
++
++				/* Set temporary IP address */
++				if (ioctl(s, SIOCGIFADDR, &amp;ifr))
++					perror(wan_ifname);
++
++				nvram_set(strcat_r(prefix, &quot;ipaddr&quot;, tmp), inet_ntoa(sin_addr(&amp;ifr.ifr_addr)));
++				nvram_set(strcat_r(prefix, &quot;netmask&quot;, tmp), &quot;255.255.255.255&quot;);
++
++				/* Set temporary P-t-P address */
++				if (ioctl(s, SIOCGIFDSTADDR, &amp;ifr))
++					perror(wan_ifname);
++				nvram_set(strcat_r(prefix, &quot;gateway&quot;, tmp), inet_ntoa(sin_addr(&amp;ifr.ifr_dstaddr)));
++
++				close(s);
++
++				/* 
++				* Preset routes so that traffic can be sent to proper pppx even before 
++				* the link is brought up.
++				*/
++				preset_wan_routes(wan_ifname);
++			}
++		
++		}
++		/* 
++		* Configure DHCP connection. The DHCP client will run 
++		* 'udhcpc bound'/'udhcpc deconfig' upon finishing IP address 
++		* renew and release.
++		*/
++		else if (strcmp(wan_proto, &quot;dhcp&quot;) == 0 ||
++			 strcmp(wan_proto, &quot;bigpond&quot;) ==0) {
++			char *wan_hostname = nvram_get(strcat_r(prefix, &quot;hostname&quot;, tmp));
++			char *dhcp_argv[] = { &quot;udhcpc&quot;,
++					      &quot;-i&quot;, wan_ifname,
++					      &quot;-p&quot;, &quot;/var/run/udhcpc0.pid&quot;,
++					      &quot;-s&quot;, &quot;/tmp/udhcpc&quot;,
++					      wan_hostname &amp;&amp; *wan_hostname ? &quot;-H&quot; : NULL,
++					      wan_hostname &amp;&amp; *wan_hostname ? wan_hostname : NULL,
++					      NULL
++			};
++			/* Start dhcp daemon */
++			_eval(dhcp_argv, NULL, 0, &amp;pid);
++#ifdef ASUS_EXT
++			wanmessage(&quot;Can not get IP from server&quot;);
++#endif
++		}
++		/* Configure static IP connection. */
++		else if (strcmp(wan_proto, &quot;static&quot;) == 0) {
++			/* Assign static IP address to i/f */
++			ifconfig(wan_ifname, IFUP,
++				 nvram_safe_get(strcat_r(prefix, &quot;ipaddr&quot;, tmp)), 
++				 nvram_safe_get(strcat_r(prefix, &quot;netmask&quot;, tmp)));
++			/* We are done configuration */
++			wan_up(wan_ifname);
++		}
++
++		dprintf(&quot;%s %s\n&quot;,
++			nvram_safe_get(strcat_r(prefix, &quot;ipaddr&quot;, tmp)),
++			nvram_safe_get(strcat_r(prefix, &quot;netmask&quot;, tmp)));
++	}
++
++	/* Report stats */
++	if (nvram_invmatch(&quot;stats_server&quot;, &quot;&quot;)) {
++		char *stats_argv[] = { &quot;stats&quot;, nvram_get(&quot;stats_server&quot;), NULL };
++		_eval(stats_argv, NULL, 5, NULL);
++	}
++}
++
++void
++stop_wan(void)
++{
++	char name[80], *next, signal[] = &quot;XXXX&quot;;
++	
++	eval(&quot;killall&quot;, &quot;stats&quot;);
++	eval(&quot;killall&quot;, &quot;ntpclient&quot;);
++
++	/* Shutdown and kill all possible tasks */
++	eval(&quot;killall&quot;, &quot;ip-up&quot;);
++	eval(&quot;killall&quot;, &quot;ip-down&quot;);
++	snprintf(signal, sizeof(signal), &quot;-%d&quot;, SIGHUP);
++	eval(&quot;killall&quot;, signal, &quot;pppd&quot;);
++	eval(&quot;killall&quot;, &quot;pppd&quot;);
++	snprintf(signal, sizeof(signal), &quot;-%d&quot;, SIGUSR2);
++	eval(&quot;killall&quot;, signal, &quot;udhcpc&quot;);
++	eval(&quot;killall&quot;, &quot;udhcpc&quot;);
++
++	/* Bring down WAN interfaces */
++	foreach(name, nvram_safe_get(&quot;wan_ifnames&quot;), next)
++		ifconfig(name, 0, NULL, NULL);
++
++	/* Remove dynamically created links */
++	unlink(&quot;/tmp/udhcpc&quot;);
++	
++	unlink(&quot;/tmp/ppp/ip-up&quot;);
++	unlink(&quot;/tmp/ppp/ip-down&quot;);
++	rmdir(&quot;/tmp/ppp&quot;);
++
++	if (nvram_match(&quot;wan0_proto&quot;, &quot;static&quot;))
++		wan_down(nvram_safe_get(&quot;wan0_ifname&quot;));
++
++	dprintf(&quot;done\n&quot;);
++}
++
++static int
++add_ns(char *wan_ifname)
++{
++	FILE *fp;
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++	char word[100], *next;
++	char line[100];
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return -1;
++
++	/* Open resolv.conf to read */
++	if (!(fp = fopen(&quot;/tmp/resolv.conf&quot;, &quot;r+&quot;))) {
++		perror(&quot;/tmp/resolv.conf&quot;);
++		return errno;
++	}
++
++	/* Append only those not in the original list */
++	foreach(word, nvram_safe_get(strcat_r(prefix, &quot;dns&quot;, tmp)), next) 
++	{
++		fseek(fp, 0, SEEK_SET);
++		while (fgets(line, sizeof(line), fp)) {
++			char *token = strtok(line, &quot; \t\n&quot;);
++
++			if (!token || strcmp(token, &quot;nameserver&quot;) != 0)
++				continue;
++			if (!(token = strtok(NULL, &quot; \t\n&quot;)))
++				continue;
++
++			if (!strcmp(token, word))
++				break;
++		}
++		if (feof(fp))
++			fprintf(fp, &quot;nameserver %s\n&quot;, word);
++	}
++	fclose(fp);
++
++#ifdef ASUS_EXT
++	stop_dns();
++	start_dns();
++#else
++	/* notify dnsmasq */
++	snprintf(tmp, sizeof(tmp), &quot;-%d&quot;, SIGHUP);
++	eval(&quot;killall&quot;, tmp, &quot;dnsmasq&quot;);
++#endif
++	
++	return 0;
++}
++
++static int
++del_ns(char *wan_ifname)
++{
++	FILE *fp, *fp2;
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++	char word[100], *next;
++	char line[100];
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return -1;
++
++	/* Open resolv.conf to read */
++	if (!(fp = fopen(&quot;/tmp/resolv.conf&quot;, &quot;r&quot;))) {
++		perror(&quot;fopen /tmp/resolv.conf&quot;);
++		return errno;
++	}
++	/* Open resolv.tmp to save updated name server list */
++	if (!(fp2 = fopen(&quot;/tmp/resolv.tmp&quot;, &quot;w&quot;))) {
++		perror(&quot;fopen /tmp/resolv.tmp&quot;);
++		fclose(fp);
++		return errno;
++	}
++	/* Copy updated name servers */
++	while (fgets(line, sizeof(line), fp)) {
++		char *token = strtok(line, &quot; \t\n&quot;);
++
++		if (!token || strcmp(token, &quot;nameserver&quot;) != 0)
++			continue;
++		if (!(token = strtok(NULL, &quot; \t\n&quot;)))
++			continue;
++
++		foreach(word, nvram_safe_get(strcat_r(prefix, &quot;dns&quot;, tmp)), next)
++			if (!strcmp(word, token))
++				break;
++		if (!next)
++			fprintf(fp2, &quot;nameserver %s\n&quot;, token);
++	}
++	fclose(fp);
++	fclose(fp2);
++	/* Use updated file as resolv.conf */
++	unlink(&quot;/tmp/resolv.conf&quot;);
++	rename(&quot;/tmp/resolv.tmp&quot;, &quot;/tmp/resolv.conf&quot;);
++
++#ifdef ASUS_EXT
++	stop_dns();
++	start_dns();
++#else	
++	/* notify dnsmasq */
++	snprintf(tmp, sizeof(tmp), &quot;-%d&quot;, SIGHUP);
++	eval(&quot;killall&quot;, tmp, &quot;dnsmasq&quot;);
++#endif
++	
++	return 0;
++}
++
++void
++wan_up(char *wan_ifname)
++{
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++	char *wan_proto;
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return;
++
++	wan_proto = nvram_safe_get(strcat_r(prefix, &quot;proto&quot;, tmp));	
++
++	dprintf(&quot;%s %s\n&quot;, wan_ifname, wan_proto);
++
++	/* Set default route to gateway if specified */
++	if (nvram_match(strcat_r(prefix, &quot;primary&quot;, tmp), &quot;1&quot;))
++		route_add(wan_ifname, 0, &quot;0.0.0.0&quot;, 
++			nvram_safe_get(strcat_r(prefix, &quot;gateway&quot;, tmp)),
++			&quot;0.0.0.0&quot;);
++
++	/* Install interface dependent static routes */
++	add_wan_routes(wan_ifname);
++
++	/* Add dns servers to resolv.conf */
++	add_ns(wan_ifname);
++
++	/* Sync time */
++	//start_ntpc();
++
++#ifdef ASUS_EXT
++	update_wan_status(1);
++
++	if (strcmp(wan_proto, &quot;dhcp&quot;)==0 ||
++	    strcmp(wan_proto, &quot;bigpond&quot;)==0 ||
++	    strcmp(wan_proto, &quot;pppoe&quot;)==0 ||
++	    strcmp(wan_proto, &quot;pptp&quot;)==0) 
++		start_firewall();
++
++	/* Start connection dependent firewall */
++	start_firewall2(wan_ifname);
++	//start_firewall_ex(wan_ifname, nvram_safe_get(strcat_r(prefix, &quot;ipaddr&quot;, tmp)), &quot;br0&quot;, nvram_safe_get(&quot;lan_ipaddr&quot;));
++	start_ddns();
++
++	if (strcmp(wan_proto, &quot;bigpond&quot;)==0) start_bpalogin();
++	
++#ifdef REMOVE
++	if (strcmp(wan_proto, &quot;pptp&quot;)==0)
++	{
++		eval(&quot;insmod&quot;, &quot;ip_conntrack_proto_gre.o&quot;);
++		eval(&quot;insmod&quot;, &quot;ip_conntrack_pptp.o&quot;);
++		eval(&quot;insmod&quot;, &quot;ip_nat_proto_gre.o&quot;);
++		eval(&quot;insmod&quot;, &quot;ip_nat_pptp.o&quot;);	
++	}
++#endif
++#endif
++	
++	dprintf(&quot;done\n&quot;);
++}
++
++void
++wan_down(char *wan_ifname)
++{
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++	char *wan_proto;
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return;
++
++	wan_proto = nvram_safe_get(strcat_r(prefix, &quot;proto&quot;, tmp));
++	
++	/* Remove default route to gateway if specified */
++	if (nvram_match(strcat_r(prefix, &quot;primary&quot;, tmp), &quot;1&quot;))
++		route_del(wan_ifname, 0, &quot;0.0.0.0&quot;, 
++			nvram_safe_get(strcat_r(prefix, &quot;gateway&quot;, tmp)),
++			&quot;0.0.0.0&quot;);
++
++	/* Remove interface dependent static routes */
++	del_wan_routes(wan_ifname);
++
++	/* Update resolv.conf */
++	del_ns(wan_ifname);
++
++#ifdef ASUS_EXT
++	update_wan_status(0);
++
++	if (strcmp(wan_proto, &quot;bigpond&quot;)==0) stop_bpalogin();
++
++#ifdef REMOVE
++	if (strcmp(wan_proto, &quot;pptp&quot;)==0)
++	{
++		eval(&quot;rmmod&quot;, &quot;ip_nat_pptp&quot;);
++		eval(&quot;rmmod&quot;, &quot;ip_nat_proto_gre&quot;);
++		eval(&quot;rmmod&quot;, &quot;ip_conntrack_pptp&quot;);
++		eval(&quot;rmmod&quot;, &quot;ip_conntrack_proto_gre&quot;);
++	}
++#endif
++#endif
++
++	dprintf(&quot;done\n&quot;);
++}
++
++#ifdef ASUS_EXT
++void
++lan_up(char *lan_ifname)
++{
++	FILE *fp;
++	char word[100], *next;
++	char line[100];
++
++	/* Set default route to gateway if specified */
++	route_add(lan_ifname, 0, &quot;0.0.0.0&quot;, 
++			nvram_safe_get(&quot;lan_gateway&quot;),
++			&quot;0.0.0.0&quot;);
++
++	/* Open resolv.conf to read */
++	if (!(fp = fopen(&quot;/tmp/resolv.conf&quot;, &quot;w&quot;))) {
++		perror(&quot;/tmp/resolv.conf&quot;);
++		return errno;
++	}
++
++	if (nvram_invmatch(&quot;lan_gateway&quot;, &quot;&quot;))
++		fprintf(fp, &quot;nameserver %s\n&quot;, nvram_safe_get(&quot;lan_gateway&quot;));
++
++	foreach(word, nvram_safe_get(&quot;lan_dns&quot;), next)
++	{
++		fprintf(fp, &quot;nameserver %s\n&quot;, word);
++	}
++	fclose(fp);
++
++	/* Sync time */
++	//start_ntpc();
++
++	update_lan_status(1);
++}
++
++void
++lan_down(char *lan_ifname)
++{
++	/* Remove default route to gateway if specified */
++	route_del(lan_ifname, 0, &quot;0.0.0.0&quot;, 
++			nvram_safe_get(&quot;lan_gateway&quot;),
++			&quot;0.0.0.0&quot;);
++
++	/* remove resolv.conf */
++	unlink(&quot;/tmp/resolv.conf&quot;);
++
++	update_lan_status(0);
++}
++#endif
++
++#ifdef REMOVE
++static int
++notify_nas(char *type, char *ifname, char *action)
++{
++	char *argv[] = {&quot;nas4not&quot;, type, ifname, action, 
++			NULL,	/* role */
++			NULL,	/* crypto */
++			NULL,	/* auth */
++			NULL,	/* passphrase */
++			NULL,	/* ssid */
++			NULL};
++	char *str = NULL;
++	int retries = 10;
++	char tmp[100], prefix[] = &quot;wlXXXXXXXXXX_&quot;;
++	int unit;
++	char remote[ETHER_ADDR_LEN];
++	char ssid[48], pass[80], auth[16], crypto[16], role[8];
++	int i;
++
++	/* the wireless interface must be configured to do WPA */
++	wl_ioctl(ifname, WLC_GET_INSTANCE, &amp;unit, sizeof(unit));
++	snprintf(prefix, sizeof(prefix), &quot;wl%d_&quot;, unit);
++	if (nvram_match(strcat_r(prefix, &quot;auth_mode&quot;, tmp), &quot;open&quot;) ||
++	    nvram_match(strcat_r(prefix, &quot;auth_mode&quot;, tmp), &quot;shared&quot;))
++		return 0;
++
++	/* find WDS link configuration */
++	wl_ioctl(ifname, WLC_WDS_GET_REMOTE_HWADDR, remote, ETHER_ADDR_LEN);
++
++	for(i=0;i&lt;ETHER_ADDR_LEN;i++)
++	{
++		sprintf(tmp, &quot;%s %x&quot;, tmp, remote[i]);
++	}
++	nvram_set(&quot;wl0_nas_hwaddr&quot;, tmp);
++
++	
++	for (i = 0; i &lt; MAX_NVPARSE; i ++) {
++		char mac[ETHER_ADDR_STR_LEN];
++		uint8 ea[ETHER_ADDR_LEN];
++
++		if (get_wds_wsec(unit, i, mac, role, crypto, auth, ssid, pass) &amp;&amp;
++		    ether_atoe(mac, ea) &amp;&amp; !bcmp(ea, remote, ETHER_ADDR_LEN)) {
++			argv[4] = role;
++			argv[5] = crypto;
++			argv[6] = auth;
++			argv[7] = pass;
++			argv[8] = ssid;
++			break;
++		}
++	}
++
++	/* did not find WDS link configuration, use wireless' */
++	if (i == MAX_NVPARSE) {
++		/* role */
++		argv[4] = &quot;auto&quot;;
++		/* crypto */
++		argv[5] = nvram_safe_get(strcat_r(prefix, &quot;crypto&quot;, tmp));
++		/* auth mode */
++		argv[6] = nvram_safe_get(strcat_r(prefix, &quot;auth_mode&quot;, tmp));
++		/* passphrase */
++		argv[7] = nvram_safe_get(strcat_r(prefix, &quot;wpa_psk&quot;, tmp));
++		/* ssid */
++		argv[8] = nvram_safe_get(strcat_r(prefix, &quot;ssid&quot;, tmp));
++	}
++
++
++	for(i=0;argv[i]!=NULL;i++)
++	{
++		char *nv[32];
++		sprintf(nv, &quot;wl0_nas_msg%d&quot;, i);
++		nvram_set(nv, argv[i]);
++	}
++	
++	/* wait till nas is started */
++	while (retries -- &gt; 0 &amp;&amp; !(str = file2str(&quot;/tmp/nas.lan.pid&quot;)))
++		sleep(1);
++	if (str) {
++		int pid;
++		free(str);
++		nvram_set(&quot;wl0_nas_msg99&quot;, &quot;ok&quot;);
++		return _eval(argv, &quot;&gt;/dev/console&quot;, 0, &amp;pid);
++	}
++	return -1;
++}
++#endif
++
++int
++hotplug_net(void)
++{
++#ifdef REMOVE
++	char *lan_ifname = nvram_safe_get(&quot;lan_ifname&quot;);
++	char *interface, *action;
++
++	if (!(interface = getenv(&quot;INTERFACE&quot;)) ||
++	    !(action = getenv(&quot;ACTION&quot;)))
++		return EINVAL;
++
++	if (strncmp(interface, &quot;wds&quot;, 3))
++		return 0;
++
++	if (!strcmp(action, &quot;register&quot;)) {
++		/* Bring up the interface and add to the bridge */
++		ifconfig(interface, IFUP, NULL, NULL);
++		
++		/* Bridge WDS interfaces */
++		if (!strncmp(lan_ifname, &quot;br&quot;, 2) &amp;&amp; 
++		    eval(&quot;brctl&quot;, &quot;addif&quot;, lan_ifname, interface))
++		    return 0;
++
++		nvram_set(&quot;wl0_nas_msg1&quot;, &quot;nas&quot;);
++		/* Notify NAS of adding the interface */
++		notify_nas(&quot;lan&quot;, interface, &quot;up&quot;);
++	}
++#endif
++	return 0;
++}
++
++int
++wan_ifunit(char *wan_ifname)
++{
++	int unit;
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++
++	if ((unit = ppp_ifunit(wan_ifname)) &gt;= 0)
++		return unit;
++	else {
++		for (unit = 0; unit &lt; MAX_NVPARSE; unit ++) {
++			snprintf(prefix, sizeof(prefix), &quot;wan%d_&quot;, unit);
++			if (nvram_match(strcat_r(prefix, &quot;ifname&quot;, tmp), wan_ifname) &amp;&amp;
++			    (nvram_match(strcat_r(prefix, &quot;proto&quot;, tmp), &quot;dhcp&quot;) ||
++			     nvram_match(strcat_r(prefix, &quot;proto&quot;, tmp), &quot;bigpond&quot;) ||
++			     nvram_match(strcat_r(prefix, &quot;proto&quot;, tmp), &quot;static&quot;)))
++				return unit;
++		}
++	}
++	return -1;
++}
++
++int
++preset_wan_routes(char *wan_ifname)
++{
++	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++
++
++	/* Figure out nvram variable name prefix for this i/f */
++	if (wan_prefix(wan_ifname, prefix) &lt; 0)
++		return -1;
++
++	/* Set default route to gateway if specified */
++	if (nvram_match(strcat_r(prefix, &quot;primary&quot;, tmp), &quot;1&quot;))
++	{
++		route_add(wan_ifname, 0, &quot;0.0.0.0&quot;, &quot;0.0.0.0&quot;, &quot;0.0.0.0&quot;);
++	}
++
++	/* Install interface dependent static routes */
++	add_wan_routes(wan_ifname);
++	return 0;
++}
++
++int
++wan_primary_ifunit(void)
++{
++	int unit;
++	
++	for (unit = 0; unit &lt; MAX_NVPARSE; unit ++) {
++		char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
++		snprintf(prefix, sizeof(prefix), &quot;wan%d_&quot;, unit);
++		if (nvram_match(strcat_r(prefix, &quot;primary&quot;, tmp), &quot;1&quot;))
++			return unit;
++	}
++
++	return 0;
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000125.html">[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www
+</A></li>
+	<LI>Next message: <A HREF="000127.html">[Wl530g-svncheckins] r341 - trunk/Marvell/Src/uClinux-dist/lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

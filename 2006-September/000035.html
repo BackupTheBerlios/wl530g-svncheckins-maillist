@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r249 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r249%20-%20trunk&In-Reply-To=%3C200609171602.k8HG2FQC015571%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000034.html">
+   <LINK REL="Next"  HREF="000036.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r249 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r249%20-%20trunk&In-Reply-To=%3C200609171602.k8HG2FQC015571%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r249 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 18:02:15 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000034.html">[Wl530g-svncheckins] r248 - trunk/Marvell/Src/uClinux-dist
+</A></li>
+        <LI>Next message: <A HREF="000036.html">[Wl530g-svncheckins] r250 - trunk/Marvell/Src/uClinux-dist
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-17 18:02:13 +0200 (Sun, 17 Sep 2006)
+New Revision: 249
+
+Modified:
+   trunk/readme.txt
+Log:
+edits to represent new toolchain build info and other.
+
+
+Modified: trunk/readme.txt
+===================================================================
+--- trunk/readme.txt	2006-09-17 15:56:43 UTC (rev 248)
++++ trunk/readme.txt	2006-09-17 16:02:13 UTC (rev 249)
+@@ -1,14 +1,17 @@
+-This buildroot is still a mess. It's getting better, but you must manually
+-put new files into the firmware filesystem, which has its advantages and
+-disadvantages. I'm working on getting all Makefiles set up so they install
+-to the firmware filesystem (instead of romfs), and do so appropriately.
++-----------------------------------------------------
+ 
++This buildroot is still a mess, but it's getting better.
++
++-----------------------------------------------------
++
+ HowTo build a firmware image (doesn't require compiling):
+ 
+ 1.) edit the files in firmware_files/rootfs however you wish.
+     These are the files the firmware image contains.
+ 2.) run create_firmware_image.sh to build a firmware with today's date.
+ 
++-----------------------------------------------------
++
+ HowTo compile your own packages and/or kernel:
+ 
+ 1.) Download and install toolchains:
+@@ -27,21 +30,33 @@
+     any you want into the firmware filesystem. You should place packages that have
+     vendor/board specific extensions here.
+ 
++-----------------------------------------------------
+ 
+ Advanced HowTo:
++
++In order to build BusyBox 1.21 you must rebuild the arm-elf uClibc toolchains so that appropriate
++settings are made. 
++
+ 	Rebuilding the toolchains:
+-		See build-uclinux-tools.sh here (GCC 2.9.5):		
++
++		See build-uclinux-tools.sh in the uCLinux-dist folder. Do NOT use the standard
++		one since I've patched this copy up as necessary for our needs. Prequisites can
++		be found here (download all of them, except the build-uclinix-tools.sh):		
++
+ 			<A HREF="http://www.uclinux.org/pub/uClinux/arm-elf-tools/tools-20030314/">http://www.uclinux.org/pub/uClinux/arm-elf-tools/tools-20030314/</A>
+-		All files in that folder are pre-requisites, you must get them all.
+ 
++				
+ 		Alternatively, you can check out the newer GCC 3.4.0 toolchains here:
++		
+ 			<A HREF="http://www.uclinux.org/pub/uClinux/arm-elf-tools/gcc-3/">http://www.uclinux.org/pub/uClinux/arm-elf-tools/gcc-3/</A>
++
+ 		Note: GCC 3.4.0 may not work right with this uClinux-dist. Minor code
+-		 tweaks here and there seem required.
+-		
++		 tweaks here and there seem required.		
+ 
+ 		There are also experimental GCC 4.0 toolchains.
+ 			
++
++-----------------------------------------------------
+ 		
+ For help, visit the forums. 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000034.html">[Wl530g-svncheckins] r248 - trunk/Marvell/Src/uClinux-dist
+</A></li>
+	<LI>Next message: <A HREF="000036.html">[Wl530g-svncheckins] r250 - trunk/Marvell/Src/uClinux-dist
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

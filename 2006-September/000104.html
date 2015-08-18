@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r318 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r318%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609210156.k8L1u6B0019925%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000103.html">
+   <LINK REL="Next"  HREF="000105.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r318 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r318%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609210156.k8L1u6B0019925%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r318 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 21 03:56:06 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000103.html">[Wl530g-svncheckins] r317 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+        <LI>Next message: <A HREF="000105.html">[Wl530g-svncheckins] r319 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-21 03:56:03 +0200 (Thu, 21 Sep 2006)
+New Revision: 318
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/services_ex.c
+Log:
+use /etc/init.d/S20syslogd to start syslogd
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile	2006-09-20 20:08:35 UTC (rev 317)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile	2006-09-21 01:56:03 UTC (rev 318)
+@@ -23,7 +23,6 @@
+ #################################
+ # other defines:
+ # -DDEBUG
+-# -DSYSLOGD_TIMEZONE_SUPPORT
+ 
+ INSTALLDIR = ../../../../../firmware_files/rootfs
+ #LDFLAGS	+= -L$(TOP)/nvram -L$(INSTALLDIR)/nvram/usr/lib -lnvram -L$(TOP)/shared -L$(INSTALLDIR)/shared/usr/lib -lshared 
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/services_ex.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/services_ex.c	2006-09-20 20:08:35 UTC (rev 317)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/services_ex.c	2006-09-21 01:56:03 UTC (rev 318)
+@@ -400,57 +400,30 @@
+ start_logger(void)
+ {		
+ 	pid_t pid;
+-	/* must be careful not to use the same buffer when we're using multiple calls in an arugment */
+-	char szTemp[16];
+-	char szTemp2[16];
+ 	
+ 	if (nvram_match(&quot;router_disable&quot;, &quot;1&quot;))
+ 		return 0;
+ 
++	/* start syslogd */
++	eval(&quot;/bin/sh&quot;,&quot;/etc/init.d/S20syslogd&quot;,&quot;start&quot;);
++
++	/* start klogd */
+ 	if (nvram_invmatch(&quot;log_ipaddr&quot;, &quot;&quot;))
+ 	{
+-#ifdef SYSLOGD_TIMEZONE_SUPPORT
+-		char *syslogd_argv[] = {&quot;syslogd&quot;, \
+-				&quot;-C&quot;, nvram_safe_get_with_default(&quot;syslogd_logsize_kb&quot;, &quot;32&quot;, szTemp, sizeof(szTemp)),  \
+-				&quot;-m&quot;, nvram_safe_get_with_default(&quot;syslogd_mark_min&quot;, &quot;20&quot;, szTemp2, sizeof(szTemp2)), \
+-				&quot;-t&quot;, nvram_safe_get(&quot;time_zone_x&quot;), \
+-				&quot;-O&quot;, &quot;/tmp/syslog.log&quot;, \
+-				&quot;-R&quot;, nvram_safe_get(&quot;log_ipaddr&quot;), &quot;-L&quot;, NULL};
+-#else
+-		char *syslogd_argv[] = {&quot;syslogd&quot;, \
+-				&quot;-C&quot;, nvram_safe_get_with_default(&quot;syslogd_logsize_kb&quot;, &quot;32&quot;, szTemp, sizeof(szTemp)),  \
+-				&quot;-m&quot;, nvram_safe_get_with_default(&quot;syslogd_mark_min&quot;, &quot;20&quot;, szTemp2, sizeof(szTemp2)), \
+-				&quot;-O&quot;, &quot;/tmp/syslog.log&quot;, \
+-				&quot;-R&quot;, nvram_safe_get(&quot;log_ipaddr&quot;), &quot;-L&quot;, NULL};
+-#endif
+ 		char *klogd_argv[] = {&quot;klogd&quot;, NULL, NULL};
+ 
+ 		if (nvram_match(&quot;log_all&quot;, &quot;1&quot;))
+ 			klogd_argv[1] = &quot;-d&quot;;
+ 
+-		_eval(syslogd_argv, NULL, 0, &amp;pid);
+ 		_eval(klogd_argv, NULL, 0, &amp;pid);
+ 	}
+ 	else
+ 	{
+-#ifdef SYSLOGD_TIMEZONE_SUPPORT
+-		char *syslogd_argv[] = {&quot;syslogd&quot;, \
+-			&quot;-C&quot;, nvram_safe_get_with_default(&quot;syslogd_logsize_kb&quot;, &quot;32&quot;, szTemp, sizeof(szTemp)),  \
+-			&quot;-m&quot;, nvram_safe_get_with_default(&quot;syslogd_mark_min&quot;, &quot;20&quot;, szTemp2, sizeof(szTemp2)), \
+-			&quot;-t&quot;, nvram_safe_get(&quot;time_zone_x&quot;), \
+-			&quot;-O&quot;, &quot;/tmp/syslog.log&quot;, NULL};
+-#else
+-		char *syslogd_argv[] = {&quot;syslogd&quot;, \
+-			&quot;-C&quot;, nvram_safe_get_with_default(&quot;syslogd_logsize_kb&quot;, &quot;32&quot;, szTemp, sizeof(szTemp)), \
+-			&quot;-m&quot;, nvram_safe_get_with_default(&quot;syslogd_mark_min&quot;, &quot;20&quot;, szTemp2, sizeof(szTemp2)), \
+-			&quot;-O&quot;, &quot;/tmp/syslog.log&quot;,NULL};
+-#endif
+ 		char *klogd_argv[] = {&quot;klogd&quot;, NULL, NULL};
+ 
+ 		if (nvram_match(&quot;log_all&quot;, &quot;1&quot;))
+ 			klogd_argv[1] = &quot;-d&quot;;
+ 
+-		_eval(syslogd_argv, NULL, 0, &amp;pid);
+ 		_eval(klogd_argv, NULL, 0, &amp;pid);
+ 	}
+ 	return 0;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000103.html">[Wl530g-svncheckins] r317 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+	<LI>Next message: <A HREF="000105.html">[Wl530g-svncheckins] r319 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

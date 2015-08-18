@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r399 - branch/uClinux-080306
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r399%20-%20branch/uClinux-080306&In-Reply-To=%3C200610130516.k9D5GODY011840%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000180.html">
+   <LINK REL="Next"  HREF="000182.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r399 - branch/uClinux-080306</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r399%20-%20branch/uClinux-080306&In-Reply-To=%3C200610130516.k9D5GODY011840%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r399 - branch/uClinux-080306">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 13 07:16:24 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000180.html">[Wl530g-svncheckins] r394 - trunk/firmware_files/rootfs/sbin
+</A></li>
+        <LI>Next message: <A HREF="000182.html">[Wl530g-svncheckins] r400 - branch/uClinux-080306
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-10-13 07:16:20 +0200 (Fri, 13 Oct 2006)
+New Revision: 399
+
+Added:
+   branch/uClinux-080306/libertas-mtd-map.patch
+Log:
+patch up libertas mtd map to latest Liberated Libertas state
+
+Added: branch/uClinux-080306/libertas-mtd-map.patch
+===================================================================
+--- branch/uClinux-080306/libertas-mtd-map.patch	2006-10-13 02:51:06 UTC (rev 398)
++++ branch/uClinux-080306/libertas-mtd-map.patch	2006-10-13 05:16:20 UTC (rev 399)
+@@ -0,0 +1,109 @@
++--- drivers/mtd/maps.old/libertas.c	2006-10-13 00:16:21.000000000 -0400
+++++ drivers/mtd/maps/libertas.c	2006-10-13 00:16:29.000000000 -0400
++@@ -1,10 +1,10 @@
++ /*
++- *	libertas.c - mapper for Marvell Libertas AP-32 board.
+++ * libertas.c - mapper for Marvell Libertas AP-32 board.
++  *
++  * Copyright (C) 2003 - 2005 Marvell Co.
+++ * 			Jeremy Collake &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">jeremy at bitsum.com</A>&gt;
++  *
++  * This code is GPL
++- *
++  */
++ 
++ #include &lt;linux/config.h&gt;
++@@ -40,7 +40,7 @@
++ struct map_info libertas_map = {
++ 	name: NAME,
++ 	size: WINDOW_SIZE,
++-	bankwidth: BUSWIDTH,
+++	buswidth: BUSWIDTH,
++ 	phys: WINDOW_ADDR
++ };
++ 
++@@ -51,35 +51,27 @@
++  
++ static struct mtd_partition libertas_partitions[] = {
++ 	{
++-		name: &quot;Libertas AP-32 compressed kernel&quot;,
++-#ifdef PROTECTION
++-		size:   0x000A0000,
++-		offset: 0x00000000,
++-		mask_flags: MTD_WRITEABLE
++-#else
+++		name: &quot;Liberated Libertas kernel&quot;,
++ 		size:   0x00380000,
++ 		offset: 0x00000000
++-#endif
++-
++ 	},
++ 	{
++-		name: &quot;Libertas AP-32 romfs root file system&quot;,
++-#ifdef PROTECTION
++-		size:   0x002E0000,
++-		offset: 0x000A0000,
++-		mask_flags: MTD_WRITEABLE
++-#else
++-		size:   0x002E0000,
+++		name: &quot;Libertas AP-32 rootfs&quot;,
+++		size:   0x00280000,
++ 		offset: 0x000A0000
++-#endif
++ 	},
++ 	{
++-		name: &quot;Libertas AP-32 jffs2 file system&quot;,
++-		size:   0x00050000,
++-		offset: 0x00380000,
+++		name: &quot;Libertas AP-32 jffs2&quot;,
+++		size:   0x000A0000,
+++		offset: 0x00320000,
+++	},
+++	{
+++		name: &quot;Libertas AP-32 nvram&quot;,
+++		size:   0x00010000,
+++		offset: 0x003C0000,
++ 	},
++ 	{
++-		name: &quot;Libertas AP-32 manufacture data&quot;,
+++		name: &quot;Libertas AP-32 mfgdata&quot;,
++ 		size:   0x00010000,
++ 		offset: 0x003D0000,
++ 	}
++@@ -100,7 +92,7 @@
++ 	struct mtd_info *mtd;
++ 	int             ret_val;
++ 	
++-	printk(KERN_NOTICE &quot;Marvell Libertas AP-32 flash mapping: %x at %x\n&quot;, WINDOW_SIZE, WINDOW_ADDR);
+++	printk(KERN_NOTICE &quot;Liberated Libertas AP-32 flash mapping: %x at %x\n&quot;, WINDOW_SIZE, WINDOW_ADDR);
++ 
++ 	libertas_map.virt = (unsigned long) ioremap(WINDOW_ADDR, WINDOW_SIZE);
++ 
++@@ -123,7 +115,8 @@
++ 	if (ret_val != SUCCESS)
++ 		return ret_val;
++ 
++-	mtd = get_mtd_named(&quot;Libertas AP-32 romfs root file system&quot;);
+++/*	mtd = get_mtd_named(&quot;Libertas AP-32 rootfs&quot;); */
+++	mtd = get_mtd_device(NULL, 1);
++ 	
++ 	if (mtd) {
++ 		ROOT_DEV = MKDEV(MTD_BLOCK_MAJOR, mtd-&gt;index);
++@@ -149,7 +142,7 @@
++ /*
++  * Find the MTD device with the given name
++  */
++-
+++/*
++ static struct mtd_info *get_mtd_named(char *name)
++ {
++ 	int i;
++@@ -166,7 +159,7 @@
++ 	
++ 	return(NULL);
++ }
++-
+++*/
++ 
++ module_init(init_libertas);
++ module_exit(cleanup_libertas);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000180.html">[Wl530g-svncheckins] r394 - trunk/firmware_files/rootfs/sbin
+</A></li>
+	<LI>Next message: <A HREF="000182.html">[Wl530g-svncheckins] r400 - branch/uClinux-080306
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

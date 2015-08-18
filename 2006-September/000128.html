@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r342 - in	trunk/Marvell/Src/uClinux-dist/user.asus: . mtd
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r342%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/user.asus%3A%20.%20mtd&In-Reply-To=%3C200609221529.k8MFTrci019422%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000127.html">
+   <LINK REL="Next"  HREF="000129.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r342 - in	trunk/Marvell/Src/uClinux-dist/user.asus: . mtd</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r342%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/user.asus%3A%20.%20mtd&In-Reply-To=%3C200609221529.k8MFTrci019422%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r342 - in	trunk/Marvell/Src/uClinux-dist/user.asus: . mtd">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 17:29:53 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000127.html">[Wl530g-svncheckins] r341 - trunk/Marvell/Src/uClinux-dist/lib
+</A></li>
+        <LI>Next message: <A HREF="000129.html">[Wl530g-svncheckins] r343 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 17:29:49 +0200 (Fri, 22 Sep 2006)
+New Revision: 342
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/Makefile
+   trunk/Marvell/Src/uClinux-dist/user.asus/mtd/Makefile
+Log:
+fixes
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/Makefile	2006-09-22 15:05:23 UTC (rev 341)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/Makefile	2006-09-22 15:29:49 UTC (rev 342)
+@@ -1,21 +1,22 @@
+ # $Id$
+ 
+ CC := arm-elf-gcc
++CFLAGS := -I../../linux-2.4.x/include/asm-armnommu -I../../uClibc/include
+ INSTALL_TARGET = ../../../../../firmware_files/rootfs
+ 
+ all: 
+-	make -C mtd	
++	#make -C mtd	
+ 	make -C rc
+ 	make -C httpd
+ 
+ install: 
+-	make -C mtd install
++	#make -C mtd install
+ 	make -C rc install
+ 	make -C httpd install
+ 	
+ 
+ clean: 
+-	make -C mtd clean
++	#make -C mtd clean
+ 	make -C rc clean
+ 	make -C httpd clean
+ 
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/mtd/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/mtd/Makefile	2006-09-22 15:05:23 UTC (rev 341)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/mtd/Makefile	2006-09-22 15:29:49 UTC (rev 342)
+@@ -1,16 +1,16 @@
+ # $Id: Makefile 3198 2006-02-09 03:21:01Z nbd $
+ 
+-LINUX_SRC := ../../uClinux-dist/linux-2.4.x
++LINUX_SRC := ../../linux-2.4.x
+ PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+ CC := arm-elf-gcc
+-CFLAGS	+= -I. -nostdinc -Wall -Dlinux 
++CFLAGS	+= -O2 -Os -I. -nostdinc -Wall -Dlinux -I../../linux-2.4.x/include/asm-armnommu -I../../uClibc/include
+ LDFLAGS	+= -Wl,-elf2flt=&quot;&quot;
+ INSTALL_TARGET = ../../../../../firmware_files/rootfs
+ 
+ all: mtd
+ 
+ mtd: mtd.o
+-	$(CC) -o $@ $^ $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+ 
+ install: mtd
+ 	install $^ $(INSTALL_TARGET)/sbin/$^
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000127.html">[Wl530g-svncheckins] r341 - trunk/Marvell/Src/uClinux-dist/lib
+</A></li>
+	<LI>Next message: <A HREF="000129.html">[Wl530g-svncheckins] r343 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

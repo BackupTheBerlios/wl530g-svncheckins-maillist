@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r322 - trunk/firmware_files/rootfs/etc/init.d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r322%20-%20trunk/firmware_files/rootfs/etc/init.d&In-Reply-To=%3C200609210238.k8L2c2t0024912%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000107.html">
+   <LINK REL="Next"  HREF="000109.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r322 - trunk/firmware_files/rootfs/etc/init.d</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r322%20-%20trunk/firmware_files/rootfs/etc/init.d&In-Reply-To=%3C200609210238.k8L2c2t0024912%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r322 - trunk/firmware_files/rootfs/etc/init.d">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 21 04:38:02 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000107.html">[Wl530g-svncheckins] r321 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+        <LI>Next message: <A HREF="000109.html">[Wl530g-svncheckins] r323 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-21 04:38:00 +0200 (Thu, 21 Sep 2006)
+New Revision: 322
+
+Added:
+   trunk/firmware_files/rootfs/etc/init.d/S20syslogd
+Log:
+start/stop syslogd
+
+Added: trunk/firmware_files/rootfs/etc/init.d/S20syslogd
+===================================================================
+--- trunk/firmware_files/rootfs/etc/init.d/S20syslogd	2006-09-21 02:37:34 UTC (rev 321)
++++ trunk/firmware_files/rootfs/etc/init.d/S20syslogd	2006-09-21 02:38:00 UTC (rev 322)
+@@ -0,0 +1,26 @@
++#!/bin/sh
++# always stop
++killall syslogd &gt;&gt; /dev/null 2&gt;&amp;1
++if [ &quot;$1&quot; = &quot;stop&quot; ]; then
++	echo &quot;$0: Stoped syslogd.&quot;
++else
++	echo &quot;$0: Starting syslogd ...&quot;
++	logsize=`nvram get syslogd_logsize_kb`
++	echo &quot;$0: logsize=$logsize&quot;
++	if [ ! $logsize ]; then
++		logsize=&quot;16&quot;
++	fi
++	mark_interval=`nvram get syslogd_mark_min`	
++	if [ ! $mark_interval ]; then
++		mark_interval=&quot;0&quot;
++	fi	
++	echo &quot;$0: mark_interval=$mark_interval&quot;
++	log_ipaddr=`nvram get log_ipaddr`
++	if [ ! $log_ipaddr ]; then
++		remote_cmdline=&quot;&quot;
++	else
++		echo &quot;remote&quot;
++		remote_cmdline=&quot;-R $log_ipaddr&quot;
++	fi
++	syslogd -C &quot;$logsize&quot; -m &quot;$mark_interval&quot; &quot;$remote_cmdline&quot;
++fi
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000107.html">[Wl530g-svncheckins] r321 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+	<LI>Next message: <A HREF="000109.html">[Wl530g-svncheckins] r323 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

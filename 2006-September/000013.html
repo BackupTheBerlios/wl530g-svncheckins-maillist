@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r227 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r227%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609170016.k8H0G28F018394%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000012.html">
+   <LINK REL="Next"  HREF="000014.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r227 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r227%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609170016.k8H0G28F018394%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r227 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 02:16:02 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000012.html">[Wl530g-svncheckins] r226 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+        <LI>Next message: <A HREF="000014.html">[Wl530g-svncheckins] r228 - trunk/firmware_files/rootfs/www/graph
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#13">[ date ]</a>
+              <a href="thread.html#13">[ thread ]</a>
+              <a href="subject.html#13">[ subject ]</a>
+              <a href="author.html#13">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-17 02:15:59 +0200 (Sun, 17 Sep 2006)
+New Revision: 227
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+Log:
+* switched to mtd utility for mtd related actions. (instead of rc's write/erase)
+* fixed nvram erase (/dev/mtd2 -&gt; /dev/mtd3)
+* added debug output to firmware upgrade
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-17 00:13:54 UTC (rev 226)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-17 00:15:59 UTC (rev 227)
+@@ -52,13 +52,13 @@
+ #define do_file(webs, file)
+ #endif
+ 
+-#define sys_upgrade(image) eval(&quot;write&quot;, image, &quot;/dev/mtd0&quot;)
++#define sys_upgrade(image) eval(&quot;mtd&quot;, &quot;write&quot;, image, &quot;/dev/mtd0&quot;)
+ #define sys_upload(image) eval(&quot;nvram&quot;, &quot;restore&quot;, image)
+ #define sys_download(file) eval(&quot;nvram&quot;, &quot;save&quot;, file)
+ #define sys_stats(url) eval(&quot;stats&quot;, (url))
+-#define sys_restore(sid) eval(&quot;nvram_x&quot;,&quot;get&quot;,(sid))
++/*#define sys_restore(sid) eval(&quot;nvram_x&quot;,&quot;get&quot;,(sid))*/
+ #define sys_commit(sid) nvram_commit();
+-#define sys_default()   eval(&quot;erase&quot;, &quot;/dev/mtd2&quot;)
++#define sys_default()   eval(&quot;mtd&quot;, &quot;erase&quot;, &quot;/dev/mtd3&quot;)
+ #define sys_nvram_set(param) eval(&quot;nvram&quot;, &quot;set&quot;, param)
+ 
+ #define UPNP_E_SUCCESS 0
+@@ -1912,8 +1912,7 @@
+ #endif
+ 
+ #if defined(linux)
+-
+-
++#ifdef WEBCAM_CRAP
+ static void
+ do_webcam_cgi(char *url, FILE *stream)
+ {
+@@ -1936,6 +1935,7 @@
+ 	cprintf(&quot;\nWebCam: %s\n&quot;, pic);
+ 	do_file(pic, stream);
+ }
++#endif
+ 
+ static void
+ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
+@@ -1961,6 +1961,7 @@
+ 	{
+ 	     if (!fgets(buf, MIN(len + 1, sizeof(buf)), stream))
+ 	     {			
++			cprintf(&quot;httpd: error - no file\n&quot;);
+ 			goto err;
+ 	     }			
+ 		
+@@ -1968,18 +1969,24 @@
+ 		
+ 	     if (!strncasecmp(buf, &quot;Content-Disposition:&quot;, 20) &amp;&amp;
+ 		    strstr(buf, &quot;name=\&quot;file\&quot;&quot;))
++		{
++			cprintf(&quot;httpd: error - bad content 0\n&quot;);
+ 			break;			
++		}
++
+ 	}
+ 	
+ 	/* Skip boundary and headers */
+ 	while (len &gt; 0) {
+ 		if (!fgets(buf, MIN(len + 1, sizeof(buf)), stream))
+ 		{
++			printf(&quot;httpd: error - bad content 1\n&quot;);
+ 			goto err;
+ 		}		
+ 		len -= strlen(buf);
+ 		if (!strcmp(buf, &quot;\n&quot;) || !strcmp(buf, &quot;\r\n&quot;))
+ 		{
++			printf(&quot;httpd: error - bad content 2\n&quot;);
+ 			break;
+ 		}
+ 	}
+@@ -1990,14 +1997,14 @@
+         cnt = 0;
+         
+ 	/* Pipe the rest to the FIFO */
+-	//printf(&quot;Upgrading %d\n&quot;, len);
++	cprintf(&quot;Upgrading %d\n&quot;, len);
+ 	cmpHeader = 0;
+ 	
+ 	while (len &gt; 0 &amp;&amp; filelen&gt;0) 
+ 	{				
+ 		if (waitfor(fileno(stream), 10) &lt;= 0)
+ 		{
+-			/*printf(&quot;Break while len=%x filelen=%x\n&quot;, len, filelen);*/
++			cprintf(&quot;Break while len=%x filelen=%x\n&quot;, len, filelen);
+ 			break;
+ 		}
+                 				
+@@ -2007,7 +2014,7 @@
+ 		{		  
+ 		    if (strncmp(buf, IMAGE_HEADER, 4)!=0) 
+ 		    {
+-		       /*printf(&quot;Header %x %x %x %x\n&quot;, buf[0], buf[1], buf[2], buf[3]);*/
++		       cprintf(&quot;Header %x %x %x %x\n&quot;, buf[0], buf[1], buf[2], buf[3]);
+ 		       len-=count;
+ 		       goto err;
+ 		    }
+@@ -2015,7 +2022,7 @@
+ 		    		   
+ 		    filelenptr = (buf+4);		   
+ 		    filelen = *filelenptr;		  
+-		    /*printf(&quot;Filelen: %x %x %x %x %x %x\n&quot;, filelen, count, (unsigned long)(buf+4), (unsigned long)(buf+7), buf[5], buf[4]);*/
++		    cprintf(&quot;Filelen: %x %x %x %x %x %x\n&quot;, filelen, count, (unsigned long)(buf+4), (unsigned long)(buf+7), buf[5], buf[4]);
+ 		    cnt ++;
+ 		}
+ 		
+@@ -2023,7 +2030,7 @@
+ 		len-=count;	
+ 										
+ 		fwrite(buf, 1, count, fifo);
+-		/*printf(&quot;.&quot;);*/								   		
++		cprintf(&quot;.&quot;);
+ 	}		 		
+ 	
+ 	if (!cmpHeader) goto err;		
+@@ -2072,7 +2079,7 @@
+ #ifdef REMOVE_WL600
+ 	unlink(upload_fifo);
+ #endif	
+-	//printf(&quot;Error : %d\n&quot;, ret);	
++	cprintf(&quot;httpd: do_upgrade_post return %d\n&quot;, ret);	
+ 	fcntl(fileno(stream), F_SETOWN, -ret);
+ }
+ 
+@@ -2081,13 +2088,14 @@
+ {
+ 	int ret;
+ 	
+-	//printf(&quot;Upgrade CGI\n&quot;);
++	cprintf(&quot;httpd: upgrade.cgi ..\n&quot;);
+ 
+ 	ret = fcntl(fileno(stream), F_GETOWN, 0);
+ 	
+ 	/* Reboot if successful */
+ 	if (ret == 0)
+ 	{
++		printf(&quot;httpd: Writing flash...\n&quot;);
+                 websApply(stream, &quot;Updating.asp&quot;); 
+ 		sys_upgrade(&quot;/tmp/linux.trx&quot;);
+ 		sys_reboot();
+@@ -2351,7 +2359,9 @@
+ 	{ &quot;upgrade.cgi*&quot;, &quot;text/html&quot;, no_cache, do_upgrade_post, do_upgrade_cgi, do_auth},
+ 	{ &quot;upload.cgi*&quot;, &quot;text/html&quot;, no_cache, do_upload_post, do_upload_cgi, do_auth },
+  	{ &quot;syslog.cgi*&quot;, &quot;text/txt&quot;, no_cache, NULL, do_log_cgi, do_auth },
++#ifdef WEBCAM_CRAP
+ 	{ &quot;webcam.cgi*&quot;, &quot;text/html&quot;, no_cache, NULL, do_webcam_cgi, do_auth },
++#endif
+ 	{ NULL, NULL, NULL, NULL, NULL, NULL }
+ };
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000012.html">[Wl530g-svncheckins] r226 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+	<LI>Next message: <A HREF="000014.html">[Wl530g-svncheckins] r228 - trunk/firmware_files/rootfs/www/graph
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#13">[ date ]</a>
+              <a href="thread.html#13">[ thread ]</a>
+              <a href="subject.html#13">[ subject ]</a>
+              <a href="author.html#13">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

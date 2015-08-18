@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r371 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r371%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609231911.k8NJBNjn024629%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000156.html">
+   <LINK REL="Next"  HREF="000158.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r371 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r371%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609231911.k8NJBNjn024629%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r371 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 23 21:11:23 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000156.html">[Wl530g-svncheckins] r370 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+        <LI>Next message: <A HREF="000158.html">[Wl530g-svncheckins] r372 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-23 21:11:20 +0200 (Sat, 23 Sep 2006)
+New Revision: 371
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c
+Log:
+added /etc/on_wan_up|down_begin|end events and cleaned up source
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c	2006-09-23 14:44:25 UTC (rev 370)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/network.c	2006-09-23 19:11:20 UTC (rev 371)
+@@ -485,25 +485,10 @@
+ 
+ 			/* Bring up i/f */
+ 			ifconfig(wan_ifname, IFUP, NULL, NULL);
+-
+-#ifdef BRCM
+-			/* do wireless specific config */
+-			eval(&quot;wlconf&quot;, wan_ifname, &quot;up&quot;);
+-#endif
+ 		}
+ 	
+ 		close(s);
+ 
+-#ifndef ASUS_EXT
+-		if (strcmp(wan_proto, &quot;pppoe&quot;)==0)
+-		{
+-		
+-		}
+-		else if (strcmp(wan_proto, &quot;pptp&quot;)==0) 
+-		{
+-			start_pptp(prefix);
+-		}
+-#else
+ 		if (unit==0) 
+ 		{		
+ 			FILE *fp;
+@@ -593,104 +578,7 @@
+ 			}
+ 		
+ 		}
+-#ifdef REMOVE
+ 		/* 
+-		* Configure PPPoE connection. The PPPoE client will run 
+-		* ip-up/ip-down scripts upon link's connect/disconnect.
+-		*/
+-		if (strcmp(wan_proto, &quot;pppoe&quot;) == 0) {
+-			char *pppoe_argv[] = { &quot;pppoecd&quot;,
+-					       nvram_safe_get(strcat_r(prefix, &quot;ifname&quot;, tmp)),
+-					       &quot;-u&quot;, nvram_safe_get(strcat_r(prefix, &quot;pppoe_username&quot;, tmp)),
+-					       &quot;-p&quot;, nvram_safe_get(strcat_r(prefix, &quot;pppoe_passwd&quot;, tmp)),
+-					       &quot;-r&quot;, nvram_safe_get(strcat_r(prefix, &quot;pppoe_mru&quot;, tmp)),
+-					       &quot;-t&quot;, nvram_safe_get(strcat_r(prefix, &quot;pppoe_mtu&quot;, tmp)),
+-					       &quot;-i&quot;, nvram_match(strcat_r(prefix, &quot;pppoe_demand&quot;, tmp), &quot;1&quot;) ?
+-					       		nvram_safe_get(strcat_r(prefix, &quot;pppoe_idletime&quot;, tmp)) : &quot;0&quot;,
+-#ifdef ASUS_EXT
+-						&quot;-I&quot;, &quot;30&quot;,
+-						&quot;-T&quot;, &quot;3&quot;,
+-						&quot;-N&quot;, &quot;5&quot;,
+-#endif
+-					       NULL, NULL,	/* pppoe_service */
+-					       NULL, NULL,	/* pppoe_ac */
+-					       NULL,		/* pppoe_keepalive */
+-					       NULL, NULL,	/* ppp unit requested */
+-					       NULL
+-			}, **arg;
+-			int timeout = 5;
+-			char pppunit[] = &quot;XXXXXXXXXXXX&quot;;
+-
+-			/* Add optional arguments */
+-
+-			for (arg = pppoe_argv; *arg; arg++);
+-
+-#ifdef ASUS_EXT
+-			if (nvram_invmatch(strcat_r(prefix, &quot;pppoe_txonly_x&quot;, tmp), &quot;0&quot;)) {
+-				*arg++ = &quot;-o&quot;;
+-			}
+-#endif
+-			if (nvram_invmatch(strcat_r(prefix, &quot;pppoe_service&quot;, tmp), &quot;&quot;)) {
+-				*arg++ = &quot;-s&quot;;
+-				*arg++ = nvram_safe_get(strcat_r(prefix, &quot;pppoe_service&quot;, tmp));
+-			}
+-			if (nvram_invmatch(strcat_r(prefix, &quot;pppoe_ac&quot;, tmp), &quot;&quot;)) {
+-				*arg++ = &quot;-a&quot;;
+-				*arg++ = nvram_safe_get(strcat_r(prefix, &quot;pppoe_ac&quot;, tmp));
+-			}
+-
+-#ifndef ASUS_EXT	// keep alive anyway
+-			if (nvram_match(strcat_r(prefix, &quot;pppoe_demand&quot;, tmp), &quot;1&quot;) || 
+-			    nvram_match(strcat_r(prefix, &quot;pppoe_keepalive&quot;, tmp), &quot;1&quot;))
+-#endif
+-				*arg++ = &quot;-k&quot;;
+-			snprintf(pppunit, sizeof(pppunit), &quot;%d&quot;, unit);
+-			*arg++ = &quot;-U&quot;;
+-			*arg++ = pppunit;
+-
+-			/* launch pppoe client daemon */
+-			_eval(pppoe_argv, NULL, 0, &amp;pid);
+-
+-			/* ppp interface name is referenced from this point on */
+-
+-			wan_ifname = nvram_safe_get(strcat_r(prefix, &quot;pppoe_ifname&quot;, tmp));
+-			
+-			/* Pretend that the WAN interface is up */
+-			if (nvram_match(strcat_r(prefix, &quot;pppoe_demand&quot;, tmp), &quot;1&quot;)) {
+-				/* Wait for pppx to be created */
+-				while (ifconfig(wan_ifname, IFUP, NULL, NULL) &amp;&amp; timeout--)
+-					sleep(1);
+-
+-				/* Retrieve IP info */
+-				if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) &lt; 0)
+-					continue;
+-				strncpy(ifr.ifr_name, wan_ifname, IFNAMSIZ);
+-
+-				/* Set temporary IP address */
+-				if (ioctl(s, SIOCGIFADDR, &amp;ifr))
+-					perror(wan_ifname);
+-				nvram_set(strcat_r(prefix, &quot;ipaddr&quot;, tmp), inet_ntoa(sin_addr(&amp;ifr.ifr_addr)));
+-				nvram_set(strcat_r(prefix, &quot;netmask&quot;, tmp), &quot;255.255.255.255&quot;);
+-
+-				/* Set temporary P-t-P address */
+-				if (ioctl(s, SIOCGIFDSTADDR, &amp;ifr))
+-					perror(wan_ifname);
+-				nvram_set(strcat_r(prefix, &quot;gateway&quot;, tmp), inet_ntoa(sin_addr(&amp;ifr.ifr_dstaddr)));
+-
+-				close(s);
+-
+-				/* 
+-				* Preset routes so that traffic can be sent to proper pppx even before 
+-				* the link is brought up.
+-				*/
+-
+-
+-				preset_wan_routes(wan_ifname);
+-			}
+-		}
+-#endif
+-#endif
+-		/* 
+ 		* Configure DHCP connection. The DHCP client will run 
+ 		* 'udhcpc bound'/'udhcpc deconfig' upon finishing IP address 
+ 		* renew and release.
+@@ -881,9 +769,11 @@
+ 	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
+ 	char *wan_proto;
+ 
++	eval(&quot;/bin/sh&quot;, &quot;/etc/on_wan_up_begin&quot;);
++	
+ 	/* Figure out nvram variable name prefix for this i/f */
+ 	if (wan_prefix(wan_ifname, prefix) &lt; 0)
+-		return;
++		return;	
+ 
+ 	wan_proto = nvram_safe_get(strcat_r(prefix, &quot;proto&quot;, tmp));	
+ 
+@@ -901,6 +791,8 @@
+ 	/* Add dns servers to resolv.conf */
+ 	add_ns(wan_ifname);
+ 
++	eval(&quot;/bin/sh&quot;, &quot;/etc/on_wan_up_end&quot;);
++
+ 	/* Sync time */
+ 	//start_ntpc();
+ 
+@@ -940,6 +832,8 @@
+ 	char tmp[100], prefix[] = &quot;wanXXXXXXXXXX_&quot;;
+ 	char *wan_proto;
+ 
++	eval(&quot;/bin/sh&quot;, &quot;/etc/on_wan_down_begin&quot;);
++
+ 	/* Figure out nvram variable name prefix for this i/f */
+ 	if (wan_prefix(wan_ifname, prefix) &lt; 0)
+ 		return;
+@@ -974,6 +868,8 @@
+ #endif
+ #endif
+ 
++	eval(&quot;/bin/sh&quot;, &quot;/etc/on_wan_down_end&quot;);
++
+ 	dprintf(&quot;done\n&quot;);
+ }
+ 
+@@ -1026,124 +922,7 @@
+ }
+ #endif
+ 
+-#ifdef REMOVE
+-static int
+-notify_nas(char *type, char *ifname, char *action)
+-{
+-	char *argv[] = {&quot;nas4not&quot;, type, ifname, action, 
+-			NULL,	/* role */
+-			NULL,	/* crypto */
+-			NULL,	/* auth */
+-			NULL,	/* passphrase */
+-			NULL,	/* ssid */
+-			NULL};
+-	char *str = NULL;
+-	int retries = 10;
+-	char tmp[100], prefix[] = &quot;wlXXXXXXXXXX_&quot;;
+-	int unit;
+-	char remote[ETHER_ADDR_LEN];
+-	char ssid[48], pass[80], auth[16], crypto[16], role[8];
+-	int i;
+-
+-	/* the wireless interface must be configured to do WPA */
+-	wl_ioctl(ifname, WLC_GET_INSTANCE, &amp;unit, sizeof(unit));
+-	snprintf(prefix, sizeof(prefix), &quot;wl%d_&quot;, unit);
+-	if (nvram_match(strcat_r(prefix, &quot;auth_mode&quot;, tmp), &quot;open&quot;) ||
+-	    nvram_match(strcat_r(prefix, &quot;auth_mode&quot;, tmp), &quot;shared&quot;))
+-		return 0;
+-
+-	/* find WDS link configuration */
+-	wl_ioctl(ifname, WLC_WDS_GET_REMOTE_HWADDR, remote, ETHER_ADDR_LEN);
+-
+-	for(i=0;i&lt;ETHER_ADDR_LEN;i++)
+-	{
+-		sprintf(tmp, &quot;%s %x&quot;, tmp, remote[i]);
+-	}
+-	nvram_set(&quot;wl0_nas_hwaddr&quot;, tmp);
+-
+-	
+-	for (i = 0; i &lt; MAX_NVPARSE; i ++) {
+-		char mac[ETHER_ADDR_STR_LEN];
+-		uint8 ea[ETHER_ADDR_LEN];
+-
+-		if (get_wds_wsec(unit, i, mac, role, crypto, auth, ssid, pass) &amp;&amp;
+-		    ether_atoe(mac, ea) &amp;&amp; !bcmp(ea, remote, ETHER_ADDR_LEN)) {
+-			argv[4] = role;
+-			argv[5] = crypto;
+-			argv[6] = auth;
+-			argv[7] = pass;
+-			argv[8] = ssid;
+-			break;
+-		}
+-	}
+-
+-	/* did not find WDS link configuration, use wireless' */
+-	if (i == MAX_NVPARSE) {
+-		/* role */
+-		argv[4] = &quot;auto&quot;;
+-		/* crypto */
+-		argv[5] = nvram_safe_get(strcat_r(prefix, &quot;crypto&quot;, tmp));
+-		/* auth mode */
+-		argv[6] = nvram_safe_get(strcat_r(prefix, &quot;auth_mode&quot;, tmp));
+-		/* passphrase */
+-		argv[7] = nvram_safe_get(strcat_r(prefix, &quot;wpa_psk&quot;, tmp));
+-		/* ssid */
+-		argv[8] = nvram_safe_get(strcat_r(prefix, &quot;ssid&quot;, tmp));
+-	}
+-
+-
+-	for(i=0;argv[i]!=NULL;i++)
+-	{
+-		char *nv[32];
+-		sprintf(nv, &quot;wl0_nas_msg%d&quot;, i);
+-		nvram_set(nv, argv[i]);
+-	}
+-	
+-	/* wait till nas is started */
+-	while (retries -- &gt; 0 &amp;&amp; !(str = file2str(&quot;/tmp/nas.lan.pid&quot;)))
+-		sleep(1);
+-	if (str) {
+-		int pid;
+-		free(str);
+-		nvram_set(&quot;wl0_nas_msg99&quot;, &quot;ok&quot;);
+-		return _eval(argv, &quot;&gt;/dev/console&quot;, 0, &amp;pid);
+-	}
+-	return -1;
+-}
+-#endif
+-
+ int
+-hotplug_net(void)
+-{
+-#ifdef REMOVE
+-	char *lan_ifname = nvram_safe_get(&quot;lan_ifname&quot;);
+-	char *interface, *action;
+-
+-	if (!(interface = getenv(&quot;INTERFACE&quot;)) ||
+-	    !(action = getenv(&quot;ACTION&quot;)))
+-		return EINVAL;
+-
+-	if (strncmp(interface, &quot;wds&quot;, 3))
+-		return 0;
+-
+-	if (!strcmp(action, &quot;register&quot;)) {
+-		/* Bring up the interface and add to the bridge */
+-		ifconfig(interface, IFUP, NULL, NULL);
+-		
+-		/* Bridge WDS interfaces */
+-		if (!strncmp(lan_ifname, &quot;br&quot;, 2) &amp;&amp; 
+-		    eval(&quot;brctl&quot;, &quot;addif&quot;, lan_ifname, interface))
+-		    return 0;
+-
+-		nvram_set(&quot;wl0_nas_msg1&quot;, &quot;nas&quot;);
+-		/* Notify NAS of adding the interface */
+-		notify_nas(&quot;lan&quot;, interface, &quot;up&quot;);
+-	}
+-#endif
+-	return 0;
+-}
+-
+-int
+ wan_ifunit(char *wan_ifname)
+ {
+ 	int unit;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000156.html">[Wl530g-svncheckins] r370 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+	<LI>Next message: <A HREF="000158.html">[Wl530g-svncheckins] r372 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r361 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r361%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils&In-Reply-To=%3C200609230139.k8N1d1M9025558%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000146.html">
+   <LINK REL="Next"  HREF="000148.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r361 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r361%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils&In-Reply-To=%3C200609230139.k8N1d1M9025558%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r361 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 23 03:39:01 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000146.html">[Wl530g-svncheckins] r360 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+        <LI>Next message: <A HREF="000148.html">[Wl530g-svncheckins] r362 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-23 03:38:58 +0200 (Sat, 23 Sep 2006)
+New Revision: 361
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils/rmmod.c
+Log:
+backported bb 0.60's rmmod to remove missing __NR_delete_module. Also ended up smaller
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils/rmmod.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils/rmmod.c	2006-09-23 01:38:23 UTC (rev 360)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/modutils/rmmod.c	2006-09-23 01:38:58 UTC (rev 361)
+@@ -2,105 +2,63 @@
+ /*
+  * Mini rmmod implementation for busybox
+  *
+- * Copyright (C) 1999-2004 by Erik Andersen &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">andersen at codepoet.org</A>&gt;
++ * Copyright (C) 1999,2000 by Lineo, inc. and Erik Andersen
++ * Copyright (C) 1999,2000,2001 by Erik Andersen &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">andersee at debian.org</A>&gt;
+  *
+- * Licensed under GPLv2 or later, see file LICENSE in this tarball for details.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
+  */
+ 
+-#include &quot;busybox.h&quot;
+ #include &lt;stdio.h&gt;
+ #include &lt;errno.h&gt;
+ #include &lt;unistd.h&gt;
+ #include &lt;stdlib.h&gt;
+ #include &lt;getopt.h&gt;
+-#include &lt;fcntl.h&gt;
+-#include &lt;string.h&gt;
+-#include &lt;sys/utsname.h&gt;
+-#include &lt;sys/syscall.h&gt;
++#include &quot;busybox.h&quot;
+ 
+-#ifdef CONFIG_FEATURE_2_6_MODULES
+-static inline void filename2modname(char *modname, const char *afterslash)
+-{
+-	unsigned int i;
++/* fixes for the move from 0.60 to 1.2.1 */
++#define show_usage bb_show_usage
++#define perror_msg bb_perror_msg 
++#define perror_msg_and_die bb_perror_msg_and_die
+ 
+-#if ENABLE_FEATURE_2_4_MODULES
+-	int kr_chk = 1;
+-	if (get_linux_version_code() &lt;= KERNEL_VERSION(2,6,0))
+-		kr_chk = 0;
+-#else
+-#define kr_chk 1
+-#endif
++extern int delete_module(const char * name);
+ 
+-	/* Convert to underscores, stop at first . */
+-	for (i = 0; afterslash[i] &amp;&amp; afterslash[i] != '.'; i++) {
+-		if (kr_chk &amp;&amp; (afterslash[i] == '-'))
+-			modname[i] = '_';
+-		else
+-			modname[i] = afterslash[i];
+-	}
+-	modname[i] = '\0';
+-}
+-#endif
+ 
+-int rmmod_main(int argc, char **argv)
++extern int rmmod_main(int argc, char **argv)
+ {
+ 	int n, ret = EXIT_SUCCESS;
+-	unsigned int flags = O_NONBLOCK|O_EXCL;
+-#ifdef CONFIG_FEATURE_QUERY_MODULE_INTERFACE
+-	/* bb_common_bufsiz1 hold the module names which we ignore
+-	   but must get */
+-	size_t bufsize = sizeof(bb_common_bufsiz1);
+-#endif
+ 
+ 	/* Parse command line. */
+-	n = bb_getopt_ulflags(argc, argv, &quot;wfa&quot;);
+-	if((n &amp; 1))	// --wait
+-		flags &amp;= ~O_NONBLOCK;
+-	if((n &amp; 2))	// --force
+-		flags |= O_TRUNC;
+-	if((n &amp; 4)) {
+-		/* Unload _all_ unused modules via NULL delete_module() call */
+-		/* until the number of modules does not change */
+-		size_t nmod = 0; /* number of modules */
+-		size_t pnmod = -1; /* previous number of modules */
+-
+-		while (nmod != pnmod) {
+-			if (syscall(__NR_delete_module, NULL, flags) != 0) {
+-				if (errno==EFAULT)
+-					return(ret);
+-				bb_perror_msg_and_die(&quot;rmmod&quot;);
+-			}
+-			pnmod = nmod;
+-#ifdef CONFIG_FEATURE_QUERY_MODULE_INTERFACE
+-			/* 1 == QM_MODULES */
+-			if (my_query_module(NULL, 1, &amp;bb_common_bufsiz1, &amp;bufsize, &amp;nmod)) {
+-				bb_perror_msg_and_die(&quot;QM_MODULES&quot;);
+-			}
+-#endif
++	while ((n = getopt(argc, argv, &quot;a&quot;)) != EOF) {
++		switch (n) {
++			case 'a':
++				/* Unload _all_ unused modules via NULL delete_module() call */
++				if (delete_module(NULL))
++					perror_msg_and_die(&quot;rmmod&quot;);
++				return EXIT_SUCCESS;
++			default:
++				show_usage();
+ 		}
+-		return EXIT_SUCCESS;
+ 	}
+ 
+ 	if (optind == argc)
+-		bb_show_usage();
++			show_usage();
+ 
+ 	for (n = optind; n &lt; argc; n++) {
+-#ifdef CONFIG_FEATURE_2_6_MODULES
+-		const char *afterslash;
+-		char *module_name;
+-
+-		afterslash = strrchr(argv[n], '/');
+-		if (!afterslash)
+-			afterslash = argv[n];
+-		else
+-			afterslash++;
+-		module_name = alloca(strlen(afterslash) + 1);
+-		filename2modname(module_name, afterslash);
+-#else
+-#define module_name		argv[n]
+-#endif
+-		if (syscall(__NR_delete_module, module_name, flags) != 0) {
+-			bb_perror_msg(&quot;%s&quot;, argv[n]);
++		if (delete_module(argv[n]) &lt; 0) {
++			perror_msg(&quot;%s&quot;, argv[n]);
+ 			ret = EXIT_FAILURE;
+ 		}
+ 	}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000146.html">[Wl530g-svncheckins] r360 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+	<LI>Next message: <A HREF="000148.html">[Wl530g-svncheckins] r362 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

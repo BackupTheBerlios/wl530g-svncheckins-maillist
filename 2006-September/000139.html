@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r353 - in	trunk/Marvell/Src/uClinux-dist/linux-2.4.x:	arch/armnommu/boot/compressed lib
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r353%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x%3A%0A%09arch/armnommu/boot/compressed%20lib&In-Reply-To=%3C200609221716.k8MHGv8s003676%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000138.html">
+   <LINK REL="Next"  HREF="000140.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r353 - in	trunk/Marvell/Src/uClinux-dist/linux-2.4.x:	arch/armnommu/boot/compressed lib</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r353%20-%20in%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x%3A%0A%09arch/armnommu/boot/compressed%20lib&In-Reply-To=%3C200609221716.k8MHGv8s003676%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r353 - in	trunk/Marvell/Src/uClinux-dist/linux-2.4.x:	arch/armnommu/boot/compressed lib">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 19:16:57 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000138.html">[Wl530g-svncheckins] r352 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+</A></li>
+        <LI>Next message: <A HREF="000140.html">[Wl530g-svncheckins] r354 - in trunk/Marvell/Src/uClinux-dist: .	lzma lzma/C lzma/C/7zip lzma/C/7zip/Archive	lzma/C/7zip/Archive/7z_C lzma/C/7zip/Common	lzma/C/7zip/Compress lzma/C/7zip/Compress/Branch	lzma/C/7zip/Compress/LZ lzma/C/7zip/Compress/LZ/BinTree	lzma/C/7zip/Compress/LZ/HashChain lzma/C/7zip/Compress/LZMA	lzma/C/7zip/Compress/LZMA_Alone lzma/C/7zip/Compress/LZMA_C	lzma/C/7zip/Compress/RangeCoder lzma/C/Common lzma/C/Windows	lzma/CS lzma/CS/7zip lzma/CS/7zip/Common	lzma/CS/7zip/Compress lzma/CS/7zip/Compress/LZ	lzma/CS/7zip/Compress/LZMA lzma/CS/7zip/Compress/LzmaAlone	lzma/CS/7zip/Compress/LzmaAlone/Properties	lzma/CS/7zip/Compress/RangeCoder lzma/Java lzma/Java/SevenZip	lzma/Java/SevenZip/Compression lzma/Java/SevenZip/Compression/LZ	lzma/Java/SevenZip/Compression/LZMA	lzma/Java/SevenZip/Compression/RangeCoder
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#139">[ date ]</a>
+              <a href="thread.html#139">[ thread ]</a>
+              <a href="subject.html#139">[ subject ]</a>
+              <a href="author.html#139">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 19:16:51 +0200 (Fri, 22 Sep 2006)
+New Revision: 353
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/misc.c
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c
+Log:
+final code to suppress some error checks and text to reduce decompression stub size
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 16:57:31 UTC (rev 352)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 17:16:51 UTC (rev 353)
+@@ -10,14 +10,12 @@
+ HEAD		 = head.o
+ OBJS		 = misc.o
+ 
+-# -Derror suppresses all error texts
+-CFLAGS		 = $(CPPFLAGS) -O2 -DSTDC_HEADERS $(CFLAGS_PROC) -msoft-float -D__linux__ -Derror
++# SUPPRESS_ERRORS suppresses all error texts
++CFLAGS		 = $(CPPFLAGS) -O2 -DSTDC_HEADERS $(CFLAGS_PROC) -msoft-float -D__linux__ -DSUPPRESS_ERRORS
+ 
+ FONTC		 = $(TOPDIR)/drivers/video/font_acorn_8x8.c
+ ZLDFLAGS	 = -p -X -T $(LINUX).lds
+ 
+-GZFLAGS 	 += &quot; -9 &quot;
+-
+ #
+ # Architecture dependencies
+ #
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/misc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/misc.c	2006-09-22 16:57:31 UTC (rev 352)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/misc.c	2006-09-22 17:16:51 UTC (rev 353)
+@@ -203,8 +203,10 @@
+ {
+ 	void *p;
+ 
++	#ifndef SUPPRESS_ERRORS
+ 	if (size &lt;0) error(&quot;Malloc error\n&quot;);
+ 	if (free_mem_ptr &lt;= 0) error(&quot;Memory error\n&quot;);
++	#endif
+ 
+ 	free_mem_ptr = (free_mem_ptr + 3) &amp; ~3;	/* Align */
+ 
+@@ -212,7 +214,11 @@
+ 	free_mem_ptr += size;
+ 
+ 	if (free_mem_ptr &gt;= free_mem_ptr_end)
++	{
++#ifndef SUPPRESS_ERRORS
+ 		error(&quot;Out of memory&quot;);
++#endif
++	}
+ 	return p;
+ }
+ 
+@@ -248,7 +254,11 @@
+ int fill_inbuf(void)
+ {
+ 	if (insize != 0)
++	{
++#ifndef SUPPRESS_ERRORS
+ 		error(&quot;ran out of input data\n&quot;);
++#endif
++	}
+ 
+ 	inbuf = input_data;
+ 	insize = &amp;input_data_end[0] - &amp;input_data[0];
+@@ -279,7 +289,7 @@
+ 	outcnt = 0;
+ 	puts(&quot;.&quot;);
+ }
+-
++#ifndef SUPPRESS_ERRORS
+ static void error(char *x)
+ {
+ 	int ptr;
+@@ -288,8 +298,9 @@
+ 	puts(x);
+ 	puts(&quot;\n\n -- System halted&quot;);
+ 
+-	while(1);	/* Halt */
++	while(1);	
+ }
++#endif
+ 
+ #ifndef STANDALONE_DEBUG
+ 
+@@ -306,9 +317,17 @@
+ 	arch_decomp_setup();
+ 
+ 	makecrc();
++#ifndef SUPPRESS_ERRORS
+ 	puts(&quot;Uncompressing Linux...&quot;);
++#else
++	puts(&quot;\n&quot;);
++#endif
+ 	gunzip();
++#ifndef SUPPRESS_ERRORS
++	puts(&quot;\n&quot;);
++#else
+ 	puts(&quot; done, booting the kernel.\n&quot;);
++#endif
+ 	return output_ptr;
+ }
+ #else
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c	2006-09-22 16:57:31 UTC (rev 352)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c	2006-09-22 17:16:51 UTC (rev 353)
+@@ -867,7 +867,9 @@
+   {
+ DEBG(&quot;dyn5b &quot;);
+     if (i == 1) {
++#ifndef SUPPRESS_ERRORS
+       error(&quot; incomplete literal tree\n&quot;);
++#endif
+       huft_free(tl);
+     }
+     return i;                   /* incomplete code set */
+@@ -878,7 +880,9 @@
+   {
+ DEBG(&quot;dyn5d &quot;);
+     if (i == 1) {
++#ifndef SUPPRESS_ERRORS
+       error(&quot; incomplete distance tree\n&quot;);
++#endif
+ #ifdef PKZIP_BUG_WORKAROUND
+       i = 0;
+     }
+@@ -1080,27 +1084,37 @@
+ 
+     if (magic[0] != 037 ||
+ 	((magic[1] != 0213) &amp;&amp; (magic[1] != 0236))) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;bad gzip magic numbers&quot;);
++#endif
+ 	    return -1;
+     }
+ 
+     /* We only support method #8, DEFLATED */
+     if (method != 8)  {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;internal error, invalid method&quot;);
++#endif
+ 	    return -1;
+     }
+ 
+     flags  = (uch)get_byte();
+     if ((flags &amp; ENCRYPTED) != 0) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;Input is encrypted\n&quot;);
++#endif
+ 	    return -1;
+     }
+     if ((flags &amp; CONTINUATION) != 0) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;Multi part input\n&quot;);
++#endif
+ 	    return -1;
+     }
+     if ((flags &amp; RESERVED) != 0) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;Input has invalid flags\n&quot;);
++#endif
+ 	    return -1;
+     }
+     (ulg)get_byte();	/* Get timestamp */
+@@ -1133,6 +1147,7 @@
+ 	    switch (res) {
+ 	    case 0:
+ 		    break;
++#ifndef SUPPRESS_ERRORS
+ 	    case 1:
+ 		    error(&quot;invalid compressed format (err=1)&quot;);
+ 		    break;
+@@ -1144,6 +1159,7 @@
+ 		    break;
+ 	    default:
+ 		    error(&quot;invalid compressed format (other)&quot;);
++#endif
+ 	    }
+ 	    return -1;
+     }
+@@ -1164,11 +1180,15 @@
+     
+     /* Validate decompression */
+     if (orig_crc != CRC_VALUE) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;crc error&quot;);
++#endif
+ 	    return -1;
+     }
+     if (orig_len != bytes_out) {
++#ifndef SUPPRESS_ERRORS
+ 	    error(&quot;length error&quot;);
++#endif
+ 	    return -1;
+     }
+     return 0;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000138.html">[Wl530g-svncheckins] r352 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+</A></li>
+	<LI>Next message: <A HREF="000140.html">[Wl530g-svncheckins] r354 - in trunk/Marvell/Src/uClinux-dist: .	lzma lzma/C lzma/C/7zip lzma/C/7zip/Archive	lzma/C/7zip/Archive/7z_C lzma/C/7zip/Common	lzma/C/7zip/Compress lzma/C/7zip/Compress/Branch	lzma/C/7zip/Compress/LZ lzma/C/7zip/Compress/LZ/BinTree	lzma/C/7zip/Compress/LZ/HashChain lzma/C/7zip/Compress/LZMA	lzma/C/7zip/Compress/LZMA_Alone lzma/C/7zip/Compress/LZMA_C	lzma/C/7zip/Compress/RangeCoder lzma/C/Common lzma/C/Windows	lzma/CS lzma/CS/7zip lzma/CS/7zip/Common	lzma/CS/7zip/Compress lzma/CS/7zip/Compress/LZ	lzma/CS/7zip/Compress/LZMA lzma/CS/7zip/Compress/LzmaAlone	lzma/CS/7zip/Compress/LzmaAlone/Properties	lzma/CS/7zip/Compress/RangeCoder lzma/Java lzma/Java/SevenZip	lzma/Java/SevenZip/Compression lzma/Java/SevenZip/Compression/LZ	lzma/Java/SevenZip/Compression/LZMA	lzma/Java/SevenZip/Compression/RangeCoder
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#139">[ date ]</a>
+              <a href="thread.html#139">[ thread ]</a>
+              <a href="subject.html#139">[ subject ]</a>
+              <a href="author.html#139">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

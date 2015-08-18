@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r363 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r363%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609230518.k8N5ID0H010672%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000148.html">
+   <LINK REL="Next"  HREF="000150.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r363 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r363%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609230518.k8N5ID0H010672%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r363 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 23 07:18:13 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000148.html">[Wl530g-svncheckins] r362 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000150.html">[Wl530g-svncheckins] r364 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-23 07:18:06 +0200 (Sat, 23 Sep 2006)
+New Revision: 363
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/common.h
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+Log:
+backlog of commits
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/common.h
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/common.h	2006-09-23 05:17:36 UTC (rev 362)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/common.h	2006-09-23 05:18:06 UTC (rev 363)
+@@ -27,7 +27,10 @@
+ 
+ #ifndef FALSE
+ #define FALSE 0
+-#endif
++#endif
++
++/* cprintf to stdout */
++#define cprintf printf
+ 
+ struct variable {
+ 	char *name;
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c	2006-09-23 05:17:36 UTC (rev 362)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c	2006-09-23 05:18:06 UTC (rev 363)
+@@ -58,7 +58,7 @@
+ 	int i;
+ 	FILE *fOut=fopen(pszOutputFile,&quot;w&quot;);	
+ 	if(!fOut)
+-	{
++	{	
+ 		return 1;
+ 	}
+ 
+@@ -135,6 +135,7 @@
+ 	if (log_shmid != -1)
+ 		shmdt(buf);
+ 	
++	printf(&quot;\n httpd.busybox_logread: returning success&quot;);
+ 	fclose(fOut);
+ 	return 0;
+ }
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-23 05:17:36 UTC (rev 362)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-23 05:18:06 UTC (rev 363)
+@@ -1302,8 +1302,8 @@
+     {   	
+ 	/*unlink(&quot;/tmp/syslog.log-1&quot;);
+ 	unlink(&quot;/tmp/syslog.log&quot;);	*/
+-	eval(&quot;/bin/sh&quot;, &quot;/etc/init.d/S20syslogd&quot;, &quot;stop&quot;);
+ 	eval(&quot;/bin/sh&quot;, &quot;/etc/init.d/S20syslogd&quot;, &quot;start&quot;);	
++	sleep(2);
+     	websRedirect(wp, current_url);
+         return 0;	
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000148.html">[Wl530g-svncheckins] r362 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000150.html">[Wl530g-svncheckins] r364 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

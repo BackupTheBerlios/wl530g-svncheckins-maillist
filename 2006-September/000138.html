@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r352 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r352%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed&In-Reply-To=%3C200609221657.k8MGvYRH010658%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000137.html">
+   <LINK REL="Next"  HREF="000139.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r352 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r352%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed&In-Reply-To=%3C200609221657.k8MGvYRH010658%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r352 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 18:57:34 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000137.html">[Wl530g-svncheckins] r351 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+        <LI>Next message: <A HREF="000139.html">[Wl530g-svncheckins] r353 - in	trunk/Marvell/Src/uClinux-dist/linux-2.4.x:	arch/armnommu/boot/compressed lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 18:57:31 +0200 (Fri, 22 Sep 2006)
+New Revision: 352
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+Log:
+suppress error texts from decompression stub
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 16:56:19 UTC (rev 351)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 16:57:31 UTC (rev 352)
+@@ -10,7 +10,8 @@
+ HEAD		 = head.o
+ OBJS		 = misc.o
+ 
+-CFLAGS		 = $(CPPFLAGS) -O2 -DSTDC_HEADERS $(CFLAGS_PROC) -msoft-float -D__linux__
++# -Derror suppresses all error texts
++CFLAGS		 = $(CPPFLAGS) -O2 -DSTDC_HEADERS $(CFLAGS_PROC) -msoft-float -D__linux__ -Derror
+ 
+ FONTC		 = $(TOPDIR)/drivers/video/font_acorn_8x8.c
+ ZLDFLAGS	 = -p -X -T $(LINUX).lds
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000137.html">[Wl530g-svncheckins] r351 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+	<LI>Next message: <A HREF="000139.html">[Wl530g-svncheckins] r353 - in	trunk/Marvell/Src/uClinux-dist/linux-2.4.x:	arch/armnommu/boot/compressed lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

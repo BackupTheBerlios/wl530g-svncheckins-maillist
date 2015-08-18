@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r335 - trunk/firmware_files/rootfs/sbin
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r335%20-%20trunk/firmware_files/rootfs/sbin&In-Reply-To=%3C200609220121.k8M1LXHP013135%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000120.html">
+   <LINK REL="Next"  HREF="000122.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r335 - trunk/firmware_files/rootfs/sbin</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r335%20-%20trunk/firmware_files/rootfs/sbin&In-Reply-To=%3C200609220121.k8M1LXHP013135%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r335 - trunk/firmware_files/rootfs/sbin">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 03:21:33 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000120.html">[Wl530g-svncheckins] r334 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+        <LI>Next message: <A HREF="000122.html">[Wl530g-svncheckins] r336 - trunk/firmware_files/rootfs/www
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 03:21:29 +0200 (Fri, 22 Sep 2006)
+New Revision: 335
+
+Added:
+   trunk/firmware_files/rootfs/sbin/install.sh
+Log:
+new script to install packages (.tar.gz)
+
+Added: trunk/firmware_files/rootfs/sbin/install.sh
+===================================================================
+--- trunk/firmware_files/rootfs/sbin/install.sh	2006-09-21 03:10:59 UTC (rev 334)
++++ trunk/firmware_files/rootfs/sbin/install.sh	2006-09-22 01:21:29 UTC (rev 335)
+@@ -0,0 +1,26 @@
++#!/bin/sh
++INSTALL_DIR=&quot;/jffs/bin&quot;
++if [ $# -lt 1 ]; then
++	echo &quot; This script installs packages from .tar.gz files.&quot;
++	echo
++	echo &quot; USAGE: &quot;
++	echo &quot;   $0 SOMEPACKAGEURL&quot;
++	echo &quot;   Packages are installed to $INSTALL_DIR&quot;
++	echo
++	exit 1
++fi
++packagename=`basename &quot;$1&quot;`
++echo &quot; Installing $packagename ...&quot;
++mkdir /jffs/bin 2&gt;&amp;1 &gt;&gt; /dev/null
++wget $1 -P /tmp
++if [ $? != 0 ]; then
++	echo &quot; Error retrieving $1.&quot;
++	exit 1
++fi
++tar -xzf /tmp -C /jffs/bin
++if [ $? != 0 ]; then
++	echo &quot; Error extracting $1.&quot;
++	exit 1
++fi
++chmod +x /jffs/bin/$packagename
++echo &quot; Package installed!&quot;
+
+
+Property changes on: trunk/firmware_files/rootfs/sbin/install.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000120.html">[Wl530g-svncheckins] r334 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+	<LI>Next message: <A HREF="000122.html">[Wl530g-svncheckins] r336 - trunk/firmware_files/rootfs/www
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r275 - trunk/Marvell/Src/uClinux-dist/config
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r275%20-%20trunk/Marvell/Src/uClinux-dist/config&In-Reply-To=%3C200609180040.k8I0esNd006363%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000060.html">
+   <LINK REL="Next"  HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r275 - trunk/Marvell/Src/uClinux-dist/config</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r275%20-%20trunk/Marvell/Src/uClinux-dist/config&In-Reply-To=%3C200609180040.k8I0esNd006363%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r275 - trunk/Marvell/Src/uClinux-dist/config">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 02:40:54 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000060.html">[Wl530g-svncheckins] r274 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000062.html">[Wl530g-svncheckins] r276 - in trunk/firmware_files/rootfs: bin sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 02:40:45 +0200 (Mon, 18 Sep 2006)
+New Revision: 275
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/config/config.in
+Log:
+rename Busybox option to Busybox 0.60 so that user knows it's the old one.
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/config/config.in
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/config/config.in	2006-09-17 23:59:39 UTC (rev 274)
++++ trunk/Marvell/Src/uClinux-dist/config/config.in	2006-09-18 00:40:45 UTC (rev 275)
+@@ -18,7 +18,7 @@
+ bool '  enable console shell'		CONFIG_USER_INIT_CONSOLE_SH
+ bool '  execute firewall rules'		CONFIG_USER_INIT_RUN_FIREWALL
+ choice 'Shell Program'	&quot;Sash		CONFIG_USER_SASH_SH \
+-			 minix-shell	CONFIG_USER_SH_SH \
++			 minix-shell	CONFIG_USER_SH_SH \Busy
+ 			 nwsh		CONFIG_USER_NWSH_SH \
+ 			 bash		CONFIG_USER_BASH_BASH \
+ 			 Other		CONFIG_USER_OTHER_SH \
+@@ -639,9 +639,9 @@
+ #############################################################################
+ 
+ mainmenu_option next_comment
+-comment 'BusyBox'
++comment 'BusyBox 0.60 (old, depreciated)'
+ 
+-bool 'BusyBox'			CONFIG_USER_BUSYBOX_BUSYBOX
++bool 'BusyBox (old, depreciated)'			CONFIG_USER_BUSYBOX_BUSYBOX
+ 
+ if [ &quot;$CONFIG_USER_BUSYBOX_BUSYBOX&quot; = &quot;y&quot; ]; then
+ 	comment &quot;Applets&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000060.html">[Wl530g-svncheckins] r274 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000062.html">[Wl530g-svncheckins] r276 - in trunk/firmware_files/rootfs: bin sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

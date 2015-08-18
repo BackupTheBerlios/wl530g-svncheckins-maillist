@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r403 - branch/uClinux-080306
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r403%20-%20branch/uClinux-080306&In-Reply-To=%3C200610131900.k9DJ09TW023024%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000184.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r403 - branch/uClinux-080306</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r403%20-%20branch/uClinux-080306&In-Reply-To=%3C200610131900.k9DJ09TW023024%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r403 - branch/uClinux-080306">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 13 21:00:09 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000184.html">[Wl530g-svncheckins] r402 - branch/uClinux-080306
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-10-13 21:00:06 +0200 (Fri, 13 Oct 2006)
+New Revision: 403
+
+Added:
+   branch/uClinux-080306/notes.txt
+Log:
+notes on current status and problems
+
+Added: branch/uClinux-080306/notes.txt
+===================================================================
+--- branch/uClinux-080306/notes.txt	2006-10-13 06:22:00 UTC (rev 402)
++++ branch/uClinux-080306/notes.txt	2006-10-13 19:00:06 UTC (rev 403)
+@@ -0,0 +1,6 @@
++
++2.4.32 is not fully working yet, though it does boot.
++
++I believe the current problem is with the mtd driver and its partition mapping. These do not seem to be created correctly, resulting in an error finding the nvram and other partitions. The rootfs appears to be readable ok though.
++
++There is no pressing need to get 2.4.32 working - however, since uClinux 2.4.32 already includes squashfs-lzma it will save the trouble of porting squashfs-lzma into the older 2.4.22 kernel currently in use.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000184.html">[Wl530g-svncheckins] r402 - branch/uClinux-080306
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

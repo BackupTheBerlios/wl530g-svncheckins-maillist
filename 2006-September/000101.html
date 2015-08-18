@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r315 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r315%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609201540.k8KFeiTB010040%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000100.html">
+   <LINK REL="Next"  HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r315 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r315%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/httpd&In-Reply-To=%3C200609201540.k8KFeiTB010040%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r315 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep 20 17:40:44 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000100.html">[Wl530g-svncheckins] r314 - in trunk: . packages
+</A></li>
+        <LI>Next message: <A HREF="000102.html">[Wl530g-svncheckins] r316 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-20 17:40:36 +0200 (Wed, 20 Sep 2006)
+New Revision: 315
+
+Added:
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.h
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/Makefile
+   trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+Log:
+added busybox_logread function to read circular log buffer from busybox's syslogd
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/Makefile	2006-09-20 15:05:49 UTC (rev 314)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/Makefile	2006-09-20 15:40:36 UTC (rev 315)
+@@ -22,5 +22,5 @@
+ install: all
+ 	install -D httpd $(INSTALLDIR)/sbin/httpd
+ 
+-httpd: httpd.o ej.o cgi.o web_ex.o ../shared/shutils.o common.o nvram_f.o nvmap.o utility.o ../shared/nvram_linux.o ../netconf/netconf_linux.o
++httpd: httpd.o ej.o cgi.o web_ex.o ../shared/shutils.o common.o nvram_f.o nvmap.o utility.o ../shared/nvram_linux.o ../netconf/netconf_linux.o logread.o
+ 	$(CC) $(CFLAGS) -o $@ $^  $(LDFLAGS) ../iptables/libiptc/libiptc.a
+
+Added: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c	2006-09-20 15:05:49 UTC (rev 314)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.c	2006-09-20 15:40:36 UTC (rev 315)
+@@ -0,0 +1,142 @@
++/* this is logread from Busybox 1.2.1, with a couple minor mods to be called as a function */
++
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;string.h&gt;
++#include &lt;sys/ipc.h&gt;
++#include &lt;sys/types.h&gt;
++#include &lt;sys/sem.h&gt;
++#include &lt;sys/shm.h&gt;
++#include &lt;signal.h&gt;
++#include &lt;setjmp.h&gt;
++#include &lt;unistd.h&gt;
++
++static const long KEY_ID = 0x414e4547; /*&quot;GENA&quot;*/
++
++static struct shbuf_ds {
++	int size;		// size of data written
++	int head;		// start of message list
++	int tail;		// end of message list
++	char data[1];		// data/messages
++} *buf = NULL;			// shared memory pointer
++
++
++// Semaphore operation structures
++static struct sembuf SMrup[1] = {{0, -1, IPC_NOWAIT | SEM_UNDO}}; // set SMrup
++static struct sembuf SMrdn[2] = {{1, 0}, {0, +1, SEM_UNDO}}; // set SMrdn
++
++static int	log_shmid = -1;	// ipc shared memory id
++static int	log_semid = -1;	// ipc semaphore id
++
++/*
++ * cleanup_sema - release semaphore if acquired
++ */
++static void cleanup_sema() 
++{
++	//release all acquired resources
++	if (log_shmid != -1)
++		shmdt(buf);	
++}
++/*
++ * sem_up - up()'s a semaphore.
++ */
++static inline void sem_up(int semid)
++{
++	semop(semid, SMrup, 1);		
++}
++
++/*
++ * sem_down - down()'s a semaphore
++ */
++static inline void sem_down(int semid)
++{
++	semop(semid, SMrdn, 2);
++}
++
++int busybox_logread(char *pszOutputFile)
++{
++	int i;
++	FILE *fOut=fopen(pszOutputFile,&quot;w&quot;);	
++	if(!fOut)
++	{
++		return 1;
++	}
++
++	if ( (log_shmid = shmget(KEY_ID, 0, 0)) == -1)
++	{
++		fclose(fOut);
++		return 1;
++	}
++
++	// Attach shared memory to our char*
++	if ( (buf = shmat(log_shmid, NULL, SHM_RDONLY)) == NULL)
++	{
++		cleanup_sema();		
++		fClose(fOUt);
++		return 1;
++	}
++
++	if ( (log_semid = semget(KEY_ID, 0, 0)) == -1)
++	{
++		cleanup_sema();		
++		fClose(fOut);
++		return 1;
++	}
++
++	// Suppose atomic memory move
++	i = buf-&gt;head;
++
++#ifdef CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING
++		char *buf_data;
++		int log_len,j;
++#endif
++
++		sem_down(log_semid);
++
++		//printf(&quot;head: %i tail: %i size: %i\n&quot;,buf-&gt;head,buf-&gt;tail,buf-&gt;size);
++		if (buf-&gt;head == buf-&gt;tail || i==buf-&gt;tail) {
++			fprintf(fOut,&quot;&lt;empty syslog&gt;\n&quot;);			
++		}
++
++		// Read Memory
++#ifdef CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING
++		log_len = buf-&gt;tail - i;
++		if (log_len &lt; 0)
++			log_len += buf-&gt;size;
++		buf_data = (char *)xmalloc(log_len);
++
++		if (buf-&gt;tail &lt; i) {
++			memcpy(buf_data, buf-&gt;data+i, buf-&gt;size-i);
++			memcpy(buf_data+buf-&gt;size-i, buf-&gt;data, buf-&gt;tail);
++		} else {
++			memcpy(buf_data, buf-&gt;data+i, buf-&gt;tail-i);
++		}
++		i = buf-&gt;tail;
++
++#else
++		while ( i != buf-&gt;tail) {
++			fprintf(fOut, &quot;%s&quot;, buf-&gt;data+i);
++			i+= strlen(buf-&gt;data+i) + 1;
++			if (i &gt;= buf-&gt;size )
++				i=0;
++		}
++#endif
++		// release the lock on the log chain
++		sem_up(log_semid);
++
++#ifdef CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING
++		for (j=0; j &lt; log_len; j+=strlen(buf_data+j)+1) {
++			fprintf(fOut, &quot;%s&quot;, buf_data+j);
++		}
++		free(buf_data);
++#endif
++		fflush(fOut);
++
++	if (log_shmid != -1)
++		shmdt(buf);
++	
++	fclose(fOut);
++	return 0;
++}
++
++
+
+Added: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.h
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.h	2006-09-20 15:05:49 UTC (rev 314)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/logread.h	2006-09-20 15:40:36 UTC (rev 315)
+@@ -0,0 +1 @@
++int busybox_logread(char *pszOutputFile);
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-20 15:05:49 UTC (rev 314)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/httpd/web_ex.c	2006-09-20 15:40:36 UTC (rev 315)
+@@ -43,6 +43,7 @@
+ #include &quot;bcmutils.h&quot;
+ #include &quot;bcmnvram_f.h&quot;
+ #include &quot;common.h&quot;
++#include &quot;logread.h&quot; /* for syslogd circular buffer */
+ 
+ #define sys_restart() kill(1, SIGHUP)
+ #define sys_reboot() kill(1, SIGTERM)
+@@ -1070,10 +1071,15 @@
+ 			   
+ 	if (strcmp(file, &quot;syslog.log&quot;)==0)
+ 	{
+-		eval(&quot;logread&quot;, &quot;&gt; /tmp/syslog.log&quot;);
+-           	sprintf(filename, &quot;/tmp/%s-1&quot;, file);
+-	   	ret+=dump_file(wp, filename); 
+-		eval(&quot;rm&quot;, &quot;/tmp/syslog.log&quot;);
++		/* todo: we need to create a unique tmp filename instead of this crap */
++		char szFilename[64];	
++		sprintf(szFilename,&quot;/tmp/.syslog-%u&quot;,clock());
++		cprintf(&quot;logread tempf=%s\n&quot;, szFilename);
++		if(busybox_logread(szFilename)==0)
++		{
++           	   	ret+=dump_file(wp, filename); 
++		}
++		eval(&quot;rm&quot;, szFilename);
+ 	}
+ 	   			   
+ 	sprintf(filename, &quot;/tmp/%s&quot;, file);
+@@ -2904,3 +2910,5 @@
+   	} else
+ 		return errno;
+ }
++
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000100.html">[Wl530g-svncheckins] r314 - in trunk: . packages
+</A></li>
+	<LI>Next message: <A HREF="000102.html">[Wl530g-svncheckins] r316 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

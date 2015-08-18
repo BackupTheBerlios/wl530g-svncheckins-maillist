@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r338 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r338%20-%20trunk&In-Reply-To=%3C200609220246.k8M2kG2i020590%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000123.html">
+   <LINK REL="Next"  HREF="000125.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r338 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r338%20-%20trunk&In-Reply-To=%3C200609220246.k8M2kG2i020590%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r338 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 04:46:16 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000123.html">[Wl530g-svncheckins] r337 - trunk/firmware_files/rootfs/etc
+</A></li>
+        <LI>Next message: <A HREF="000125.html">[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#124">[ date ]</a>
+              <a href="thread.html#124">[ thread ]</a>
+              <a href="subject.html#124">[ subject ]</a>
+              <a href="author.html#124">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 04:46:12 +0200 (Fri, 22 Sep 2006)
+New Revision: 338
+
+Added:
+   trunk/embed_date.sh
+   trunk/embed_rev.sh
+Log:
+scripts to embed revision number and date into documents, respecitvely
+
+Added: trunk/embed_date.sh
+===================================================================
+--- trunk/embed_date.sh	2006-09-22 02:45:31 UTC (rev 337)
++++ trunk/embed_date.sh	2006-09-22 02:46:12 UTC (rev 338)
+@@ -0,0 +1,21 @@
++#!/bin/sh
++#
++# this script embeds the date in document(s) given on command line
++# document should have __CURRENT_DATE__ where it wants the revision number
++# to be placed. Wildcards okay.
++#
++if [ $# -lt 1 ]; then
++	echo &quot; Invalid usage. Must supply one or more files.&quot;
++	exit 1
++fi
++current_date=$(date +%m%d%y)
++tempfile=$(mktemp)
++echo &quot; Date is $current_date&quot;
++echo &quot; Temporary file is $tempfile&quot;
++# todo: update to unlimited args
++for curfile in $1 $2 $3 $4 $5 $6 $7 $8 $9; do
++	echo &quot; Processing $curfile ...&quot;
++	cp $curfile $tempfile	
++	cat $tempfile | sed s/__CURRENT_DATE__/$current_date/ &gt; $curfile
++	rm $tempfile	
++done
+
+
+Property changes on: trunk/embed_date.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/embed_rev.sh
+===================================================================
+--- trunk/embed_rev.sh	2006-09-22 02:45:31 UTC (rev 337)
++++ trunk/embed_rev.sh	2006-09-22 02:46:12 UTC (rev 338)
+@@ -0,0 +1,22 @@
++#!/bin/sh
++#
++# this script embeds the global revision number in document(s) given on command line
++# document should have __SVN_REVISION__ where it wants the revision number
++# to be placed. Wildcards okay.
++#
++if [ $# -lt 1 ]; then
++	echo &quot; Invalid usage. Must supply one or more files.&quot;
++	exit 1
++fi
++revision_number=$(svn info | grep Revision | cut -c11-)
++tempfile=$(mktemp)
++echo &quot; Revision number is $revision_number&quot;
++echo &quot; Temporary file is $tempfile&quot;
++# todo: update to unlimited args
++for curfile in $1 $2 $3 $4 $5 $6 $7 $8 $9; do
++	echo &quot; Processing $curfile ...&quot;
++	cp $curfile $tempfile	
++	cat $tempfile | sed s/__SVN_REVISION__/$revision_number/ &gt; $curfile
++	rm $tempfile	
++done
++
+
+
+Property changes on: trunk/embed_rev.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000123.html">[Wl530g-svncheckins] r337 - trunk/firmware_files/rootfs/etc
+</A></li>
+	<LI>Next message: <A HREF="000125.html">[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#124">[ date ]</a>
+              <a href="thread.html#124">[ thread ]</a>
+              <a href="subject.html#124">[ subject ]</a>
+              <a href="author.html#124">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

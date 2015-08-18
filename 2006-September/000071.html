@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r285 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r285%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1&In-Reply-To=%3C200609181615.k8IGFmQN011804%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000070.html">
+   <LINK REL="Next"  HREF="000072.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r285 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r285%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1&In-Reply-To=%3C200609181615.k8IGFmQN011804%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r285 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 18:15:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000070.html">[Wl530g-svncheckins] r284 - trunk/Marvell/Src/uClinux-dist/user
+</A></li>
+        <LI>Next message: <A HREF="000072.html">[Wl530g-svncheckins] r286 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 18:15:42 +0200 (Mon, 18 Sep 2006)
+New Revision: 285
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/Rules.mak
+Log:
+stack size to 32KB - was 16KB
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/Rules.mak
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/Rules.mak	2006-09-18 16:09:33 UTC (rev 284)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/Rules.mak	2006-09-18 16:15:42 UTC (rev 285)
+@@ -60,7 +60,7 @@
+ ARFLAGS=cru
+ 
+ # custom CFLAGS for FLT
+-CFLAGS+=-Wl,-elf2flt=&quot;-s 16384&quot; 
++CFLAGS+=-Wl,-elf2flt=&quot;-s 32678&quot; 
+ # gcc centric. Perhaps fiddle with findstring gcc,$(CC) for the rest
+ # get the CC MAJOR/MINOR version
+ CC_MAJOR:=$(shell printf &quot;%02d&quot; $(shell echo __GNUC__ | $(CC) -E -xc - | tail -n 1))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000070.html">[Wl530g-svncheckins] r284 - trunk/Marvell/Src/uClinux-dist/user
+</A></li>
+	<LI>Next message: <A HREF="000072.html">[Wl530g-svncheckins] r286 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

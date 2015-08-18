@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r350 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r350%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed&In-Reply-To=%3C200609221654.k8MGsIGt007952%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000135.html">
+   <LINK REL="Next"  HREF="000137.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r350 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r350%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed&In-Reply-To=%3C200609221654.k8MGsIGt007952%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r350 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 18:54:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000135.html">[Wl530g-svncheckins] r349 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+        <LI>Next message: <A HREF="000137.html">[Wl530g-svncheckins] r351 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#136">[ date ]</a>
+              <a href="thread.html#136">[ thread ]</a>
+              <a href="subject.html#136">[ subject ]</a>
+              <a href="author.html#136">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 18:54:16 +0200 (Fri, 22 Sep 2006)
+New Revision: 350
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+Log:
+make size -9 is used
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 16:53:19 UTC (rev 349)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed/Makefile	2006-09-22 16:54:16 UTC (rev 350)
+@@ -15,6 +15,8 @@
+ FONTC		 = $(TOPDIR)/drivers/video/font_acorn_8x8.c
+ ZLDFLAGS	 = -p -X -T $(LINUX).lds
+ 
++GZFLAGS 	 += &quot; -9 &quot;
++
+ #
+ # Architecture dependencies
+ #
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000135.html">[Wl530g-svncheckins] r349 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+	<LI>Next message: <A HREF="000137.html">[Wl530g-svncheckins] r351 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#136">[ date ]</a>
+              <a href="thread.html#136">[ thread ]</a>
+              <a href="subject.html#136">[ subject ]</a>
+              <a href="author.html#136">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

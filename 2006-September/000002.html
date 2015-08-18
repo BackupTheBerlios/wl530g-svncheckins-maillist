@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r216 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r216%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609152333.k8FNX9nh028431%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next"  HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r216 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r216%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609152333.k8FNX9nh028431%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r216 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 01:33:09 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Wl530g-svncheckins] r215 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000003.html">[Wl530g-svncheckins] r217 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-16 01:33:06 +0200 (Sat, 16 Sep 2006)
+New Revision: 216
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+Log:
+added new nvram_safe_get_with_default function for proper setting of variables with a fallback default. Use it now to set iw_mode.
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-15 22:48:18 UTC (rev 215)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-15 23:33:06 UTC (rev 216)
+@@ -147,13 +147,40 @@
+ 	fclose(fp);
+ }
+ 
++/************************************************
++/* jmc:  nvram_safe_get_with_default  
++
++	Returns an nvram value, or its default value if it has no value.
++	todo: move to appropriate source file.
++*/
++char *
++nvram_safe_get_with_default(char *pszVariable, char *pszDefault, char *pszBuffer, unsigned int nBufferLen)
++{	
++	char *pszTemp;
++	pszTemp=nvram_safe_get(pszVariable);
++	if(!pszTemp || !strlen(pszTemp))
++	{
++		if(pszDefault &amp;&amp; strlen(pszDefault)&lt;nBufferLen)
++		{
++			strcpy(pszBuffer,pszDefault);
++		}
++		return pszBuffer;
++	}
++	if(pszBuffer &amp;&amp; strlen(pszTemp)&lt;nBufferLen)
++	{
++		strcpy(pszBuffer,pszTemp);
++	}	
++	return pszBuffer;
++}
++
+ void
+ create_hostapd_conf(void)
+ {
+ #ifdef ASUS
+ 	FILE *fp;
+ 	char *tmpstr;
+-	int mode;	
++	int mode;
++	char szBuffer[64];	
+ 
+ 	// create hostapd.conf
+ 	fp=fopen(&quot;/tmp/hostapd.conf&quot;,&quot;w&quot;);
+@@ -231,17 +258,8 @@
+ 		fprintf(fp, &quot;g_protect=0\n&quot;);
+ 	}
+ 		
+-	tmpstr=nvram_safe_get(&quot;iw_mode&quot;);
+-	if(!tmpstr)
+-	{
+-		fprintf(fp, &quot;iw_mode=3\n&quot;);
+-	}
+-	else
+-	{
+-		fprintf(fp, &quot;iw_mode=%s\n&quot;,tmpstr);
+-	}
++	fprintf(fp, &quot;iw_mode=%s\n&quot;,nvram_safe_get_with_default(&quot;iw_mode&quot;,&quot;3&quot;,szBuffer,sizeof(szBuffer)));	
+ 
+-
+ 	if (nvram_match(&quot;wl_rate&quot;, &quot;0&quot;))
+ 	{
+ 		fprintf(fp, &quot;fixed_tx_data_rate=%s\n&quot;, nvram_safe_get(&quot;wl_rate&quot;));
+@@ -297,7 +315,7 @@
+ 	fprintf(fp, &quot;rts_threshold=%s\n&quot;, nvram_safe_get(&quot;wl_rts&quot;)); 		
+ 	fprintf(fp, &quot;fragment_threshold=%s\n&quot;, nvram_safe_get(&quot;wl_frag&quot;)); 	
+ 	fprintf(fp, &quot;short_retry_limit=7\n&quot;); 		
+-	fprintf(fp, &quot;long_retry_limit=4\n&quot;);
++	fprintf(fp, &quot;long_retry_limit=4\n&quot;);	
+ 	fprintf(fp, &quot;current_tx_power_level=1\n&quot;);	
+ 	fprintf(fp, &quot;short_preamble=1\n&quot;); 			
+ 	fprintf(fp, &quot;channel=%s\n&quot;, nvram_safe_get(&quot;wl_channel&quot;)); 		
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Wl530g-svncheckins] r215 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000003.html">[Wl530g-svncheckins] r217 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

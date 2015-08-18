@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r334 - trunk/firmware_files/rootfs/etc/init.d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r334%20-%20trunk/firmware_files/rootfs/etc/init.d&In-Reply-To=%3C200609210311.k8L3B2pd030490%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000119.html">
+   <LINK REL="Next"  HREF="000121.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r334 - trunk/firmware_files/rootfs/etc/init.d</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r334%20-%20trunk/firmware_files/rootfs/etc/init.d&In-Reply-To=%3C200609210311.k8L3B2pd030490%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r334 - trunk/firmware_files/rootfs/etc/init.d">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 21 05:11:02 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000119.html">[Wl530g-svncheckins] r333 - trunk/firmware_files/rootfs/sbin
+</A></li>
+        <LI>Next message: <A HREF="000121.html">[Wl530g-svncheckins] r335 - trunk/firmware_files/rootfs/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-21 05:10:59 +0200 (Thu, 21 Sep 2006)
+New Revision: 334
+
+Modified:
+   trunk/firmware_files/rootfs/etc/init.d/S20syslogd
+Log:
+fix missing '&amp;' for no-wait execution
+
+Modified: trunk/firmware_files/rootfs/etc/init.d/S20syslogd
+===================================================================
+--- trunk/firmware_files/rootfs/etc/init.d/S20syslogd	2006-09-21 03:03:56 UTC (rev 333)
++++ trunk/firmware_files/rootfs/etc/init.d/S20syslogd	2006-09-21 03:10:59 UTC (rev 334)
+@@ -22,5 +22,5 @@
+ 		echo &quot;remote&quot;
+ 		remote_cmdline=&quot;-R $log_ipaddr&quot;
+ 	fi
+-	syslogd -C &quot;$logsize&quot; -m &quot;$mark_interval&quot; &quot;$remote_cmdline&quot;
++	syslogd -C &quot;$logsize&quot; -m &quot;$mark_interval&quot; &quot;$remote_cmdline&quot; &amp;
+ fi
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000119.html">[Wl530g-svncheckins] r333 - trunk/firmware_files/rootfs/sbin
+</A></li>
+	<LI>Next message: <A HREF="000121.html">[Wl530g-svncheckins] r335 - trunk/firmware_files/rootfs/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

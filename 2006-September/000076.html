@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r290 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r290%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609182319.k8INJLjU013495%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000075.html">
+   <LINK REL="Next"  HREF="000077.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r290 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r290%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609182319.k8INJLjU013495%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r290 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 19 01:19:21 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000075.html">[Wl530g-svncheckins] r289 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000077.html">[Wl530g-svncheckins] r291 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-19 01:19:13 +0200 (Tue, 19 Sep 2006)
+New Revision: 290
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+Log:
++ plaintext password (smaller, faster, and no reason not to)
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-18 18:17:44 UTC (rev 289)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-18 23:19:13 UTC (rev 290)
+@@ -976,21 +976,21 @@
+ make_etc(void)
+ {
+ 	FILE *f;
+-	char *name=&quot;root&quot;;
++		
++	/* crypt using md5, no salt */
++	/*char *name;
+ 	char *pass;
++	name = nvram_get(&quot;http_username&quot;) ? : &quot;root&quot;;
++	pass = crypt(nvram_safe_get(&quot;http_passwd&quot;), &quot;$1$&quot;);*/
+ 	
+-	/* crypt using md5, no salt */
+-	/*name = nvram_get(&quot;http_username&quot;) ? : &quot;root&quot;;*/
+-	pass = crypt(nvram_safe_get(&quot;http_passwd&quot;), &quot;$1$&quot;);
+-	
+ 	if ((f = fopen(&quot;/etc/passwd&quot;, &quot;w&quot;))) {
+-		fprintf(f, &quot;%s:%s:0:0:root:/usr/local/root:/bin/sh\n&quot;
+-			&quot;nobody:x:99:99:nobody:/:/sbin/nologin\n&quot;, name, pass);
++		fprintf(f, &quot;root:%s:0:0:root:/:/bin/sh\n&quot;
++			&quot;nobody:x:99:99:nobody:/:/sbin/nologin\n&quot;, nvram_safe_get(&quot;http_passwd&quot;));
+ 		fclose(f);
+ 	}
+ 	
+ 	if ((f = fopen(&quot;/etc/group&quot;, &quot;w&quot;))) {
+-		fprintf(f, &quot;root:x:0:%s\nnobody:x:99:\n&quot;, name);
++		fprintf(f, &quot;root:x:0:root\nnobody:x:99:\n&quot;);
+ 		fclose(f);
+ 	}
+ 		
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000075.html">[Wl530g-svncheckins] r289 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000077.html">[Wl530g-svncheckins] r291 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

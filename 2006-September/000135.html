@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r349 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r349%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib&In-Reply-To=%3C200609221653.k8MGrNvW007774%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000134.html">
+   <LINK REL="Next"  HREF="000136.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r349 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r349%20-%0A%09trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib&In-Reply-To=%3C200609221653.k8MGrNvW007774%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r349 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 18:53:23 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000134.html">[Wl530g-svncheckins] r348 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+        <LI>Next message: <A HREF="000136.html">[Wl530g-svncheckins] r350 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 18:53:19 +0200 (Fri, 22 Sep 2006)
+New Revision: 349
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c
+Log:
+remove error texts to reduce size of decompression stub
+
+Modified: trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c	2006-09-22 16:32:57 UTC (rev 348)
++++ trunk/Marvell/Src/uClinux-dist/linux-2.4.x/lib/inflate.c	2006-09-22 16:53:19 UTC (rev 349)
+@@ -1,5 +1,12 @@
+ #define DEBG(x)
+ #define DEBG1(x)
++
++/* a dumb little hack to reduce size of decompression stub */
++#define GZ_REMOVE_ERROR_TEXT
++#ifdef GZ_REMOVE_ERROR_TEXT
++#define error 
++#endif
++
+ /* inflate.c -- Not copyrighted 1992 by Mark Adler
+    version c10p1, 10 January 1993 */
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000134.html">[Wl530g-svncheckins] r348 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+	<LI>Next message: <A HREF="000136.html">[Wl530g-svncheckins] r350 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x/arch/armnommu/boot/compressed
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

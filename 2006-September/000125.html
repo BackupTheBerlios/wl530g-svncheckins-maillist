@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r339%20-%20trunk/firmware_files/rootfs/www&In-Reply-To=%3C200609220247.k8M2l0fh020674%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000124.html">
+   <LINK REL="Next"  HREF="000126.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r339%20-%20trunk/firmware_files/rootfs/www&In-Reply-To=%3C200609220247.k8M2l0fh020674%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r339 - trunk/firmware_files/rootfs/www">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 22 04:47:00 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000124.html">[Wl530g-svncheckins] r338 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000126.html">[Wl530g-svncheckins] r340 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#125">[ date ]</a>
+              <a href="thread.html#125">[ thread ]</a>
+              <a href="subject.html#125">[ subject ]</a>
+              <a href="author.html#125">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-22 04:46:58 +0200 (Fri, 22 Sep 2006)
+New Revision: 339
+
+Modified:
+   trunk/firmware_files/rootfs/www/general.js
+Log:
+removed some unused code
+
+Modified: trunk/firmware_files/rootfs/www/general.js
+===================================================================
+--- trunk/firmware_files/rootfs/www/general.js	2006-09-22 02:46:12 UTC (rev 338)
++++ trunk/firmware_files/rootfs/www/general.js	2006-09-22 02:46:58 UTC (rev 339)
+@@ -296,25 +296,7 @@
+             if (document.form.url_num_x_0.value &gt;= c) cFlag=1;		
+             else if (document.form.url_keyword_x_0.value==&quot;&quot;) bFlag=1;                           	   
+             else if (!validate_duplicate(document.form.UrlList_s, document.form.url_keyword_x_0.value, 32, 0)) return false;
+-        }         
+-        else if (s=='x_FUserList')
+-    	{
+-    	    if (document.form.usb_ftpnum_x_0.value &gt;= c) cFlag=1;
+-    	    else if (!validate_string(document.form.usb_ftpusername_x_0) ||
+-    	    	!validate_string(document.form.usb_ftppasswd_x_0) ||
+-            	!validate_range(document.form.usb_ftpmaxuser_x_0, 1, 12)) return false;
+-            else if (document.form.usb_ftpusername_x_0.value==&quot;&quot; ||
+-            	document.form.usb_ftppasswd_x_0.value==&quot;&quot; ||
+-            	document.form.usb_ftpmaxuser_x_0.value==&quot;&quot;) bFlag=1;
+-            else if (!validate_duplicate(document.form.x_FUserList_s, document.form.usb_ftpusername_x_0.value, 16, 0)) return false;	
+-        }   
+-        else if (s=='x_FBanIPList')
+-    	{
+-    	    if (document.form.usb_bannum_x_0.value &gt;= c) cFlag=1;
+-            else if (!validate_iprange(document.form.usb_ftpbanip_x_0, &quot;&quot;)) return false;
+-            else if (document.form.usb_ftpbanip_x_0.value==&quot;&quot;) bFlag=1;
+-            else if (!validate_duplicate(document.form.x_FBanIPList_s, document.form.usb_ftpbanip_x_0.value, 15, 0)) return false;                                                          
+-        }
++        }        
+         else if (s=='x_QRuleList')
+     	{
+     	    if (document.form.qos_rulenum_x_0.value &gt;= c) cFlag=1;	    	    
+@@ -331,8 +313,7 @@
+             	alert('Please enter a value between 0 to ' + document.form.qos_maxbw_x_0.value + '.');	
+             	document.form.qos_minbw_x_0.focus();
+             	return false;		
+-            }	
+-            	
++            }	            	
+             //if (document.form.qos_maxbw_x_0.value==&quot;&quot;)
+             //	document.form.qos_maxbw_x_0.value==document.form.qos_minbw_x_0.value;
+             //if (document.form.qos_minbw_x_0.value==&quot;&quot;)
+@@ -3090,56 +3071,6 @@
+ 	}   
+ }
+ 
+-/*
+-function is_wlphrase(o) 
+-{          
+-    var pseed = new Array(4);
+-    var wep_key = new Array(8);
+-	           
+-    if(document.form.WLANConfig11a_WEPType.value!='None')    
+-    {       	 	
+-        for(i=0; i&lt;o.value.length; i++) {
+-            pseed[i%4]^= o.value.charAt(i);
+-        }
+-       
+-        randNumber = pseed[0]|(pseed[1]&lt;&lt;8)|(pseed[2]&lt;&lt;16)|(pseed[3]&lt;&lt;24);          
+-        document.form.WLANConfig11a_WEPKey1.value = '';  
+-        
+-        for (j=0; j&lt;5; j++) 
+-        {
+-            randNumber *= 0x343fd;
+-            randNumber += 0x269ec3;                
+-            keystr = ((randNumber&gt;&gt;8) &amp; 0xff);
+-            
+-            if (keystr&gt;10)
+-            {
+-            	if (keystr=10) keystr='A';
+-            	else if (keystr=11) keystr='B';
+-            	else if (keystr=12) keystr='C';
+-            	else if (keystr=13) keystr='D';
+-            	else if (keystr=14) keystr='E';
+-            	else if (keystr=15) keystr='F';            	            	
+-            }
+-            document.form.WLANConfig11a_WEPKey1.value += keystr;   
+-            
+-            keystr = ((randNumber&gt;&gt;16) &amp; 0x7f);
+-            
+-            if (keystr&gt;10)
+-            {
+-            	if (keystr=10) keystr='A';
+-            	else if (keystr=11) keystr='B';
+-            	else if (keystr=12) keystr='C';
+-            	else if (keystr=13) keystr='D';
+-            	else if (keystr=14) keystr='E';
+-            	else if (keystr=15) keystr='F';            	            	
+-            }
+-            document.form.WLANConfig11a_WEPKey1.value += keystr;
+-            
+-        }                     	             
+-    }         
+-}
+-*/
+-
+ function validate_wlphrase(s, v, o)
+ {   	      	   	   	
+    if (v == &quot;wl_wpa_psk&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000124.html">[Wl530g-svncheckins] r338 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000126.html">[Wl530g-svncheckins] r340 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#125">[ date ]</a>
+              <a href="thread.html#125">[ thread ]</a>
+              <a href="subject.html#125">[ subject ]</a>
+              <a href="author.html#125">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

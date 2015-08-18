@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r303 - trunk/Marvell/Src/uClinux-dist
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r303%20-%20trunk/Marvell/Src/uClinux-dist&In-Reply-To=%3C200609200043.k8K0hqHm001671%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000088.html">
+   <LINK REL="Next"  HREF="000090.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r303 - trunk/Marvell/Src/uClinux-dist</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r303%20-%20trunk/Marvell/Src/uClinux-dist&In-Reply-To=%3C200609200043.k8K0hqHm001671%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r303 - trunk/Marvell/Src/uClinux-dist">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep 20 02:43:52 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000088.html">[Wl530g-svncheckins] r302 - in trunk/firmware_files/rootfs: bin etc	etc/init.d sbin www
+</A></li>
+        <LI>Next message: <A HREF="000090.html">[Wl530g-svncheckins] r304 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-20 02:43:43 +0200 (Wed, 20 Sep 2006)
+New Revision: 303
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/.config
+   trunk/Marvell/Src/uClinux-dist/build-uclinux-tools.sh
+   trunk/Marvell/Src/uClinux-dist/config.in
+Log:
+lazy
+
+Modified: trunk/Marvell/Src/uClinux-dist/.config
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/.config	2006-09-20 00:40:27 UTC (rev 302)
++++ trunk/Marvell/Src/uClinux-dist/.config	2006-09-20 00:43:43 UTC (rev 303)
+@@ -84,9 +84,15 @@
+ # CONFIG_DEFAULTS_LIBC_GLIBC is not set
+ # CONFIG_DEFAULTS_LIBC_UC_LIBC is not set
+ CONFIG_DEFAULTS_LIBC_UCLIBC=y
+-# CONFIG_DEFAULTS_LIBC_UCLIBC_NEW is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_19_PATCH_GZ is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26 is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_EXEC_ALLOC_PATCH is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_M68K_CONFIG is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_PTRACE_LVALUE_PATCH is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_SYSCALLS_INLINE_PATCH is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_TAR_BZ2 is not set
++# CONFIG_DEFAULTS_LIBC_UCLIBC_20030314_TAR_GZ is not set
+ # CONFIG_DEFAULTS_OVERRIDE is not set
+-# CONFIG_DEFAULTS_KERNEL is not set
+ # CONFIG_DEFAULTS_VENDOR is not set
+ # CONFIG_DEFAULTS_VENDOR_UPDATE is not set
+ CONFIG_VENDOR=Marvell
+
+Modified: trunk/Marvell/Src/uClinux-dist/build-uclinux-tools.sh
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/build-uclinux-tools.sh	2006-09-20 00:40:27 UTC (rev 302)
++++ trunk/Marvell/Src/uClinux-dist/build-uclinux-tools.sh	2006-09-20 00:43:43 UTC (rev 303)
+@@ -225,7 +225,9 @@
+ 		egrep -v '(UCLIBC_HAS_MMU|HAVE_SHARED|BUILD_UCLIBC_LDSO)' |
+ 			egrep -v '(HAS_SHADOW|MALLOC|UNIX98PTY_ONLY|UCLIBC_CTOR_DTOR)' |
+ 			egrep -v '(DOPIC|UCLIBC_DYNAMIC_ATEXIT|UCLIBC_MALLOC_DEBUGGING)' |
+-			egrep -v '(UCLIBC_HAS_THREADS|UCLIBC_HAS_WCHAR|UCLIBC_HAS_LOCALE|UCLIBC_HAS_FLOATS|HAS_FPU|UCLIBC_HAS_SOFT_FLOAT|UCLIBC_HAS_RPC|UCLIBC_HAS_FULL_RPC)'
++			egrep -v '(UCLIBC_HAS_THREADS|UCLIBC_HAS_WCHAR|UCLIBC_HAS_LOCALE)' |
++ 			egrep -v '(UCLIBC_HAS_FLOATS|HAS_FPU|UCLIBC_HAS_SOFT_FLOAT)' |
++			egrep -v '(UCLIBC_HAS_RPC|UCLIBC_HAS_FULL_RPC)'
+ 		echo '# UCLIBC_HAS_MMU is not set'
+ 		echo '# HAVE_SHARED is not set'
+ 		echo '# BUILD_UCLIBC_LDSO is not set'
+@@ -244,6 +246,7 @@
+ 		echo &quot;# HAS_FPU is not set&quot;
+ 		echo &quot;UCLIBC_HAS_SOFT_FLOAT=y&quot;
+ 		echo &quot;UCLIBC_HAS_RPC=y&quot;
++		echo &quot;UCLIBC_LITTLE_ENDIAN=y&quot;
+ 		echo &quot;# UCLIBC_HAS_FULL_RPC is not set&quot;
+ 	else
+ 		cat
+
+Modified: trunk/Marvell/Src/uClinux-dist/config.in
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/config.in	2006-09-20 00:40:27 UTC (rev 302)
++++ trunk/Marvell/Src/uClinux-dist/config.in	2006-09-20 00:43:43 UTC (rev 303)
+@@ -84,14 +84,14 @@
+ uC-libc CONFIG_DEFAULTS_LIBC_UC_LIBC \
+ uClibc CONFIG_DEFAULTS_LIBC_UCLIBC \
+ uClibc-0.9.19.patch.gz CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_19_PATCH_GZ \
++uClibc-0.9.26 CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26 \
+ uClibc-0.9.26-exec_alloc.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_EXEC_ALLOC_PATCH \
+ uClibc-0.9.26-m68k.config CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_M68K_CONFIG \
+ uClibc-0.9.26-ptrace-lvalue.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_PTRACE_LVALUE_PATCH \
+ uClibc-0.9.26-syscalls-inline.patch CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_SYSCALLS_INLINE_PATCH \
+ uClibc-0.9.26.tar.bz2 CONFIG_DEFAULTS_LIBC_UCLIBC_0_9_26_TAR_BZ2 \
+ uClibc-20030314.tar.gz CONFIG_DEFAULTS_LIBC_UCLIBC_20030314_TAR_GZ \
+-uClibc-new CONFIG_DEFAULTS_LIBC_UCLIBC_NEW \
+-&quot; uClibc-new
++&quot; uClibc-20030314.tar.gz
+ bool 'Default all settings (lose changes)'	CONFIG_DEFAULTS_OVERRIDE
+ bool 'Customize Kernel Settings'			CONFIG_DEFAULTS_KERNEL
+ bool 'Customize Vendor/User Settings'		CONFIG_DEFAULTS_VENDOR
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000088.html">[Wl530g-svncheckins] r302 - in trunk/firmware_files/rootfs: bin etc	etc/init.d sbin www
+</A></li>
+	<LI>Next message: <A HREF="000090.html">[Wl530g-svncheckins] r304 -	trunk/Marvell/Src/uClinux-dist/linux-2.4.x
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

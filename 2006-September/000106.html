@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r320 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r320%20-%20trunk&In-Reply-To=%3C200609210235.k8L2ZNg3024472%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000105.html">
+   <LINK REL="Next"  HREF="000107.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r320 - trunk</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r320%20-%20trunk&In-Reply-To=%3C200609210235.k8L2ZNg3024472%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r320 - trunk">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 21 04:35:23 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000105.html">[Wl530g-svncheckins] r319 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+        <LI>Next message: <A HREF="000107.html">[Wl530g-svncheckins] r321 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#106">[ date ]</a>
+              <a href="thread.html#106">[ thread ]</a>
+              <a href="subject.html#106">[ subject ]</a>
+              <a href="author.html#106">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-21 04:35:21 +0200 (Thu, 21 Sep 2006)
+New Revision: 320
+
+Modified:
+   trunk/changes.txt
+Log:
+09-20-06
+
+Modified: trunk/changes.txt
+===================================================================
+--- trunk/changes.txt	2006-09-21 01:56:35 UTC (rev 319)
++++ trunk/changes.txt	2006-09-21 02:35:21 UTC (rev 320)
+@@ -1,3 +1,16 @@
++09/20/06
++  * added new logread code to httpd for reading the syslogd circular buffer (a.k.a. log viewing now works in web UI).
++  * added /etc/init.d/S20syslogd to start/stop syslogd. 
++  * rc now uses /etc/init.d/S20syslogd to start syslogd.
++  * httpd now clears syslogd circular buffer through syslogd start/restart.
++  * added symlink from /www/tmp to /tmp/www for adding your own temporary web pages.
++  * added symlink from /www/jffs to /jffs/www for adding yur own persistant web pages.
++  * new syslogd variables are: syslogd_logsize_kb to set circular buffer size and syslogd_mark_min to set mark interval time (set to 0 to disable).
++  * reduced default circular buffer size to 16KB (syslogd_logsize_kb).
++  * changed default syslogd mark time to 0/disabled (syslogd_mark_min).
++  * removed 'cpu' utility from base firmware image to an installable package.
++  * fixed default incorrectly handled in /etc/init.d/S10conntrack. This would cause web UI to not show default value if max_conntrack unset.
++  * increased JFFS2 size by 128KB (it will therefore be erased during an upgrade from any previous build).
+ 
+ 09/19/06 (3)
+   * important fix: new syslogd didn't have max log size set correctly. This would cause all available RAM to eventually be eaten up by syslog.log. This fix adds proper circular buffer support. Read the log with 'logread'. Web UI needs updating as well, I'll do that shortly.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000105.html">[Wl530g-svncheckins] r319 -	trunk/Marvell/Src/uClinux-dist/user.asus/httpd
+</A></li>
+	<LI>Next message: <A HREF="000107.html">[Wl530g-svncheckins] r321 - trunk/firmware_files/rootfs/etc/init.d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#106">[ date ]</a>
+              <a href="thread.html#106">[ thread ]</a>
+              <a href="subject.html#106">[ subject ]</a>
+              <a href="author.html#106">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

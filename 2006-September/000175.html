@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r389 -	trunk/Marvell/Src/uClinux-dist/user/pptp-client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r389%20-%0A%09trunk/Marvell/Src/uClinux-dist/user/pptp-client&In-Reply-To=%3C200609270117.k8R1Hi0t015033%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000174.html">
+   <LINK REL="Next"  HREF="000176.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r389 -	trunk/Marvell/Src/uClinux-dist/user/pptp-client</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r389%20-%0A%09trunk/Marvell/Src/uClinux-dist/user/pptp-client&In-Reply-To=%3C200609270117.k8R1Hi0t015033%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r389 -	trunk/Marvell/Src/uClinux-dist/user/pptp-client">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep 27 03:17:44 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000174.html">[Wl530g-svncheckins] r388 -	trunk/Marvell/Src/uClinux-dist/user/pptp-client
+</A></li>
+        <LI>Next message: <A HREF="000176.html">[Wl530g-svncheckins] r390 - trunk/firmware_files/rootfs/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-27 03:17:42 +0200 (Wed, 27 Sep 2006)
+New Revision: 389
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user/pptp-client/Makefile
+Log:
+updates
+
+Modified: trunk/Marvell/Src/uClinux-dist/user/pptp-client/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user/pptp-client/Makefile	2006-09-27 01:11:59 UTC (rev 388)
++++ trunk/Marvell/Src/uClinux-dist/user/pptp-client/Makefile	2006-09-27 01:17:42 UTC (rev 389)
+@@ -1,3 +1,4 @@
++INSTALLDIR=../../../../../firmware_files/rootfs/
+ 
+ EXEC1 = pptp
+ OBJS1 = pptp.o pptp_gre.o ppp_fcs.o pty.o pptp_ctrl.o dirutil.o \
+@@ -14,7 +15,7 @@
+ ### pptp_callmgr.h pptp_ctrl.h dirutil.h pptp_msg.h vector.h
+  
+ 
+-CFLAGS += '-DPPPD_BINARY=&quot;/bin/pppd&quot;' '-DPPTP_LINUX_VERSION=&quot;1.0.2&quot;'
++CFLAGS += '-DPPPD_BINARY=&quot;/sbin/pppd&quot;' '-DPPTP_LINUX_VERSION=&quot;1.0.2&quot;'
+ FLTFLAGS += -s 8192
+ 
+ ifdef BUILD_NETtel
+@@ -29,10 +30,14 @@
+ $(EXEC2):	$(OBJS2)
+ 		$(CC) $(LDFLAGS) -o $@ $(OBJS2) $(LDLIBS)
+ 
+-romfs:
++romfs: install
+ 	$(ROMFSINST) -e CONFIG_USER_PPTP_CLIENT_PPTP /bin/pptp
+ 	$(ROMFSINST) -e CONFIG_USER_PPTP_CLIENT_PPTP_CALLMGR /bin/pptp_callmgr
+ 
++install:
++	cp ./pptp $(INSTALLDIR)/sbin/pptp
++	cp ./pptp_callmgr $(INSTALLDIR)/sbin/pptp_callmgr
++
+ clean:
+ 		-rm -f $(EXEC1) $(EXEC2) *.elf *.gdb *.o
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000174.html">[Wl530g-svncheckins] r388 -	trunk/Marvell/Src/uClinux-dist/user/pptp-client
+</A></li>
+	<LI>Next message: <A HREF="000176.html">[Wl530g-svncheckins] r390 - trunk/firmware_files/rootfs/sbin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

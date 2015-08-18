@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r391 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r391%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1&In-Reply-To=%3C200609300305.k8U35vhN012388%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000176.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r391 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r391%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1&In-Reply-To=%3C200609300305.k8U35vhN012388%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r391 -	trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 30 05:05:57 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000176.html">[Wl530g-svncheckins] r390 - trunk/firmware_files/rootfs/sbin
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-30 05:05:53 +0200 (Sat, 30 Sep 2006)
+New Revision: 391
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/.config
+Log:
+add xargs
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/.config
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/.config	2006-09-27 04:07:33 UTC (rev 390)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/busybox-1.2.1/.config	2006-09-30 03:05:53 UTC (rev 391)
+@@ -21,7 +21,7 @@
+ # CONFIG_LOCALE_SUPPORT is not set
+ CONFIG_GETOPT_LONG=y
+ # CONFIG_FEATURE_DEVPTS is not set
+-# CONFIG_FEATURE_CLEAN_UP is not set
++CONFIG_FEATURE_CLEAN_UP=y
+ CONFIG_FEATURE_SUID=y
+ # CONFIG_FEATURE_SUID_CONFIG is not set
+ # CONFIG_FEATURE_SUID_CONFIG_QUIET is not set
+@@ -296,10 +296,10 @@
+ CONFIG_FEATURE_GREP_EGREP_ALIAS=y
+ CONFIG_FEATURE_GREP_FGREP_ALIAS=y
+ CONFIG_FEATURE_GREP_CONTEXT=y
+-# CONFIG_XARGS is not set
+-# CONFIG_FEATURE_XARGS_SUPPORT_CONFIRMATION is not set
+-# CONFIG_FEATURE_XARGS_SUPPORT_QUOTES is not set
+-# CONFIG_FEATURE_XARGS_SUPPORT_TERMOPT is not set
++CONFIG_XARGS=y
++CONFIG_FEATURE_XARGS_SUPPORT_CONFIRMATION=y
++CONFIG_FEATURE_XARGS_SUPPORT_QUOTES=y
++CONFIG_FEATURE_XARGS_SUPPORT_TERMOPT=y
+ # CONFIG_FEATURE_XARGS_SUPPORT_ZERO_TERM is not set
+ 
+ #
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000176.html">[Wl530g-svncheckins] r390 - trunk/firmware_files/rootfs/sbin
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>

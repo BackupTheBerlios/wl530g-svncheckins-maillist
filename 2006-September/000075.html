@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Wl530g-svncheckins] r289 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/wl530g-svncheckins/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r289%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609181817.k8IIHmVm025135%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000074.html">
+   <LINK REL="Next"  HREF="000076.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Wl530g-svncheckins] r289 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc</H1>
+    <B>jcollake at mail.berlios.de</B> 
+    <A HREF="mailto:wl530g-svncheckins%40lists.berlios.de?Subject=Re%3A%20%5BWl530g-svncheckins%5D%20r289%20-%0A%09trunk/Marvell/Src/uClinux-dist/user.asus/rc&In-Reply-To=%3C200609181817.k8IIHmVm025135%40sheep.berlios.de%3E"
+       TITLE="[Wl530g-svncheckins] r289 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc">jcollake at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 20:17:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000074.html">[Wl530g-svncheckins] r288 - trunk/firmware_files/rootfs/etc
+</A></li>
+        <LI>Next message: <A HREF="000076.html">[Wl530g-svncheckins] r290 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#75">[ date ]</a>
+              <a href="thread.html#75">[ thread ]</a>
+              <a href="subject.html#75">[ subject ]</a>
+              <a href="author.html#75">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: jcollake
+Date: 2006-09-18 20:17:44 +0200 (Mon, 18 Sep 2006)
+New Revision: 289
+
+Modified:
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/ppp.c
+   trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+Log:
++ add /etc/passwd generation (was in /etc/init.d/S10login)
++ add /etc/groups generation
++ add /etc/on_ppp_up and /etc/on_ppp_down launch.
+
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile	2006-09-18 17:50:39 UTC (rev 288)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/Makefile	2006-09-18 18:17:44 UTC (rev 289)
+@@ -26,8 +26,8 @@
+ # -DSYSLOGD_TIMEZONE_SUPPORT
+ 
+ INSTALLDIR = ../../../../../firmware_files/rootfs
+-#LDFLAGS	+= -L$(TOP)/nvram -L$(INSTALLDIR)/nvram/usr/lib -lnvram -L$(TOP)/shared -L$(INSTALLDIR)/shared/usr/lib -lshared
+-LDFLAGS = -Wl,-elf2flt=&quot;-s 64000&quot; 
++#LDFLAGS	+= -L$(TOP)/nvram -L$(INSTALLDIR)/nvram/usr/lib -lnvram -L$(TOP)/shared -L$(INSTALLDIR)/shared/usr/lib -lshared 
++LDFLAGS = -lcrypt -Wl,-elf2flt=&quot;-s 64000&quot; 
+ 
+ # Add for ASUS modification
+ CFLAGS 	+= -DASUS_EXT -DASUS -DASUS_EXTENSION -DWPA2 -DWDS -DNOMPPE -DRPPPPOE -DREMOVE_USB -DREMOVE_WEBCAM
+@@ -35,7 +35,7 @@
+ 
+ ifeq ($(CONFIG_NETCONF),y)
+ OBJS += firewall.o
+-LDFLAGS += -L$(TOP)/netconf -L$(INSTALLDIR)/netconf/usr/lib -lnetconf
++LDFLAGS += -L$(TOP)/netconf -L$(INSTALLDIR)/netconf/usr/lib -lnetconf 
+ endif
+ 
+ 
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/ppp.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/ppp.c	2006-09-18 17:50:39 UTC (rev 288)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/ppp.c	2006-09-18 18:17:44 UTC (rev 289)
+@@ -90,6 +90,8 @@
+ 	logmessage(nvram_safe_get(&quot;wan_proto_t&quot;), &quot;connect to ISP&quot;);
+ 	wanmessage(&quot;&quot;);
+ 
++	eval(&quot;/etc/on_ppp_up.sh&quot;);
++
+ 	dprintf(&quot;done\n&quot;);
+ 	return 0;
+ }
+@@ -118,6 +120,8 @@
+ 	logmessage(nvram_safe_get(&quot;wan_proto_t&quot;), &quot;Disconnected&quot;);
+ 	wanmessage(pppstatus(tmp));
+ 
++	eval(&quot;/etc/on_ppp_down.sh&quot;);
++
+ 	return 0;
+ }
+ 
+
+Modified: trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c
+===================================================================
+--- trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-18 17:50:39 UTC (rev 288)
++++ trunk/Marvell/Src/uClinux-dist/user.asus/rc/rc.c	2006-09-18 18:17:44 UTC (rev 289)
+@@ -960,9 +960,62 @@
+ 	/* Set a sane date */
+ 	stime(&amp;tm);
+ 
++	/* Initialize /etc files */
++	make_etc();
++
+ 	dprintf(&quot;done\n&quot;);
+ }
++ 
++/*
++ * create /etc/passwd and /etc/group files
++ *
++ * This bit of code originally borrowed from Oleg's WL-500g sources.
++ *
++ */
++static void 
++make_etc(void)
++{
++	FILE *f;
++	char *name=&quot;root&quot;;
++	char *pass;
++	
++	/* crypt using md5, no salt */
++	/*name = nvram_get(&quot;http_username&quot;) ? : &quot;root&quot;;*/
++	pass = crypt(nvram_safe_get(&quot;http_passwd&quot;), &quot;$1$&quot;);
++	
++	if ((f = fopen(&quot;/etc/passwd&quot;, &quot;w&quot;))) {
++		fprintf(f, &quot;%s:%s:0:0:root:/usr/local/root:/bin/sh\n&quot;
++			&quot;nobody:x:99:99:nobody:/:/sbin/nologin\n&quot;, name, pass);
++		fclose(f);
++	}
++	
++	if ((f = fopen(&quot;/etc/group&quot;, &quot;w&quot;))) {
++		fprintf(f, &quot;root:x:0:%s\nnobody:x:99:\n&quot;, name);
++		fclose(f);
++	}
++		
++#ifdef UCLIBC_TZ	
++	/* uClibc TZ */
++	if ((f = fopen(&quot;/etc/TZ&quot;, &quot;w&quot;))) {
++		fprintf(f, &quot;%s\n&quot;, nvram_safe_get(&quot;time_zone&quot;));
++		fclose(f);
++	}
++#endif
++		
++#ifdef RESOLV_DYNAMIC_SYMLINK	
++	/* /etc/resolv.conf compatibility */
++	symlink(&quot;/tmp/resolv.conf&quot;, &quot;/etc/resolv.conf&quot;);
++#endif
++	
++	/* hostname */
++	if ((f = fopen(&quot;/proc/sys/kernel/hostname&quot;, &quot;w&quot;))) {
++		fputs(nvram_safe_get(&quot;lan_hostname&quot;), f);
++		fclose(f);
++	}
+ 
++}
++
++
+ /* States */
+ enum {
+ 	RESTART,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000074.html">[Wl530g-svncheckins] r288 - trunk/firmware_files/rootfs/etc
+</A></li>
+	<LI>Next message: <A HREF="000076.html">[Wl530g-svncheckins] r290 -	trunk/Marvell/Src/uClinux-dist/user.asus/rc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#75">[ date ]</a>
+              <a href="thread.html#75">[ thread ]</a>
+              <a href="subject.html#75">[ subject ]</a>
+              <a href="author.html#75">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/wl530g-svncheckins">More information about the Wl530g-svncheckins
+mailing list</a><br>
+</body></html>
